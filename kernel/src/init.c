@@ -2,10 +2,22 @@
 
 #include "console.h"
 
+menu_entry_t mainmenu[] = {
+	{ "Screen 0", MENU_SELECTED },
+	{ "Screen 1", MENU_DEFAULT },
+	{ "Screen 2", MENU_DEFAULT },
+	{ "Warn", MENU_RED },
+	{ "Warn!", MENU_RED | MENU_SELECTED },
+	{ "16:40", MENU_RIGHTALIGN },
+	{ "Right 0", MENU_RIGHTALIGN },
+	{ "Right 1", MENU_RIGHTALIGN },
+};
+
 void os_init()
 {
 	// TODO: Initialize OS…
 	console_init();
+	console_setmenu(mainmenu, 8);
 	
 	printf("Starting the OS...\n");
 	

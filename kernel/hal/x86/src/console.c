@@ -42,9 +42,9 @@ static inline uint8_t mapColor(enum vchar_color color)
 		case vcRedHighlight:
 			return 0xCF;
 		case vcRed:
-			return 0xFC;
+			return 0x0C;
 		case vcHighlight:
-			return 0x7F;
+			return 0x8F;
 		case vcDefault:
 		default:
 			return 0x0F;

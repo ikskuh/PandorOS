@@ -1,11 +1,15 @@
 #include "console.h"
 #include <stdarg.h>
+#include <stddef.h>
 #include "printf.h"
 #include "hal.h"
 
 static int width, height;
 
 int cx, cy, yoffset;
+
+static menu_entry_t const * menu;
+static int menu_size;
 
 static vchar mkvchar(char c, enum vchar_color color) {
 	return (vchar) { c, color };
@@ -17,6 +21,8 @@ void console_init()
 	hal_console_init(&width, &height);
 	height -= yoffset;
 	cx = 0; cy = 0;
+	menu_size = 0;
+	menu = NULL;
 	cls();
 }
 
@@ -27,7 +33,7 @@ void console_move(int x, int y)
 	hal_movecursor(x, y + 2);
 }
 
-void cls()
+static void render_menu()
 {
 	for(int x = 0; x < width; x++) {
 		for(int y = 0; y < (yoffset - 1); y++) {
@@ -45,11 +51,69 @@ void cls()
 			c = 0xD9;
 		hal_setchar(x, yoffset - 1, mkvchar(c, vcDefault));
 	}
+	if(menu_size > 0)
+	{
+		int leftpad = 1;
+		int rightpad = width - 2;
+		
+		// MENU_DEFAULT, MENU_SELECTED ,MENU_RED, MENU_RIGHTALIGN
+		for(int i = 0; i < menu_size; i++)
+		{
+			enum vchar_color color = vcDefault;
+			if(menu[i].flags & MENU_SELECTED)
+				color = vcHighlight;
+			if(menu[i].flags & MENU_RED) {
+				if(menu[i].flags & MENU_SELECTED)
+					color = vcRedHighlight;
+				else
+					color = vcRed;
+			}
+			
+			
+			if(menu[i].flags & MENU_RIGHTALIGN)
+			{
+				char const *str = menu[i].label;
+				int len = 0;
+				while(*str++) len++;
+				str = menu[i].label;
+				for(int i = len - 1; i >= 0; i--) {
+					hal_setchar(rightpad--, 0, mkvchar(str[i], color));
+					len--;
+				}
+				hal_setchar(rightpad, 1, mkvchar(0xC1, vcDefault));
+				hal_setchar(rightpad--, 0, mkvchar(0xB3, vcDefault));
+			}
+			else
+			{
+				char const *str = menu[i].label;
+				while(*str) {
+					hal_setchar(leftpad++, 0, mkvchar(*str++, color));
+				}
+				hal_setchar(leftpad, 1, mkvchar(0xC1, vcDefault));
+				hal_setchar(leftpad++, 0, mkvchar(0xB3, vcDefault));
+			}
+		}
+	}
+}
+
+void cls()
+{
 	for(int y = 0; y < height; y++) {
 		for(int x = 0; x < width; x++) {
 			hal_setchar(x, y + yoffset, mkvchar(' ', vcDefault));
 		}
 	}
+	render_menu();
+}
+
+void console_setmenu(menu_entry_t const * entries, int count)
+{
+	menu = entries;
+	if(menu != NULL)
+		menu_size = count;
+	else
+		menu_size = 0;
+	render_menu();
 }
 
 void puts(char const *string)
@@ -83,7 +147,6 @@ static void newline()
 
 void putc(char c)
 {
-	// TODO: Call HAL function
 	switch(c)
 	{
 		case '\r': break;
