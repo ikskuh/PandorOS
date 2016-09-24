@@ -1,6 +1,7 @@
 #include <stdbool.h>
 
 #include "console.h"
+#include "input.h"
 
 menu_entry_t mainmenu[] = {
 	{ "Screen 0", MENU_SELECTED },
@@ -12,6 +13,8 @@ menu_entry_t mainmenu[] = {
 	{ "Right 0", MENU_RIGHTALIGN },
 	{ "Right 1", MENU_RIGHTALIGN },
 };
+
+void shell_start();
 
 void os_init()
 {
@@ -51,7 +54,64 @@ void os_init()
 		printf("\n");
 	}
 	
-	printf("a\nb\nc\nd\n");
+	putchar('H');
+	putchar('a');
+	putchar('l');
+	putchar('l');
+	putchar('o');
+	putchar('W');
+	putchar('\b');
+	putchar(' ');
+	putchar('W');
+	putchar('e');
+	putchar('l');
+	putchar('t');
+	putchar('!');
+	putchar('\n');
+	
+	shell_start();
 	
 	while(true);
+}
+
+int readline(char *buffer)
+{
+	int cursor = 0;
+	int length = 0;
+	while(true)
+	{
+		int c = getchar();
+		if(c < 0)
+			continue;
+		if(c == '\n')
+			break;
+		switch(c)
+		{
+			case '\b':
+				buffer[cursor--] = 0;
+				putc('\b');
+				break;
+			default:
+				buffer[cursor++] = c;
+				putc(c);
+				break;
+		}
+		if(cursor > length) {
+			length = cursor;
+		}
+	}
+	putc('\n');
+	buffer[length] = 0;
+	return length;
+}
+
+void shell_start()
+{
+	while(true)
+	{
+		static char line[256];
+		int len = readline(line);
+		printf("You entered %d chars:\n\"%s\"\n", len, line);
+	
+	}
 }

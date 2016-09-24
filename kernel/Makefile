@@ -8,7 +8,7 @@ endif
 all: kernel rmbuild
 
 kernel: makefile 
-	$(MAKE) -C build -B
+	$(MAKE) -B -C build
 	mv build/kernel kernel
 
 makefile:
