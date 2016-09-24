@@ -15,6 +15,21 @@ static vchar mkvchar(char c, enum vchar_color color) {
 	return (vchar) { c, color };
 }
 
+static enum vchar_color getMenuColor(menu_entry_t const * menu)
+{
+	if(menu->flags & MENU_RED) {
+		if(menu->flags & MENU_SELECTED)
+			return vcRedHighlight;
+		else
+			return vcRed;
+	} else {
+		if(menu->flags & MENU_SELECTED)
+			return vcHighlight;
+		else
+			return vcDefault;
+	}
+}
+
 void console_init()
 {
 	yoffset = 2;
@@ -54,44 +69,39 @@ static void render_menu()
 	if(menu_size > 0)
 	{
 		int leftpad = 1;
-		int rightpad = width - 2;
-		
+
 		// MENU_DEFAULT, MENU_SELECTED ,MENU_RED, MENU_RIGHTALIGN
 		for(int i = 0; i < menu_size; i++)
 		{
-			enum vchar_color color = vcDefault;
-			if(menu[i].flags & MENU_SELECTED)
-				color = vcHighlight;
-			if(menu[i].flags & MENU_RED) {
-				if(menu[i].flags & MENU_SELECTED)
-					color = vcRedHighlight;
-				else
-					color = vcRed;
-			}
+			if((menu[i].flags & MENU_RIGHTALIGN) != 0) continue;
 			
+			enum vchar_color color = getMenuColor(&menu[i]);
 			
-			if(menu[i].flags & MENU_RIGHTALIGN)
-			{
-				char const *str = menu[i].label;
-				int len = 0;
-				while(*str++) len++;
-				str = menu[i].label;
-				for(int i = len - 1; i >= 0; i--) {
-					hal_setchar(rightpad--, 0, mkvchar(str[i], color));
-					len--;
-				}
-				hal_setchar(rightpad, 1, mkvchar(0xC1, vcDefault));
-				hal_setchar(rightpad--, 0, mkvchar(0xB3, vcDefault));
+			char const *str = menu[i].label;
+			while(*str) {
+				hal_setchar(leftpad++, 0, mkvchar(*str++, color));
 			}
-			else
-			{
-				char const *str = menu[i].label;
-				while(*str) {
-					hal_setchar(leftpad++, 0, mkvchar(*str++, color));
-				}
-				hal_setchar(leftpad, 1, mkvchar(0xC1, vcDefault));
-				hal_setchar(leftpad++, 0, mkvchar(0xB3, vcDefault));
+			hal_setchar(leftpad, 1, mkvchar(0xC1, vcDefault));
+			hal_setchar(leftpad++, 0, mkvchar(0xB3, vcDefault));
+		}
+		
+		int rightpad = width - 2;
+		// MENU_DEFAULT, MENU_SELECTED ,MENU_RED, MENU_RIGHTALIGN
+		for(int i = (menu_size - 1); i >= 0; i--)
+		{
+			if((menu[i].flags & MENU_RIGHTALIGN) == 0) continue;
+			enum vchar_color color = getMenuColor(&menu[i]);
+
+			char const *str = menu[i].label;
+			int len = 0;
+			while(*str++) len++;
+			str = menu[i].label;
+			for(int i = len - 1; i >= 0; i--) {
+				hal_setchar(rightpad--, 0, mkvchar(str[i], color));
+				len--;
 			}
+			hal_setchar(rightpad, 1, mkvchar(0xC1, vcDefault));
+			hal_setchar(rightpad--, 0, mkvchar(0xB3, vcDefault));
 		}
 	}
 }
@@ -103,6 +113,12 @@ void cls()
 			hal_setchar(x, y + yoffset, mkvchar(' ', vcDefault));
 		}
 	}
+	render_menu();
+}
+
+
+void console_refresh()
+{
 	render_menu();
 }
 

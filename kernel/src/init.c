@@ -4,15 +4,14 @@
 #include "input.h"
 
 menu_entry_t mainmenu[] = {
-	{ "Screen 0", MENU_SELECTED },
+	{ "Screen 0", MENU_DEFAULT },
 	{ "Screen 1", MENU_DEFAULT },
 	{ "Screen 2", MENU_DEFAULT },
-	{ "Warn", MENU_RED },
-	{ "Warn!", MENU_RED | MENU_SELECTED },
-	{ "16:40", MENU_RIGHTALIGN },
-	{ "Right 0", MENU_RIGHTALIGN },
-	{ "Right 1", MENU_RIGHTALIGN },
+	{ "Catalog", MENU_RIGHTALIGN },
+	{ "System", MENU_RIGHTALIGN },
 };
+
+#define MENU_SIZE (sizeof(mainmenu) / sizeof(mainmenu[0]))
 
 void shell_start();
 
@@ -20,7 +19,7 @@ void os_init()
 {
 	// TODO: Initialize OS…
 	console_init();
-	console_setmenu(mainmenu, 8);
+	console_setmenu(mainmenu, MENU_SIZE);
 	
 	printf("Starting the OS...\n");
 	
@@ -65,6 +64,13 @@ void os_init()
 	putchar('W');
 	putchar('e');
 	putchar('l');
+	
+	putchar(VK_TAB);
+	putchar(VK_RIGHT);
+	putchar(VK_RIGHT);
+	putchar(VK_RIGHT);
+	putchar(VK_ENTER);
+	
 	putchar('t');
 	putchar('!');
 	putchar('\n');
@@ -74,7 +80,47 @@ void os_init()
 	while(true);
 }
 
-int readline(char *buffer)
+void select_in_menu(int item)
+{
+	for(int i = 0; i < MENU_SIZE; i++)
+	{
+		if(item == i)
+			mainmenu[i].flags |= MENU_SELECTED;
+		else
+			mainmenu[i].flags &= ~MENU_SELECTED;
+	}
+	console_refresh();
+}
+
+/**
+ * Opens the system menu and returns the menu result.
+ */
+int menu()
+{
+	int selection = 0;
+	while(true)
+	{
+		select_in_menu(selection);
+		int input = getchar();
+		switch(input)
+		{
+			case VK_LEFT:
+				if(selection > 0) selection -= 1;
+				break;
+			case VK_RIGHT:
+				if(selection < (MENU_SIZE - 1)) selection += 1;
+				break;
+			case VK_ESCAPE:
+				select_in_menu(-1);
+				return -1;
+			case VK_ENTER:
+				select_in_menu(-1);
+				return -1;
+		}
+	}
+}
+
+int readline(char *buffer, bool allowMenus)
 {
 	int cursor = 0;
 	int length = 0;
@@ -83,8 +129,16 @@ int readline(char *buffer)
 		int c = getchar();
 		if(c < 0)
 			continue;
-		if(c == '\n')
+		if(c == VK_ENTER)
 			break;
+		if(c == VK_TAB)
+		{
+			if(allowMenus)
+			{
+				int option = menu();
+			}
+			continue;
+		}
 		switch(c)
 		{
 			case '\b':
@@ -110,7 +164,7 @@ void shell_start()
 	while(true)
 	{
 		static char line[256];
-		int len = readline(line);
+		int len = readline(line, true);
 		printf("You entered %d chars:\n\"%s\"\n", len, line);
 	
 	}

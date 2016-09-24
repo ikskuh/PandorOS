@@ -17,6 +17,11 @@ typedef struct menu_entry
 void console_init();
 
 /**
+ * Refreshes the console and rerenders the menu.
+ */ 
+void console_refresh();
+
+/**
  * Moves the cursor if possible.
  */
 void console_move(int x, int y);
