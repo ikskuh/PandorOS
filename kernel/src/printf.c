@@ -14,6 +14,13 @@ int gprintf(void (*_putc)(char c), char const *fmt, va_list list)
 			c = *fmt++;
 			switch(c)
 			{
+				case 'c':
+				{
+					char c = va_arg(list, int);
+					_putc(c);
+					chars++;
+					break;
+				}
 				case 'd':
 				{
 					int val = va_arg(list, int);

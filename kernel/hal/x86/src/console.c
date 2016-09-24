@@ -5,17 +5,13 @@
 #define WIDTH 80
 #define HEIGHT 25
 
-struct vchar
+struct _vchar
 {
 	char c;
 	uint8_t color;
 };
 
-static uint8_t COLOR = 0x0F;
-
-static struct vchar * const VIDEO = (struct vchar *)0xB8000;
-
-static int cx, cy;
+static struct _vchar * const VIDEO = (struct _vchar *)0xB8000;
 
 static void displaycursor(uint8_t col, uint8_t row)
 {
@@ -28,69 +24,54 @@ static void displaycursor(uint8_t col, uint8_t row)
 }
  
 
-void hal_console_init()
+void hal_console_init(int *w, int *h)
 {
-	cx = 0;
-	cy = 0;
+	if(w) *w = WIDTH;
+	if(h) *h = HEIGHT;
 }
 
 void hal_movecursor(int x, int y)
 {
-	if(x >= 0 && x < WIDTH)
-		cx = x;
-	if(y >= 0 && y < HEIGHT)
-		cy = y;
-	displaycursor(cx, cy);
+	displaycursor(x, y);
 }
 
-void hal_cls()
+static inline uint8_t mapColor(enum vchar_color color)
 {
-	for(int y = 0; y < HEIGHT; y++)
+	switch(color)
 	{
-		for(int x = 0; x < WIDTH; x++)
-		{
-			VIDEO[WIDTH * y + x] = (struct vchar){ ' ', COLOR };
-		}
-	}
-	cx = 0;
-	cy = 0;
-}
-
-static void newline()
-{
-	cx = 0;
-	cy += 1;
-	
-	// Scoll here
-	if(cy >= HEIGHT)
-	{
-		for(int y = 1; y < HEIGHT; y++)
-		{
-			for(int x = 0; x < WIDTH; x++)
-			{
-				VIDEO[WIDTH * (y - 1) + x] = VIDEO[WIDTH * y + x];
-			}
-		}
-		cy -= 1;
-	}
-}
-
-void hal_putc(char c)
-{
-	switch(c)
-	{
-		case '\r':
-			break;
-		case '\n':
-			newline();
-			break;
+		case vcRedHighlight:
+			return 0xCF;
+		case vcRed:
+			return 0xFC;
+		case vcHighlight:
+			return 0x7F;
+		case vcDefault:
 		default:
-			VIDEO[WIDTH * cy + cx] = (struct vchar){ c, COLOR };
-			cx++;
-			if(cx >= WIDTH) {
-				newline();
-			}
-			break;
+			return 0x0F;
 	}
-	displaycursor(cx, cy);
+}
+
+static inline enum vchar_color backmapColor(uint8_t color)
+{
+	switch(color)
+	{
+		case 0xCF: return vcRedHighlight;
+		case 0xFC: return vcRed;
+		case 0x7F: return vcHighlight;
+		default:   return vcDefault;
+	}
+}
+
+void hal_setchar(int x, int y, vchar c)
+{
+	VIDEO[y * WIDTH + x] = (struct _vchar) {
+		c.c,
+		mapColor(c.color),
+	};
+}
+
+vchar hal_getchar(int x, int y)
+{
+	struct _vchar pt = VIDEO[y * WIDTH + x];
+	return (vchar) { pt.c, backmapColor(pt.color) };
 }
