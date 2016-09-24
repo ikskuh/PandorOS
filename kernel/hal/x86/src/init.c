@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include "io.h"
 #include "console.h"
 
 struct idt
@@ -79,11 +80,41 @@ static struct idt idt_entry(void *ep)
 	result.flags    = 0x8E;
 	return result;
 }
+uint8_t masterPIC = 0x20;
+uint8_t slavePIC = 0xA0;
 
 static void loop()
 {
 	printf("Hello Interrupt!\n");
 	while(1);
+}
+
+static void timer_tick()
+{
+	printf("[tick]");
+	outb(masterPIC, 0x20); // End of interrupt
+	asm volatile(
+		"add $8, %esp" "\n" 
+		"iret");
+}
+
+static void init_pic()
+{
+	// Setup master
+	outb(masterPIC + 0x00, 0x11);
+	outb(masterPIC + 0x01, 0x20);
+	outb(masterPIC + 0x01, 0x04);
+	outb(masterPIC + 0x01, 0x01);
+	
+	// Setup slave
+	outb(slavePIC + 0x00, 0x11);
+	outb(slavePIC + 0x01, 0x28);
+	outb(slavePIC + 0x01, 0x02);
+	outb(slavePIC + 0x01, 0x01);
+	
+	// Unmask all
+	outb(masterPIC + 0x01, 0x00);
+	outb(slavePIC + 0x01, 0x00);
 }
 
 static void init_idt()
@@ -92,6 +123,11 @@ static void init_idt()
 	{
 		idt[i] = idt_entry(&loop);
 	}
+	idt[0x20] = idt_entry(&timer_tick);
+	
 	lidt(idt, sizeof(idt));
+	
+	init_pic();
+	
 	asm volatile ("sti");
 }
