@@ -2,8 +2,6 @@
 #include "input.h"
 #include "io.h"
 
-#include "console.h"
-
 #include <stddef.h>
 
 #define DEFKEY(name, vkey, lower, upper, variant) { VK_##vkey, lower, upper, variant }
@@ -110,7 +108,7 @@ struct cpu *keyboard_isr(struct cpu *cpu)
 			
 			kbd_enqueue_event(event);
 		} else {
-			printf("[KBD: %d/%d]", scancode.code, scancode.set);
+			// printf("[KBD: %d/%d]", scancode.code, scancode.set);
 		}
 	}
 	

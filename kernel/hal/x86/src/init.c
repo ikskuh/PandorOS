@@ -193,7 +193,7 @@ struct cpu * interrupt_dispatch(struct cpu * cpu)
 	if(interrupts[cpu->interrupt] != NULL) {
 		cpu = interrupts[cpu->interrupt](cpu);
 	} else {
-		printf("\n[Unhandled interrupt: %d]\n", cpu->interrupt);
+		// printf("\n[Unhandled interrupt: %d]\n", cpu->interrupt);
 	}
 	
 	// ACK PICs if necessery

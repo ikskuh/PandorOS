@@ -1,5 +1,6 @@
 #include "hal.h"
 #include "io.h"
+#include "console.h"
 #include <stdint.h>
 
 #define WIDTH 80
@@ -30,48 +31,21 @@ void hal_console_init(int *w, int *h)
 	if(h) *h = HEIGHT;
 }
 
-void hal_movecursor(int x, int y)
+void hal_set_cursor(int x, int y)
 {
-	displaycursor(x, y);
+	displaycursor(x, y + 2);
 }
 
-static inline uint8_t mapColor(enum vchar_color color)
+void hal_render_console(console_t const * con, int sx, int sy, int w, int h)
 {
-	switch(color)
-	{
-		case vcRedHighlight:
-			return 0xCF;
-		case vcRed:
-			return 0x0C;
-		case vcHighlight:
-			return 0x8F;
-		case vcDefault:
-		default:
-			return 0x0F;
+	w += sx;
+	h += sy;
+	for(int y = sy; y < h; y++) {
+		for(int x = sx; x < w; x++) {
+			VIDEO[(y+2) * WIDTH + x] = (struct _vchar) {
+				con->data[con->width * y + x].c,
+				0x0F,
+			};
+		}
 	}
-}
-
-static inline enum vchar_color backmapColor(uint8_t color)
-{
-	switch(color)
-	{
-		case 0xCF: return vcRedHighlight;
-		case 0xFC: return vcRed;
-		case 0x7F: return vcHighlight;
-		default:   return vcDefault;
-	}
-}
-
-void hal_setchar(int x, int y, vchar c)
-{
-	VIDEO[y * WIDTH + x] = (struct _vchar) {
-		c.c,
-		mapColor(c.color),
-	};
-}
-
-vchar hal_getchar(int x, int y)
-{
-	struct _vchar pt = VIDEO[y * WIDTH + x];
-	return (vchar) { pt.c, backmapColor(pt.color) };
 }

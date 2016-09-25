@@ -1,54 +1,53 @@
 #pragma once
 
-#define MENU_DEFAULT  0
-#define MENU_SELECTED (1<<0)
-#define MENU_RED (1<<1)
-#define MENU_RIGHTALIGN (1<<2)
+#include <stdint.h>
 
-typedef struct menu_entry
-{
-	char label[64];
-	int flags;
-} menu_entry_t;
+#define CHAR_DEFAULT 0
 
 /**
- * Initializes the text console.
+ * An attributes character.
  */
+typedef struct 
+{
+	char c;
+	uint8_t attribs;
+} attrchar_t;
+
+typedef struct console
+{
+	const int width;
+	const int height;
+	struct { int x, y; } cursor;
+	attrchar_t * const data;
+} console_t;
+
+extern console_t *stdcon;
+
 void console_init();
 
-/**
- * Refreshes the console and rerenders the menu.
- */ 
-void console_refresh();
+void console_set(console_t *con);
 
 /**
- * Moves the cursor if possible.
+ * Creates a new console.
  */
-void console_move(int x, int y);
+console_t *console_new();
 
 /**
- * Sets the menu that is currently displayed.
- * @param entries A persistent array of menu entries. Is referenced, not copied!
- * @param count   The number of elements.
+ * Destroys a console.
  */
-void console_setmenu(menu_entry_t const * entries, int count);
+void console_delete(console_t *con);
 
-/**
- * Clears the screen.
- */
+void console_clear(console_t *con);
+
+void console_scroll(console_t *con, int lines);
+
+void console_setc(console_t *con, int x, int y, char c);
+void console_putc(console_t *con, char c);
+void console_puts(console_t *con, char const * str);
+void console_printf(console_t *con, char const * fmt, ...);
+
 void cls();
-
-/**
- * Puts a string to the console.
- */
-void puts(char const *string);
-
-/**
- * Puts a character on the screen.
- */
 void putc(char c);
-
-/**
- * Classic printf function for debugging.
- */ 
-int printf(char const *fmt, ...);
+void puts(char const * str);
+void setc(int x, int y, char c);
+void printf(char const * fmt, ...);
