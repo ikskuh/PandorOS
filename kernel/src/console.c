@@ -186,6 +186,24 @@ void printf(char const * fmt, ...)
 	va_end(list);
 }
 
+static int menucolor(menuitem_t * const item)
+{
+	if(item->flags & MENU_RED)
+	{
+		if(item->flags & MENU_SELECTED)
+			return CHA_RED | CHA_HIGHLIGHT;
+		else
+			return CHA_RED;
+	}
+	else
+	{
+		if(item->flags & MENU_SELECTED)
+			return CHA_HIGHLIGHT;
+		else
+			return CHA_DEFAULT;
+	}
+}
+
 void console_menu(menu_t const * menu)
 {
 	for(int x = 0; x < screenwidth; x++) {
@@ -194,14 +212,14 @@ void console_menu(menu_t const * menu)
 			c = 0xB3;
 		if(x == (screenwidth - 1))
 			c = 0xB3;
-		hal_render_raw(x, 0, c);
+		hal_render_raw(x, 0, c, CHA_DEFAULT);
 		
 		c = 0xC4;
 		if(x == 0)
 			c = 0xC0;
 		if(x == (screenwidth - 1))
 			c = 0xD9;
-		hal_render_raw(x, 1, c);
+		hal_render_raw(x, 1, c, CHA_DEFAULT);
 	}
 	if(menu == NULL || menu->length <= 0)
 		return;
@@ -214,12 +232,13 @@ void console_menu(menu_t const * menu)
 		menuitem_t *item = &menu->items[i];
 		if((item->flags & MENU_RIGHTALIGN) != 0) continue;
 		
+		int col = menucolor(item);
 		char const *str = item->label;
 		while(*str) {
-			hal_render_raw(leftpad++, 0, *str++);
+			hal_render_raw(leftpad++, 0, *str++, col);
 		}
-		hal_render_raw(leftpad, 1, 0xC1);
-		hal_render_raw(leftpad++, 0, 0xB3);
+		hal_render_raw(leftpad, 1, 0xC1, CHA_DEFAULT);
+		hal_render_raw(leftpad++, 0, 0xB3, CHA_DEFAULT);
 	}
 	
 	int rightpad = screenwidth - 2;
@@ -229,15 +248,16 @@ void console_menu(menu_t const * menu)
 		menuitem_t *item = &menu->items[i];
 		if((item->flags & MENU_RIGHTALIGN) == 0) continue;
 
+		int col = menucolor(item);
 		char const *str = item->label;
 		int len = 0;
 		while(*str++) len++;
 		str = item->label;
 		for(int i = len - 1; i >= 0; i--) {
-			hal_render_raw(rightpad--, 0, str[i]);
+			hal_render_raw(rightpad--, 0, str[i], col);
 			len--;
 		}
-		hal_render_raw(rightpad, 1, 0xC1);
-		hal_render_raw(rightpad--, 0, 0xB3);
+		hal_render_raw(rightpad, 1, 0xC1, CHA_DEFAULT);
+		hal_render_raw(rightpad--, 0, 0xB3, CHA_DEFAULT);
 	}
 }

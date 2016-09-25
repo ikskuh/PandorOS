@@ -36,11 +36,29 @@ void hal_set_cursor(int x, int y)
 	displaycursor(x, y + 2);
 }
 
-void hal_render_raw(int x, int y, char c)
+static uint8_t getcolor(int attribs)
+{
+	if(attribs & CHA_RED)
+	{
+		if(attribs & CHA_HIGHLIGHT)
+			return 0x8C;
+		else
+			return 0x04;
+	}
+	else
+	{
+		if(attribs & CHA_HIGHLIGHT)
+			return 0x8F;
+		else
+			return 0x0F;
+	}
+}
+
+void hal_render_raw(int x, int y, char c, int attribs)
 {
 	VIDEO[y * WIDTH + x] = (struct _vchar) {
 		c,
-		0x0F,
+		getcolor(attribs),
 	};
 }
 
@@ -52,7 +70,7 @@ void hal_render_console(console_t const * con, int sx, int sy, int w, int h)
 		for(int x = sx; x < w; x++) {
 			VIDEO[(y+2) * WIDTH + x] = (struct _vchar) {
 				con->data[con->width * y + x].c,
-				0x0F,
+				getcolor(con->data[con->width * y + x].attribs),
 			};
 		}
 	}

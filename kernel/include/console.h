@@ -2,10 +2,14 @@
 
 #include <stdint.h>
 
-#define CHAR_DEFAULT 0x00
+#define CHA_DEFAULT   0
+#define CHA_HIGHLIGHT (1<<0)
+#define CHA_RED       (1<<1)
 
 #define MENU_DEFAULT    0
-#define MENU_RIGHTALIGN 1
+#define MENU_SELECTED   CHA_HIGHLIGHT
+#define MENU_RED        CHA_RED
+#define MENU_RIGHTALIGN (1<<2)
 
 /**
  * An attributes character.

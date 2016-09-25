@@ -15,11 +15,12 @@ void os_tick()
 }
 
 menuitem_t mainmenu_contents[] = {
-	{ "Screen 0", 0x00 },
-	{ "Screen 1", 0x00 },
-	{ "Screen 2", 0x00 },
-	{ "System", MENU_RIGHTALIGN },
-	{ "Catalog", MENU_RIGHTALIGN },
+	{ "Screen 0", MENU_DEFAULT },
+	{ "Screen 1", MENU_SELECTED },
+	{ "Screen 2", MENU_RED },
+	{ "Screen 3", MENU_RED | MENU_SELECTED },
+	{ "System",   MENU_RIGHTALIGN },
+	{ "Catalog",  MENU_RIGHTALIGN },
 };
 menu_t mainmenu = {
 	sizeof(mainmenu_contents) / sizeof(mainmenu_contents[0]),
