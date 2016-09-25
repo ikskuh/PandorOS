@@ -114,6 +114,12 @@ void console_putc(console_t *con, char c)
 		case '\n':
 			console_newline(con);
 			break;
+		case '\b':
+			if(con->cursor.x > 0) {
+				con->cursor.x -= 1;
+				console_setc(con, con->cursor.x, con->cursor.y, ' ');
+			}
+			break;
 		default:
 			console_setc(con, con->cursor.x, con->cursor.y, c);
 			con->cursor.x += 1;

@@ -16,9 +16,8 @@ void os_tick()
 
 menuitem_t mainmenu_contents[] = {
 	{ "Screen 0", MENU_DEFAULT },
-	{ "Screen 1", MENU_SELECTED },
-	{ "Screen 2", MENU_RED },
-	{ "Screen 3", MENU_RED | MENU_SELECTED },
+	{ "Screen 1", MENU_DEFAULT },
+	{ "Screen 2", MENU_DEFAULT },
 	{ "System",   MENU_RIGHTALIGN },
 	{ "Catalog",  MENU_RIGHTALIGN },
 };
@@ -26,6 +25,39 @@ menu_t mainmenu = {
 	sizeof(mainmenu_contents) / sizeof(mainmenu_contents[0]),
 	mainmenu_contents,
 };
+
+static void input_demo()
+{
+	int cursor = 0;
+	char buffer[128];
+	while(true)
+	{
+		int c = getchar();
+		
+		switch(c)
+		{
+			case '\b':
+				if(cursor > 0) {
+					buffer[--cursor] = 0;
+					putc('\b');
+				}
+				break;
+			case '\n':
+				buffer[cursor] = 0;
+				cursor = 0;
+				int len = 0;
+				char *str = buffer;
+				while(*str++) len++;
+				printf("\nYou entered: \"%s\" (Length=%d)\n#> ", buffer, len);
+				break;
+			default:
+				buffer[cursor++] = c;
+				putc(c);
+				break;
+		}
+	
+	}
+}
 
 void os_init()
 {
@@ -77,6 +109,8 @@ void os_init()
 		pmm_free(p0);
 		printf("pmm_alloc[4] = %d\n", pmm_alloc());
 	}
+	
+	input_demo();
 	
 	// shell_start();
 	
