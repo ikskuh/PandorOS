@@ -167,7 +167,7 @@ void putc(char c)
 	{
 		case '\b':
 			if(cx > 0)
-				hal_setchar(cx--, cy + yoffset, mkvchar(' ', vcDefault));
+				hal_setchar(--cx, cy + yoffset, mkvchar(' ', vcDefault));
 			break;
 		case '\r': break;
 		case '\n':

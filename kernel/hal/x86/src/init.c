@@ -1,39 +1,47 @@
-#include <stdint.h>
 #include "io.h"
+#include "interrupts.h"
+#include "keyboard-drv.h"
 #include "console.h"
+#include <stdint.h>
+#include <stddef.h>
+#include "timer.h"
 
 struct idt
 {
-	uint16_t offset0; // 0-15	Offset 0-15	Gibt das Offset des ISR innerhalb des Segments an. Wenn der entsprechende Interrupt auftritt, wird eip auf diesen Wert gesetzt.
-	uint16_t selector; // 16-31	Selector	Gibt den Selector des Codesegments an, in das beim Auftreten des Interrupts gewechselt werden soll. Im Allgemeinen ist dies das Kernel-Codesegment (Ring 0).
+	uint16_t offset0;
+	uint16_t selector; 
 	uint8_t zero;
-	uint8_t flags; // 32-34	000 / IST	Gibt im LM den Index in die IST an, ansonsten 0!
-									// 35-39	Reserviert	Wird ignoriert
-									// 40-42	Typ	Gibt die Art des Interrupts an
-									// 43	D	Gibt an, ob es sich um ein 32bit- (1) oder um ein 16bit-Segment (0) handelt.
-									// Im LM: Für 64-Bit LDT 0, ansonsten 1
-									// 44	0	
-									// 45-46	DPL	Gibt das Descriptor Privilege Level an, das man braucht um diesen Interrupt aufrufen zu dürfen.
-									// 47	P	Gibt an, ob dieser Eintrag benutzt wird.
-	uint16_t offset1; // 48-63	Offset 16-31	
+	uint8_t flags;
+	uint16_t offset1;
 };
 
 static uint64_t gdt[] = {
-	0x00, // NULL descriptor
-	0x00CF9A000000FFFFULL,
-	0x00CF92000000FFFFULL,
+	0x00,                  // NULL Segment
+	0x00CF9A000000FFFFULL, // Code Segment
+	0x00CF92000000FFFFULL, // Data Segment
 };
+
+interrupt_f interrupts[256];
 
 static struct idt idt[256];
 
 static void init_gdt();
 static void init_idt();
 
+static struct cpu *timer_tick(struct cpu *cpu)
+{
+	os_tick();
+	return cpu;
+}
+
 void x86_init()
 {
 	init_gdt();
 	
 	init_idt();
+	
+	interrupts[0x20] = &timer_tick;
+	interrupts[0x21] = &keyboard_isr;
 }
 
 static void init_gdt()
@@ -83,21 +91,6 @@ static struct idt idt_entry(void *ep)
 uint8_t masterPIC = 0x20;
 uint8_t slavePIC = 0xA0;
 
-static void loop()
-{
-	printf("Hello Interrupt!\n");
-	while(1);
-}
-
-static void timer_tick()
-{
-	printf("[tick]");
-	outb(masterPIC, 0x20); // End of interrupt
-	asm volatile(
-		"add $8, %esp" "\n" 
-		"iret");
-}
-
 static void init_pic()
 {
 	// Setup master
@@ -117,13 +110,19 @@ static void init_pic()
 	outb(slavePIC + 0x01, 0x00);
 }
 
+#define ISR(n) void isr_##n();
+#define ISR_ERR(n) ISR(n)
+#include "../lists/interrupts"
+#undef ISR_ERR
+#undef ISR
+
 static void init_idt()
 {
-	for(int i = 0; i < 256; i++)
-	{
-		idt[i] = idt_entry(&loop);
-	}
-	idt[0x20] = idt_entry(&timer_tick);
+#define ISR(n) idt[n] = idt_entry(isr_##n);
+#define ISR_ERR(n) ISR(n)
+#include "../lists/interrupts"
+#undef ISR_ERR
+#undef ISR
 	
 	lidt(idt, sizeof(idt));
 	
@@ -131,3 +130,25 @@ static void init_idt()
 	
 	asm volatile ("sti");
 }
+
+struct cpu * interrupt_dispatch(struct cpu * cpu)
+{
+	// Call interrupt handler
+	if(interrupts[cpu->interrupt] != NULL) {
+		cpu = interrupts[cpu->interrupt](cpu);
+	} else {
+		printf("\n[Unhandled interrupt: %d]\n", cpu->interrupt);
+	}
+	
+	// ACK PICs if necessery
+	if(cpu->interrupt >= 0x20 && cpu->interrupt <= 0x2F) {
+		if(cpu->interrupt >= 0x28) {
+			outb(slavePIC, 0x20); // ACK Slave PIC
+		}
+		outb(masterPIC, 0x20); // ACK Master PIC
+	}
+	
+	return cpu;
+}
+
+

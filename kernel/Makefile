@@ -7,7 +7,7 @@ endif
 
 all: kernel rmbuild
 
-kernel: makefile 
+kernel: initfiles makefile 
 	$(MAKE) -B -C build
 	mv build/kernel kernel
 
@@ -15,6 +15,9 @@ makefile:
 	mkdir -p build
 	mcs build.cs
 	mono build.exe $(PLATFORM)
+
+initfiles: init.lua
+	lua init.lua
 
 clean: rmbuild
 	$(MAKE) -C build -B clean
