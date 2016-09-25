@@ -14,6 +14,17 @@ void os_tick()
 	// console_refresh();
 }
 
+menuitem_t mainmenu_contents[] = {
+	{ "Screen 0", 0x00 },
+	{ "Screen 1", 0x00 },
+	{ "Screen 2", 0x00 },
+	{ "System", MENU_RIGHTALIGN },
+	{ "Catalog", MENU_RIGHTALIGN },
+};
+menu_t mainmenu = {
+	sizeof(mainmenu_contents) / sizeof(mainmenu_contents[0]),
+	mainmenu_contents,
+};
 
 void os_init()
 {
@@ -21,6 +32,7 @@ void os_init()
 	console_init();
 	
 	console_set(console_new());
+	console_menu(&mainmenu);
 	
 	printf("Starting the OS...\n");
 	

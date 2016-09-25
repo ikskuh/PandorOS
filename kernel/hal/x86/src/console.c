@@ -36,6 +36,14 @@ void hal_set_cursor(int x, int y)
 	displaycursor(x, y + 2);
 }
 
+void hal_render_raw(int x, int y, char c)
+{
+	VIDEO[y * WIDTH + x] = (struct _vchar) {
+		c,
+		0x0F,
+	};
+}
+
 void hal_render_console(console_t const * con, int sx, int sy, int w, int h)
 {
 	w += sx;

@@ -12,6 +12,9 @@ console_t *stdcon = NULL;
 void console_init()
 {
 	hal_console_init(&screenwidth, &screenheight);
+	
+	// Render empty menu.
+	console_menu(NULL);
 }
 
 void console_set(console_t *con)
@@ -19,8 +22,8 @@ void console_set(console_t *con)
 	if(con != NULL)
 		stdcon = con;
 	hal_render_console(stdcon, 0, 0, con->width, con->height);
+	hal_set_cursor(con->cursor.x, con->cursor.y);
 }
-
 
 console_t *console_new()
 {
@@ -57,6 +60,13 @@ void console_clear(console_t *con)
 		hal_set_cursor(con->cursor.x, con->cursor.y);
 		hal_render_console(con, 0, 0, con->width, con->height);
 	}
+}
+
+void console_setcursor(console_t *con, int x, int y)
+{
+	con->cursor.x = x;
+	con->cursor.y = y;
+	if(con == stdcon) hal_set_cursor(con->cursor.x, con->cursor.y);
 }
 
 void console_scroll(console_t *con, int lines)
@@ -163,6 +173,11 @@ void setc(int x, int y, char c)
 	console_setc(stdcon, x, y, c);
 }
 
+void setcursor(int x, int y)
+{
+	console_setcursor(stdcon, x, y);
+}
+
 void printf(char const * fmt, ...)
 {
 	va_list list;
@@ -171,79 +186,58 @@ void printf(char const * fmt, ...)
 	va_end(list);
 }
 
-
-
-
-/*
-static enum vchar_color getMenuColor(menu_entry_t const * menu)
+void console_menu(menu_t const * menu)
 {
-	if(menu->flags & MENU_RED) {
-		if(menu->flags & MENU_SELECTED)
-			return vcRedHighlight;
-		else
-			return vcRed;
-	} else {
-		if(menu->flags & MENU_SELECTED)
-			return vcHighlight;
-		else
-			return vcDefault;
-	}
-}
-static void render_menu()
-{
-	for(int x = 0; x < width; x++) {
-		for(int y = 0; y < (yoffset - 1); y++) {
-			char c = ' ';
-			if(x == 0)
-				c = 0xB3;
-			if(x == (width - 1))
-				c = 0xB3;
-			hal_setchar(x, y, mkvchar(c, vcDefault));
-		}
-		char c = 0xC4;
+	for(int x = 0; x < screenwidth; x++) {
+		char c = ' ';
+		if(x == 0)
+			c = 0xB3;
+		if(x == (screenwidth - 1))
+			c = 0xB3;
+		hal_render_raw(x, 0, c);
+		
+		c = 0xC4;
 		if(x == 0)
 			c = 0xC0;
-		if(x == (width - 1))
+		if(x == (screenwidth - 1))
 			c = 0xD9;
-		hal_setchar(x, yoffset - 1, mkvchar(c, vcDefault));
+		hal_render_raw(x, 1, c);
 	}
-	if(menu_size > 0)
-	{
-		int leftpad = 1;
-
-		// MENU_DEFAULT, MENU_SELECTED ,MENU_RED, MENU_RIGHTALIGN
-		for(int i = 0; i < menu_size; i++)
-		{
-			if((menu[i].flags & MENU_RIGHTALIGN) != 0) continue;
-			
-			enum vchar_color color = getMenuColor(&menu[i]);
-			
-			char const *str = menu[i].label;
-			while(*str) {
-				hal_setchar(leftpad++, 0, mkvchar(*str++, color));
-			}
-			hal_setchar(leftpad, 1, mkvchar(0xC1, vcDefault));
-			hal_setchar(leftpad++, 0, mkvchar(0xB3, vcDefault));
-		}
+	if(menu == NULL || menu->length <= 0)
+		return;
 		
-		int rightpad = width - 2;
-		// MENU_DEFAULT, MENU_SELECTED ,MENU_RED, MENU_RIGHTALIGN
-		for(int i = (menu_size - 1); i >= 0; i--)
-		{
-			if((menu[i].flags & MENU_RIGHTALIGN) == 0) continue;
-			enum vchar_color color = getMenuColor(&menu[i]);
+	int leftpad = 1;
 
-			char const *str = menu[i].label;
-			int len = 0;
-			while(*str++) len++;
-			str = menu[i].label;
-			for(int i = len - 1; i >= 0; i--) {
-				hal_setchar(rightpad--, 0, mkvchar(str[i], color));
-				len--;
-			}
-			hal_setchar(rightpad, 1, mkvchar(0xC1, vcDefault));
-			hal_setchar(rightpad--, 0, mkvchar(0xB3, vcDefault));
+	// MENU_DEFAULT, MENU_SELECTED ,MENU_RED, MENU_RIGHTALIGN
+	for(int i = 0; i < menu->length; i++)
+	{
+		menuitem_t *item = &menu->items[i];
+		if((item->flags & MENU_RIGHTALIGN) != 0) continue;
+		
+		char const *str = item->label;
+		while(*str) {
+			hal_render_raw(leftpad++, 0, *str++);
 		}
+		hal_render_raw(leftpad, 1, 0xC1);
+		hal_render_raw(leftpad++, 0, 0xB3);
 	}
-};
-*/
+	
+	int rightpad = screenwidth - 2;
+	// MENU_DEFAULT, MENU_SELECTED ,MENU_RED, MENU_RIGHTALIGN
+	for(int i = (menu->length - 1); i >= 0; i--)
+	{
+		menuitem_t *item = &menu->items[i];
+		if((item->flags & MENU_RIGHTALIGN) == 0) continue;
+
+		char const *str = item->label;
+		int len = 0;
+		while(*str++) len++;
+		str = item->label;
+		for(int i = len - 1; i >= 0; i--) {
+			hal_render_raw(rightpad--, 0, str[i]);
+			len--;
+		}
+		hal_render_raw(rightpad, 1, 0xC1);
+		hal_render_raw(rightpad--, 0, 0xB3);
+	}
+}
