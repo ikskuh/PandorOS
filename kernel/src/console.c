@@ -1,8 +1,9 @@
 #include "console.h"
-#include <stdarg.h>
-#include <stddef.h>
 #include "printf.h"
 #include "hal.h"
+#include "pmm.h"
+#include <stdarg.h>
+#include <stddef.h>
 
 static int width, height;
 

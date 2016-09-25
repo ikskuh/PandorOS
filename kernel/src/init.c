@@ -3,6 +3,7 @@
 #include "console.h"
 #include "input.h"
 #include "stdlib.h"
+#include "pmm.h"
 
 menu_entry_t mainmenu[] = {
 	{ "Screen 0", MENU_DEFAULT },
@@ -62,6 +63,17 @@ void os_init()
 		
 		}
 		printf("\n");
+	}
+	
+	printf("PMM Testing:\n");
+	{
+		page_t p0, p1;
+		printf("pmm_alloc[0] = %d\n", pmm_alloc());
+		printf("pmm_alloc[1] = %d\n", p0 = pmm_alloc());
+		printf("pmm_alloc[2] = %d\n", pmm_alloc());
+		printf("pmm_alloc[3] = %d\n", p1 = pmm_alloc());
+		pmm_free(p0);
+		printf("pmm_alloc[4] = %d\n", pmm_alloc());
 	}
 	
 	shell_start();
