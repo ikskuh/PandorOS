@@ -2,9 +2,52 @@
 #include "interrupts.h"
 #include "keyboard-drv.h"
 #include "console.h"
+#include "multiboot.h"
 #include <stdint.h>
 #include <stddef.h>
 #include "timer.h"
+#include "pmm.h"
+#include "printf.h"
+
+
+// Prüft, ob man bereits schreiben kann
+uint8_t is_transmit_empty() {
+	return inb(0x3F8+5) & 0x20;
+}
+
+// Byte senden
+void serial_putc(char ch) {
+	while (is_transmit_empty()==0);
+	outb(0x3F8, ch);
+}
+
+void serial_printf(char const * fmt, ...)
+{
+	va_list list;
+	va_start(list, fmt);
+	gprintf(serial_putc, fmt, list);
+	va_end(list);
+}
+
+
+struct multiboot_header __attribute__((section ("multiboot"))) multibootHeader __attribute__ ((aligned (4))) = {
+	MULTIBOOT_HEADER_MAGIC, 
+	0x00,
+	-(MULTIBOOT_HEADER_MAGIC + 0x00),
+	
+	/* These are only valid if MULTIBOOT_AOUT_KLUDGE is set. */
+	0, // header_addr;
+	0, // load_addr;
+	0, // load_end_addr;
+	0, // bss_end_addr;
+	0, // entry_addr;
+
+	/* These are only valid if MULTIBOOT_VIDEO_MODE is set. */
+	0, // mode_type;
+	0, // width;
+	0, // height;
+	0, // depth;
+};
 
 struct idt
 {
@@ -27,6 +70,7 @@ static struct idt idt[256];
 
 static void init_gdt();
 static void init_idt();
+static void init_pmm(struct multiboot_info const * info);
 
 static struct cpu *timer_tick(struct cpu *cpu)
 {
@@ -34,9 +78,21 @@ static struct cpu *timer_tick(struct cpu *cpu)
 	return cpu;
 }
 
-void x86_init()
+void x86_init(uint32_t bootmagic, struct multiboot_info const * info)
 {
+	// Checks for a correct multiboot magic
+	if(bootmagic != MULTIBOOT_BOOTLOADER_MAGIC) {
+		uint16_t *video = (uint16_t*)0xB8000;
+		char *msg = "Invalid boot magic!";
+		while(*msg) {
+			*video++ = (*msg++) | 0xFC00;
+		}
+		while(true);
+	}
+	
 	init_gdt();
+	
+	init_pmm(info);
 	
 	init_idt();
 	
@@ -151,4 +207,54 @@ struct cpu * interrupt_dispatch(struct cpu * cpu)
 	return cpu;
 }
 
+/*
+struct multiboot_mmap_entry
+{
+ multiboot_uint32_t size;
+ multiboot_uint64_t addr;
+ multiboot_uint64_t len;
+#define MULTIBOOT_MEMORY_AVAILABLE              1
+#define MULTIBOOT_MEMORY_RESERVED               2
+ multiboot_uint32_t type;
+} __attribute__((packed));
+*/
 
+static void init_pmm(struct multiboot_info const * info)
+{
+	if((info->flags & MULTIBOOT_INFO_MEM_MAP) == 0)
+		return;
+	
+	serial_printf("Reading mmap...\n");
+	
+	uint32_t ptr = info->mmap_addr;
+	for(uint32_t i = 0; i < info->mmap_length; i++) {
+		struct multiboot_mmap_entry *mmap = (void*)ptr;
+		
+		serial_printf(
+			"[%d] = { .size=%d, .addr=%d, .len=%d, .type=%d }\n",
+			i,
+			(uint32_t)mmap->size,
+			(uint32_t)mmap->addr,
+			(uint32_t)mmap->len,
+			mmap->type);
+		
+		if((mmap->type == MULTIBOOT_MEMORY_AVAILABLE || mmap->type == MULTIBOOT_MEMORY_RESERVED)
+			&& mmap->addr < PMM_MEMSIZE)
+		{
+			int marking = PMM_USED;
+			if(mmap->type == MULTIBOOT_MEMORY_AVAILABLE)
+				marking = PMM_FREE;
+			for(uint64_t offset = 0; offset < mmap->len; offset += PMM_PAGESIZE)
+			{
+				uint64_t addr = mmap->addr + offset;
+				if(addr >= PMM_MEMSIZE) continue;
+				
+				page_t page = pmm_getpage((void*)addr);
+				
+				pmm_mark(page, marking);
+			}
+		}
+		ptr += mmap->size + 0x04;
+	}
+	serial_printf("End of mmap.\n");
+}

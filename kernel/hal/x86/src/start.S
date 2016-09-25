@@ -7,6 +7,8 @@
 _start:
 	mov $kernel_stack, %esp
 
+	push %ebx
+	push %eax
 	call x86_init
 	
 	call os_init
