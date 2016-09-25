@@ -19,7 +19,10 @@ void *pmm_getptr(page_t page)
 }
 
 void pmm_mark(page_t page, int state)
-{ 
+{
+	// This is important! We don't want the first page to be used ever
+	if(page == 0) state = PMM_USED;
+
   uint32_t idx = page / 32;
   uint32_t bit = page % 32;
   
