@@ -1,4 +1,8 @@
 
+if not arg[1] then
+	error("PLATFORM argument missing.")
+end
+
 virtual_keys = {
 	"INVALID",
 	"ESCAPE",
