@@ -1,3 +1,4 @@
+#include <stddef.h>
 #include <stdbool.h>
 
 #include "console.h"
@@ -32,11 +33,13 @@ static struct {
 	int cursor;
 } shells[3];
 
-#define currshell shells[currentShell]
-
 int currentShell = 0;
-
+#define currshell shells[currentShell]
 static char const * shell_prompt = "#> ";
+
+static bool catalog();
+static char const *catalog_result = NULL;
+
 
 static void menu_select(menu_t *menu, int index)
 {
@@ -77,6 +80,7 @@ static void select_shell(int shellId)
 	menu_mark(&mainmenu);
 }
 
+
 static int menu_loop()
 {
 	// Start with the current shell selected.
@@ -110,10 +114,14 @@ static int menu_loop()
 						select_shell(cursor);
 						menu_select(&mainmenu, -1);
 						return 1; // shell change
-					case 3:
-						// TODO: Implement catalog!
+					case 3: {
+						int result = catalog();
 						menu_select(&mainmenu, -1);
-						return 2; // catalog
+						if(result)
+							return 2; // catalog
+						else
+							return 0; // nothing
+					}
 				}
 				break;
 		}
@@ -134,10 +142,16 @@ static void shell_main()
 				int selection = menu_loop();
 				switch(selection)
 				{
-					case 1: // Shell changed.
+					case 1:   // Shell changed.
 						break;
-					case 2: // Catalog selection
+					case 2: { // Catalog selection
+						char *str = catalog_result;
+						while(*str) {
+							putc(*str);
+							currshell.input[currshell.cursor++] = *str++;
+						}
 						break;
+					}
 				}
 				break;
 			}
@@ -186,8 +200,6 @@ void os_init()
 		
 		console_printf(shells[i].console, "%s", shell_prompt);
 	}
-	
-	// console_set(console_new());
 	
 	console_menu(&mainmenu);
 	
@@ -245,5 +257,108 @@ static void test_printf()
 		printf("pmm_alloc[3] = %d\n", p1 = pmm_alloc());
 		pmm_free(p0);
 		printf("pmm_alloc[4] = %d\n", pmm_alloc());
+	}
+}
+
+static char const * catalog_selections[] = {
+	"Hallo",
+	"Welt",
+	"Teststring",
+	"Something Wicked!",
+	"Output(",
+	"Real(",
+	"Imag(",
+	"Conj(",
+	"SetPixel(",
+	"GetPixel(",
+	"ClearScreen(",
+	"ClearHome",
+	"a",
+	"b",
+	"c",
+	"d",
+	"e",
+	"f",
+	"g",
+	"h",
+	"i",
+	"j",
+	"k",
+	"l",
+	"m",
+	"n",
+	"o",
+	"p",
+	"q",
+	"r",
+	"s",
+	NULL,
+};
+
+static bool catalog()
+{
+	console_t *prev = stdcon;
+	console_t *catcon = console_new();
+	
+	console_set(catcon);
+	
+	int offset = 0;
+	int cursor = 0;
+	while(true)
+	{
+		// Render catalog
+		cls();
+		for(int i = 0; i < (catcon->height - 1); i++)
+		{
+			if(catalog_selections[offset + i] == NULL)
+				break;
+			if((offset + i) == cursor)
+				printf("->");
+			else
+				printf("  ");
+			printf(" %s\n", catalog_selections[offset + i]);
+		}
+		
+		keyhit_t hit;
+		do {
+			hit = getkey(true);
+		} while((hit.flags & khfKeyPress) == 0);
+		
+		switch(hit.key)
+		{
+			case VK_UP:
+				if(cursor > 0)
+					cursor--;
+				break;
+			case VK_DOWN:
+				if(catalog_selections[cursor + 1] != NULL)
+					cursor++;
+				break;
+			case VK_LEFT:
+				for(int i = 0; i < (catcon->height - 2); i++) {
+					if(cursor > 0) cursor--;
+				}
+				break;
+			case VK_RIGHT:
+				for(int i = 0; i < (catcon->height - 2); i++) {
+					if(catalog_selections[cursor + 1] != NULL)
+						cursor++;
+				}
+				break;
+			case VK_RETURN:
+				catalog_result = catalog_selections[cursor];
+				console_set(prev);
+				console_delete(catcon);
+				return true;
+			case VK_ESCAPE:
+				catalog_result =  NULL;
+				console_set(prev);
+				console_delete(catcon);
+				return false;
+		}
+		if(cursor < offset)
+			offset = cursor;
+		if(cursor > (offset + catcon->height - 2))
+			offset = cursor - catcon->height + 2;
 	}
 }
