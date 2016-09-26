@@ -5,6 +5,7 @@
 #include "input.h"
 #include "stdlib.h"
 #include "pmm.h"
+#include "alloc.h"
 
 int ticks = 0;
 
@@ -207,7 +208,20 @@ void os_init()
 
 	select_shell(0);
 	
-	shell_main();
+	{  // Allocator test
+		allocator_t *menuAlloc = allocator_new(sizeof(menuitem_t));
+		
+		void *a = allocator_alloc(menuAlloc);
+		void *b = allocator_alloc(menuAlloc);
+		allocator_free(menuAlloc, a);
+		void *c = allocator_alloc(menuAlloc);
+		void *d = allocator_alloc(menuAlloc);
+		
+		printf("%d, %d, %d, %d\n", a, b, c, d);
+		
+		allocator_delete(menuAlloc);
+	}
+	
 	
 	shell_main();
 	
