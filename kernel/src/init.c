@@ -23,6 +23,7 @@ menuitem_t mainmenu_contents[] = {
 	{ "Catalog",  MENU_RIGHTALIGN },
 	{ "System",   MENU_RIGHTALIGN },
 };
+
 menu_t mainmenu = {
 	sizeof(mainmenu_contents) / sizeof(mainmenu_contents[0]),
 	mainmenu_contents,
