@@ -35,6 +35,31 @@ static void menu_select(menuitem_t *items, int count, int index)
 	}
 }
 
+struct renderinfo
+{
+	menuitem_t *items;
+	int count;
+	int offset; // offset to the left
+	int spacex;  // offset of the blank space
+	int specew;
+} renderinfo_t;
+
+static int strlen(char const *str) {
+	int c = 0;
+	while(*str++) c++;
+	return c;
+}
+
+static int submenuwidth(menuitem_t *items, int count)
+{
+	int width = 2;
+	for(int i = 0; i < count; i++) {
+		int w = strlen(items[i].label) + 2;
+		if(w > width) width = w;
+	}
+	return width;
+}
+
 static void render_menu(menuitem_t *items, int count, int offset)
 {
 	for(int x = 0; x < screenwidth; x++) {
@@ -93,28 +118,12 @@ static void render_menu(menuitem_t *items, int count, int offset)
 	}
 }
 
-static int strlen(char const *str) {
-	int c = 0;
-	while(*str++) c++;
-	return c;
-}
-
-static int submenuwidth(menuitem_t *items, int count)
-{
-	int width = 2;
-	for(int i = 0; i < count; i++) {
-		int w = strlen(items[i].label) + 2;
-		if(w > width) width = w;
-	}
-	return width;
-}
-
 static void render_dropdown(menuitem_t *items, int count, int offset)
 {
 	int width = submenuwidth(items, count);
 	
-	hal_render_raw(offset,             1,         0xDA, CHA_DEFAULT);
-	hal_render_raw(offset + width + 1, 1,         0xBF, CHA_DEFAULT);
+	hal_render_raw(offset,             1,         0xC2, CHA_DEFAULT);
+	hal_render_raw(offset + width + 1, 1,         0xC2, CHA_DEFAULT);
 	hal_render_raw(offset,             2 + count, 0xC0, CHA_DEFAULT);
 	hal_render_raw(offset + width + 1, 2 + count, 0xD9, CHA_DEFAULT);
 	for(int x = 1; x <= width; x++)
