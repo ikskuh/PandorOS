@@ -7,6 +7,8 @@
 #include "stdlib.h"
 #include "pmm.h"
 #include "alloc.h"
+#include "interpreter.h"
+#include "string.h"
 
 int ticks = 0;
 
@@ -134,6 +136,8 @@ void os_init()
 	// TODO: Initialize OS…
 	console_init();
 	
+	var_init();
+	
 	for(int i = 0; i < 3; i++)
 	{
 		shells[i].console = console_new();
@@ -162,6 +166,23 @@ void os_init()
 		
 		allocator_delete(menuAlloc);
 	}
+	
+	variable_t *var_a    = var_get("A");
+	variable_t *var_str0 = var_get("STR0");
+	
+	printf("%d, %d\n", var_type(var_a), var_type(var_str0));
+	
+	int i = 10;
+	var_setval(var_a, &i);
+	var_setval(var_str0, "hallo!");
+	
+	int j = 55;
+	var_getval(var_a, &j);
+	
+	char str0[64];
+	var_getval(var_str0, str0);
+	
+	printf("%d, %s\n", j, str0);
 	
 	
 	shell_main();
