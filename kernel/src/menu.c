@@ -99,13 +99,19 @@ static int strlen(char const *str) {
 	return c;
 }
 
-static void render_dropdown(menuitem_t *items, int count, int offset)
+static int submenuwidth(menuitem_t *items, int count)
 {
 	int width = 2;
 	for(int i = 0; i < count; i++) {
 		int w = strlen(items[i].label) + 2;
 		if(w > width) width = w;
 	}
+	return width;
+}
+
+static void render_dropdown(menuitem_t *items, int count, int offset)
+{
+	int width = submenuwidth(items, count);
 	
 	hal_render_raw(offset,             1,         0xDA, CHA_DEFAULT);
 	hal_render_raw(offset + width + 1, 1,         0xBF, CHA_DEFAULT);
@@ -174,9 +180,33 @@ static menuitem_t *menu_subopen(
 				menuitem_t *sel = &items[cursor];
 				if(sel->length > 0)
 				{
-					int _off = 0;
-					for(int i = 0; i < cursor; i++) {
-						_off += strlen(items[i].label) + 1;
+					int _off;
+					if(sel->flags & MENU_RIGHTALIGN)
+					{
+						_off = screenwidth - 1;
+						hal_debug("Start: %d\n", _off);
+						for(int i = count-1; i >= cursor; i--) {
+							if((items[i].flags & MENU_RIGHTALIGN) == 0)
+								continue;
+							int w = strlen(items[i].label);
+							hal_debug("Segment: %d, %d, '%s'\n", _off, w, items[i].label);
+							_off -= w;
+							_off -= 1;
+						}
+						hal_debug("End: %d\n", _off);
+					}
+					else
+					{
+						_off = 0;
+						for(int i = 0; i < cursor; i++) {
+							if(items[i].flags & MENU_RIGHTALIGN)
+								continue;
+							_off += strlen(items[i].label) + 1;
+						}
+					}
+					int _w = submenuwidth(sel->items, sel->length);
+					if(_off + _w >= (screenwidth - 1)) {
+						_off = screenwidth - _w - 2;
 					}
 					menuitem_t *subsel = menu_subopen(
 						sel->items, 

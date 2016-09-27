@@ -21,7 +21,7 @@ void serial_putc(char ch) {
 	outb(0x3F8, ch);
 }
 
-void serial_printf(char const * fmt, ...)
+void hal_debug(char const *fmt, ...)
 {
 	va_list list;
 	va_start(list, fmt);
@@ -224,13 +224,13 @@ static void init_pmm(struct multiboot_info const * info)
 	if((info->flags & MULTIBOOT_INFO_MEM_MAP) == 0)
 		return;
 	
-	serial_printf("Reading mmap...\n");
+	hal_debug("Reading mmap...\n");
 	
 	uint32_t ptr = info->mmap_addr;
 	for(uint32_t i = 0; i < info->mmap_length; i++) {
 		struct multiboot_mmap_entry *mmap = (void*)ptr;
 		
-		serial_printf(
+		hal_debug(
 			"[%d] = { .size=%d, .addr=%d, .len=%d, .type=%d }\n",
 			i,
 			(uint32_t)mmap->size,
@@ -256,5 +256,5 @@ static void init_pmm(struct multiboot_info const * info)
 		}
 		ptr += mmap->size + 0x04;
 	}
-	serial_printf("End of mmap.\n");
+	hal_debug("End of mmap.\n");
 }
