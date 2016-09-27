@@ -39,7 +39,7 @@ menu_t mainmenu = {
 				{ "Screen 2", MENU_DEFAULT, &select_shell2, 0, NULL },
 			}
 		},
-		{ "Blabla Short", MENU_DEFAULT | MENU_RIGHTALIGN, NULL, 
+		{ "!Memory Management!", MENU_DEFAULT | MENU_RIGHTALIGN, NULL, 
 			6, 
 			(menuitem_t[]) {
 				{ "Memory Management", MENU_DEFAULT, NULL, 0, NULL },
