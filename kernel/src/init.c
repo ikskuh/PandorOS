@@ -28,7 +28,7 @@ static void select_shell1() { select_shell(1); }
 static void select_shell2() { select_shell(2); }
 
 menu_t mainmenu = {
-	5,
+	3,
 	(menuitem_t[]) {
 		{ "Catalog", MENU_DEFAULT, &catalog, 0, NULL },
 		{ "Screen 0", MENU_DEFAULT, NULL,
@@ -37,28 +37,6 @@ menu_t mainmenu = {
 				{ "Screen 0", MENU_DEFAULT, &select_shell0, 0, NULL },
 				{ "Screen 1", MENU_DEFAULT, &select_shell1, 0, NULL },
 				{ "Screen 2", MENU_DEFAULT, &select_shell2, 0, NULL },
-			}
-		},
-		{ "!Memory Management!", MENU_DEFAULT | MENU_RIGHTALIGN, NULL, 
-			6, 
-			(menuitem_t[]) {
-				{ "Memory Management", MENU_DEFAULT, NULL, 0, NULL },
-				{ "OS Debugger",       MENU_DEFAULT, NULL, 0, NULL },
-				{ "Network Settings",  MENU_DEFAULT, NULL, 0, NULL },
-				{ "About",             MENU_DEFAULT, NULL, 0, NULL },
-				{ "Reboot",            MENU_DEFAULT, NULL, 0, NULL },
-				{ "Poweroff",          MENU_DEFAULT, NULL, 0, NULL },
-			}
-		},
-		{ "Blabla Long", MENU_DEFAULT | MENU_RIGHTALIGN, NULL, 
-			6, 
-			(menuitem_t[]) {
-				{ "Memory Management", MENU_DEFAULT, NULL, 0, NULL },
-				{ "OS Debugger",       MENU_DEFAULT, NULL, 0, NULL },
-				{ "Network Settings",  MENU_DEFAULT, NULL, 0, NULL },
-				{ "About",             MENU_DEFAULT, NULL, 0, NULL },
-				{ "Reboot",            MENU_DEFAULT, NULL, 0, NULL },
-				{ "Poweroff",          MENU_DEFAULT, NULL, 0, NULL },
 			}
 		},
 		{ "System", MENU_DEFAULT | MENU_RIGHTALIGN, NULL, 
