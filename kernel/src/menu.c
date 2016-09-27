@@ -168,9 +168,6 @@ static menuitem_t *menu_subopen(
 				if(isVertical && cursor < (count- 1)) cursor++;
 				break;
 			case VK_ESCAPE:
-				menu_select(items, count, -1);
-				render(items, count, offset);
-				console_refresh();
 				return NULL;
 			case VK_RETURN:
 			{
@@ -190,16 +187,14 @@ static menuitem_t *menu_subopen(
 					console_refresh();
 					hal_set_cursor(0, screenheight);
 					if(subsel != NULL) {
-						menu_select(items, count, -1);
-						render(items, count, offset);
 						return subsel;
 					}
 				}
 				else
 				{
-					menu_select(items, count, -1);
-					render(items, count, offset);
-					console_refresh();
+					if(sel->callback != NULL) {
+						sel->callback(sel);
+					}
 					return sel;
 				}
 				break;
@@ -210,7 +205,13 @@ static menuitem_t *menu_subopen(
 
 menuitem_t *menu_open(menu_t const * menu)
 {
-	return menu_subopen(menu->items, menu->length, render_menu, 0, false);
+	menuitem_t *result = menu_subopen(menu->items, menu->length, render_menu, 0, false);
+	
+	menu_select(menu->items, menu->length, -1);
+	render_menu(menu->items, menu->length, 0);
+	console_refresh();
+					
+	return result;
 }
 
 void menu_render(menu_t const * menu)

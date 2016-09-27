@@ -17,16 +17,26 @@ void os_tick()
 	// console_refresh();
 }
 
+
+static void catalog(menuitem_t *);
+static char const *catalog_result = NULL;
+
+static void select_shell(int shellId);
+
+static void select_shell0() { select_shell(0); }
+static void select_shell1() { select_shell(1); }
+static void select_shell2() { select_shell(2); }
+
 menu_t mainmenu = {
 	3,
 	(menuitem_t[]) {
-		{ "Catalog", MENU_DEFAULT, NULL, 0, NULL },
+		{ "Catalog", MENU_DEFAULT, &catalog, 0, NULL },
 		{ "Screen 0", MENU_DEFAULT, NULL,
 			3,
 			(menuitem_t[]) {
-				{ "Screen 0", MENU_DEFAULT, NULL, 0, NULL },
-				{ "Screen 1", MENU_DEFAULT, NULL, 0, NULL },
-				{ "Screen 2", MENU_DEFAULT, NULL, 0, NULL },
+				{ "Screen 0", MENU_DEFAULT, &select_shell0, 0, NULL },
+				{ "Screen 1", MENU_DEFAULT, &select_shell1, 0, NULL },
+				{ "Screen 2", MENU_DEFAULT, &select_shell2, 0, NULL },
 			}
 		},
 		{ "System", MENU_DEFAULT , NULL, 
@@ -53,17 +63,15 @@ int currentShell = 0;
 #define currshell shells[currentShell]
 static char const * shell_prompt = "#> ";
 
-// static bool catalog();
-// static char const *catalog_result = NULL;
-
 static void select_shell(int shellId)
 {
 	if(shellId < 0 || shellId > 2)
 		return;
 	currentShell = shellId;
 	
+	mainmenu.items[1].label[7] = '0' + shellId;
+	
 	console_set(currshell.console);
-	// menu_mark(&mainmenu);
 }
 
 static void shell_main()
@@ -76,7 +84,17 @@ static void shell_main()
 		{
 			case '\t':
 			{
+				catalog_result = NULL;
+				// menuitem_t *selection = menu_open(&mainmenu);
 				menu_open(&mainmenu);
+				if(catalog_result != NULL)
+				{
+					char const * str = catalog_result;
+					while(*str) {
+						putc(*str);
+						currshell.input[currshell.cursor++] = *str++;
+					}
+				}
 				/*
 				int selection = menu_loop();
 				switch(selection)
@@ -84,11 +102,7 @@ static void shell_main()
 					case 1:   // Shell changed.
 						break;
 					case 2: { // Catalog selection
-						char const * str = catalog_result;
-						while(*str) {
-							putc(*str);
-							currshell.input[currshell.cursor++] = *str++;
-						}
+						
 						break;
 					}
 				}
@@ -214,7 +228,7 @@ static void test_printf()
 		printf("pmm_alloc[4] = %d\n", pmm_alloc());
 	}
 }
-
+*/
 static char const * catalog_selections[] = {
 	"Hallo",
 	"Welt",
@@ -250,8 +264,10 @@ static char const * catalog_selections[] = {
 	NULL,
 };
 
-static bool catalog()
+static void catalog(menuitem_t *this)
 {
+	(void)this;
+	
 	console_t *prev = stdcon;
 	console_t *catcon = console_new();
 	
@@ -304,12 +320,12 @@ static bool catalog()
 				catalog_result = catalog_selections[cursor];
 				console_set(prev);
 				console_delete(catcon);
-				return true;
+				return;
 			case VK_ESCAPE:
 				catalog_result =  NULL;
 				console_set(prev);
 				console_delete(catcon);
-				return false;
+				return;
 		}
 		if(cursor < offset)
 			offset = cursor;

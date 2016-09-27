@@ -11,7 +11,7 @@
 
 struct menuitem;
 
-typedef bool (*menucallback_f)(struct menuitem *);
+typedef void (*menucallback_f)(struct menuitem *);
 
 typedef struct menuitem
 {
