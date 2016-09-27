@@ -48,7 +48,7 @@ static uint8_t getcolor(int attribs)
 	else
 	{
 		if(attribs & CHA_HIGHLIGHT)
-			return 0x8F;
+			return 0x2F;
 		else
 			return 0x0F;
 	}

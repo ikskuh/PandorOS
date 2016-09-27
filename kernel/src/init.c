@@ -95,18 +95,6 @@ static void shell_main()
 						currshell.input[currshell.cursor++] = *str++;
 					}
 				}
-				/*
-				int selection = menu_loop();
-				switch(selection)
-				{
-					case 1:   // Shell changed.
-						break;
-					case 2: { // Catalog selection
-						
-						break;
-					}
-				}
-				*/
 				break;
 			}
 			case 0x1B: // Escape
