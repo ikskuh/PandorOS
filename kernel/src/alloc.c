@@ -62,7 +62,13 @@ void allocator_free(allocator_t *alloc, void *_ptr)
 	int objectCount = (PMM_PAGESIZE / alloc->objectSize);
 	
 	uintptr_t ptr = (uintptr_t)_ptr - (uintptr_t)alloc->memstart;
-	if(ptr >= (uintptr_t)alloc->memstart + alloc->objectSize * alloc->objectCount)
+	if(ptr >= (uintptr_t)alloc->memstart + alloc->objectSize * objectCount)
 		return;
 	
+	uint8_t *bitmap = alloc->bitmap;
+	
+	int index = ptr / alloc->objectSize;
+	int word = index / 8;
+	int bit  = index % 8;
+	bitmap[word] &= ~(1 << bit);
 }

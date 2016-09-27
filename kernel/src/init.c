@@ -2,6 +2,7 @@
 #include <stdbool.h>
 
 #include "console.h"
+#include "menu.h"
 #include "input.h"
 #include "stdlib.h"
 #include "pmm.h"
@@ -16,17 +17,30 @@ void os_tick()
 	// console_refresh();
 }
 
-menuitem_t mainmenu_contents[] = {
-	{ "Screen 0", MENU_DEFAULT },
-	{ "Screen 1", MENU_DEFAULT },
-	{ "Screen 2", MENU_DEFAULT },
-	{ "Catalog",  MENU_RIGHTALIGN },
-	{ "System",   MENU_RIGHTALIGN },
-};
-
 menu_t mainmenu = {
-	sizeof(mainmenu_contents) / sizeof(mainmenu_contents[0]),
-	mainmenu_contents,
+	3,
+	(menuitem_t[]) {
+		{ "Catalog", MENU_DEFAULT, NULL, 0, NULL },
+		{ "Screen 0", MENU_DEFAULT, NULL,
+			3,
+			(menuitem_t[]) {
+				{ "Screen 0", MENU_DEFAULT, NULL, 0, NULL },
+				{ "Screen 1", MENU_DEFAULT, NULL, 0, NULL },
+				{ "Screen 2", MENU_DEFAULT, NULL, 0, NULL },
+			}
+		},
+		{ "System", MENU_DEFAULT , NULL, 
+			6, 
+			(menuitem_t[]) {
+				{ "Memory Management", MENU_DEFAULT, NULL, 0, NULL },
+				{ "OS Debugger",       MENU_DEFAULT, NULL, 0, NULL },
+				{ "Network Settings",  MENU_DEFAULT, NULL, 0, NULL },
+				{ "About",             MENU_DEFAULT, NULL, 0, NULL },
+				{ "Reboot",            MENU_DEFAULT, NULL, 0, NULL },
+				{ "Poweroff",          MENU_DEFAULT, NULL, 0, NULL },
+			}
+		},
+	},
 };
 
 static struct {
@@ -39,38 +53,8 @@ int currentShell = 0;
 #define currshell shells[currentShell]
 static char const * shell_prompt = "#> ";
 
-static bool catalog();
-static char const *catalog_result = NULL;
-
-
-static void menu_select(menu_t *menu, int index)
-{
-	for(int i = 0; i < menu->length; i++) {
-		if(i == index) {
-			menu->items[i].flags |= MENU_SELECTED;
-		} else {
-			menu->items[i].flags &= ~MENU_SELECTED;
-		}
-		if(i == currentShell) {
-			menu->items[i].flags |= MENU_RED;
-		} else {
-			menu->items[i].flags &= ~MENU_RED;
-		}
-	}
-	console_menu(menu);
-}
-
-static void menu_mark(menu_t *menu)
-{
-	for(int i = 0; i < menu->length; i++) {
-		if(i == currentShell) {
-			menu->items[i].flags |= MENU_RED;
-		} else {
-			menu->items[i].flags &= ~MENU_RED;
-		}
-	}
-	console_menu(menu);
-}
+// static bool catalog();
+// static char const *catalog_result = NULL;
 
 static void select_shell(int shellId)
 {
@@ -79,56 +63,7 @@ static void select_shell(int shellId)
 	currentShell = shellId;
 	
 	console_set(currshell.console);
-	menu_mark(&mainmenu);
-}
-
-
-static int menu_loop()
-{
-	// Start with the current shell selected.
-	int cursor = currentShell;
-	while(true)
-	{
-		menu_select(&mainmenu, cursor);
-	
-		keyhit_t hit = getkey(true);
-		if((hit.flags & khfKeyPress) == 0)
-			continue;
-		switch(hit.key)
-		{
-			case VK_LEFT: 
-				if(cursor > 0) cursor--;
-				break;
-			case VK_RIGHT:
-				if(cursor < mainmenu.length - 1) cursor++;
-				break;
-			case VK_ESCAPE:
-			case VK_TAB:
-				menu_select(&mainmenu, -1);
-				return 0;
-			case VK_RETURN:
-			case VK_SPACE:
-				switch(cursor)
-				{
-					case 0:
-					case 1:
-					case 2:
-						select_shell(cursor);
-						menu_select(&mainmenu, -1);
-						return 1; // shell change
-					case 3: {
-						int result = catalog();
-						menu_select(&mainmenu, -1);
-						if(result)
-							return 2; // catalog
-						else
-							return 0; // nothing
-					}
-				}
-				break;
-		}
-	}
-	return 0;
+	// menu_mark(&mainmenu);
 }
 
 static void shell_main()
@@ -141,13 +76,15 @@ static void shell_main()
 		{
 			case '\t':
 			{
+				menu_open(&mainmenu);
+				/*
 				int selection = menu_loop();
 				switch(selection)
 				{
 					case 1:   // Shell changed.
 						break;
 					case 2: { // Catalog selection
-						char *str = catalog_result;
+						char const * str = catalog_result;
 						while(*str) {
 							putc(*str);
 							currshell.input[currshell.cursor++] = *str++;
@@ -155,6 +92,7 @@ static void shell_main()
 						break;
 					}
 				}
+				*/
 				break;
 			}
 			case 0x1B: // Escape
@@ -203,13 +141,13 @@ void os_init()
 		console_printf(shells[i].console, "%s", shell_prompt);
 	}
 	
-	console_menu(&mainmenu);
+	menu_render(&mainmenu);
 	
-	menu_select(&mainmenu, -1);
+	// menu_select(&mainmenu, -1);
 
 	select_shell(0);
 	
-	{  // Allocator test
+	if(false) {  // Allocator test
 		allocator_t *menuAlloc = allocator_new(sizeof(menuitem_t));
 		
 		void *a = allocator_alloc(menuAlloc);
@@ -228,6 +166,8 @@ void os_init()
 	
 	while(true);
 }
+
+/*
 
 static void test_printf()
 {
@@ -377,3 +317,5 @@ static bool catalog()
 			offset = cursor - catcon->height + 2;
 	}
 }
+
+//*/

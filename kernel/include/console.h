@@ -6,11 +6,6 @@
 #define CHA_HIGHLIGHT (1<<0)
 #define CHA_RED       (1<<1)
 
-#define MENU_DEFAULT    0
-#define MENU_SELECTED   CHA_HIGHLIGHT
-#define MENU_RED        CHA_RED
-#define MENU_RIGHTALIGN (1<<2)
-
 /**
  * An attributes character.
  */
@@ -28,18 +23,6 @@ typedef struct console
 	attrchar_t * const data;
 } console_t;
 
-typedef struct menuitem
-{
-	char label[64];
-	int flags;
-} menuitem_t;
-
-typedef struct menu
-{
-	int length;
-	menuitem_t *items;
-} menu_t;
-
 /**
  * The default console.
  */
@@ -51,16 +34,16 @@ extern console_t *stdcon;
 void console_init();
 
 /**
- * Renders the given menu.
- * @param menu The menu to be rendered. If NULL, an empty menu will be drawn.
+ * Refreshs the console and rerenders the screen.
  */
-void console_menu(menu_t const * menu);
+void console_refresh();
 
 /**
  * Sets the current stdcon.
  * @remarks If con is NULL, nothing will happen.
  */
 void console_set(console_t *con);
+
 
 /**
  * Creates a new console.
