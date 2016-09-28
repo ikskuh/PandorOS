@@ -88,14 +88,26 @@ static option_t * option_get(int index)
 
 static void options_editor_int(option_t *option, int x, int y, int len, int vkey)
 {
+	int *i = option->value;
 	switch(vkey)
 	{
+		case VK_RIGHT:
 		case VK_NUM_PLUS:
-			*((int*)option->value) += 1;
+			*i += 1;
 			return;
+		case VK_LEFT:
 		case VK_NUM_MINUS:
-			*((int*)option->value) -= 1;
+			*i -= 1;
 			return;
+	}
+	if(vkey == VK_RETURN)
+	{
+		char buffer[64];
+		str_printf(buffer, "%d", *i);
+		if(input_textfield(buffer, x, y, len) != VK_ESCAPE)
+		{
+			*i = str_to_int(buffer, 10);
+		}
 	}
 }
 
@@ -103,9 +115,11 @@ static void options_editor_bool(option_t *option, int x, int y, int len, int vke
 {
 	switch(vkey)
 	{
+		case VK_RIGHT:
 		case VK_NUM_PLUS:
 			*((bool*)option->value) = true;
 			return;
+		case VK_LEFT:
 		case VK_NUM_MINUS:
 			*((bool*)option->value) = false;
 			return;
@@ -118,62 +132,10 @@ static void options_editor_bool(option_t *option, int x, int y, int len, int vke
 
 static void options_editor_txt(option_t *option, int x, int y, int len, int vkey)
 {
-	char *str = option->value;
+	if(vkey != VK_RETURN)
+		return;
 	
-	char *work = malloc(OPT_STR_LIMIT);
-	str_copy(work, str);
-	
-	int cursor = str_len(str);
-	
-	int prevFlags = console->flags;
-	console->flags &= ~CON_NOCURSOR;
-	
-	while(true)
-	{
-		for(int i = 0; i < len; i++) {
-			int idx = console->width * y + x + i;
-			if(i < cursor)
-				console->data[idx].c = work[i];
-			else
-				console->data[idx].c = ' ';
-			console->data[idx].attribs = CHA_HIGHLIGHT;
-		}
-		console->cursor.x = x + cursor;
-		console->cursor.y = y;
-		console_refresh();
-	
-		keyhit_t hit = getkey(true);
-		if((hit.flags & (khfKeyPress | khfCharInput)) == 0)
-			continue;
-		
-		if(hit.flags & khfKeyPress)
-		{
-			switch(hit.key)
-			{
-				case VK_BACKSPACE:
-					if(cursor <= 0)
-						continue;
-					work[--cursor] = 0;
-					continue;
-				case VK_RETURN:
-					str_copy(str, work);
-					// Pass through
-				case VK_ESCAPE:
-					console->flags = prevFlags;
-					free(work);
-					return;
-			}
-		}
-		
-		if(hit.flags & khfCharInput)
-		{
-			// TODO: Input text here
-			work[cursor++] = hit.codepoint;
-			work[cursor] = 0;
-		}
-	}
-	
-	
+	input_textfield(option->value, x, y, len);
 }
 
 /**
@@ -300,6 +262,8 @@ void options_showmenu()
 			case VK_DOWN:
 				if((++cursor) >= optionscount) cursor--;
 				break;
+			case VK_LEFT:
+			case VK_RIGHT:
 			case VK_NUM_PLUS:
 			case VK_NUM_MINUS:
 			case VK_RETURN:

@@ -2,6 +2,8 @@
 
 #include <stdbool.h>
 
+int str_printf(char *str, char const *fmt, ...);
+
 static inline bool str_eq(char const * lhs, char const * rhs)
 {
 	while(*lhs) {

@@ -10,6 +10,11 @@
  */
 int int_to_string(char * str, int value, int base);
 
+/**
+ * Converts a string to an integer.
+ */
+int str_to_int(char *str, int base);
+
 static inline int max(int a, int b)
 {
 	return (a > b) ? a : b;
