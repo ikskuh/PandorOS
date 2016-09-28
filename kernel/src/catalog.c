@@ -176,6 +176,10 @@ void catalog_open()
 				selection = -1;
 				console_set(oldcon);
 				return;
+			case VK_RETURN:
+				selection = cursor;
+				console_set(oldcon);
+				return;
 			case VK_UP:
 				if(cursor > 0) cursor--;
 				break;
