@@ -10,17 +10,21 @@
 
 int foreground = 0xF, background = 0x0, highlight = 0x2;
 
+optioncfg_int_t halOptColorLimit = {
+	0,  // min
+	15, // max
+};
 
 option_t halOptConsoleForeground = {
-	OPT_INT, "Foreground Color", &foreground, NULL
+	OPT_INT, "Foreground Color", &foreground, &halOptColorLimit, NULL
 };
 
 option_t halOptConsoleBackground = {
-	OPT_INT, "Background Color", &background, NULL
+	OPT_INT, "Background Color", &background, &halOptColorLimit, NULL
 };
 
 option_t halOptConsoleHighlight = {
-	OPT_INT, "Highlight Color", &highlight, NULL
+	OPT_INT, "Highlight Color", &highlight, &halOptColorLimit, NULL
 };
 
 static uint8_t getcolor(int attribs)

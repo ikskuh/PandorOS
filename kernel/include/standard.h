@@ -25,6 +25,11 @@ static inline int min(int a, int b)
 	return (a < b) ? a : b;
 }
 
+static inline int clamp(int a, int lower, int upper)
+{
+	return min(max(a, lower), upper);
+}
+
 static inline void *malloc(size_t size) {
 	(void)size;
 	return pmm_getptr(pmm_alloc());

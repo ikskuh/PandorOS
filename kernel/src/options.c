@@ -14,9 +14,19 @@ int _ival;
 bool _bval;
 char _tval[64];
 
-static option_t optionInt  = { OPT_INT,  "Numeric",      &_ival, NULL };
-static option_t optionBool = { OPT_BOOL, "Boolean/Flag", &_bval, NULL };
-static option_t optionStr  = { OPT_TXT,  "String/Text",   _tval, NULL };
+static option_t optionInt  = {
+	OPT_INT,  "Numeric",      &_ival, 
+	(optioncfg_int_t[]) { { -10, 10 } },
+	NULL
+};
+
+static option_t optionBool = { OPT_BOOL, "Boolean/Flag", &_bval, NULL, NULL };
+
+static option_t optionStr  = {
+	OPT_TXT,  "String/Text",   _tval, 
+	(optioncfg_txt_t[]) { { 63 } },
+	NULL
+};
 
 void options_init()
 {
@@ -88,17 +98,18 @@ static option_t * option_get(int index)
 
 static void options_editor_int(option_t *option, int x, int y, int len, int vkey)
 {
+	optioncfg_int_t const *cfg = option->config;
 	int *i = option->value;
 	switch(vkey)
 	{
 		case VK_RIGHT:
 		case VK_NUM_PLUS:
 			*i += 1;
-			return;
+			break;
 		case VK_LEFT:
 		case VK_NUM_MINUS:
 			*i -= 1;
-			return;
+			break;
 	}
 	if(vkey == VK_RETURN)
 	{
@@ -109,10 +120,17 @@ static void options_editor_int(option_t *option, int x, int y, int len, int vkey
 			*i = str_to_int(buffer, 10);
 		}
 	}
+	if(cfg != NULL) {
+		*i = clamp(*i,  cfg->min, cfg->max);
+	}
 }
 
 static void options_editor_bool(option_t *option, int x, int y, int len, int vkey)
 {
+	// optioncfg_bool_t const *cfg = option->config;
+	(void)x;
+	(void)y;
+	(void)len;
 	switch(vkey)
 	{
 		case VK_RIGHT:
@@ -132,9 +150,9 @@ static void options_editor_bool(option_t *option, int x, int y, int len, int vke
 
 static void options_editor_txt(option_t *option, int x, int y, int len, int vkey)
 {
+	// optioncfg_txt_t const *cfg = option->config;
 	if(vkey != VK_RETURN)
 		return;
-	
 	input_textfield(option->value, x, y, len, TEXTFIELD_DEFAULT);
 }
 

@@ -5,12 +5,24 @@
 #define OPT_INT  2
 #define OPT_TXT  3
 
+typedef struct {
+	int min, max;
+} optioncfg_int_t;
+
+typedef struct {
+	int length;
+} optioncfg_txt_t;
+
+typedef struct {
+	
+} optioncfg_bool_t;
+
 typedef struct option
 {
 	int type;
 	char const *name;
 	void *value;
-	
+	void const * config;
 	struct option *next;
 } option_t;
 
