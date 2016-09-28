@@ -19,7 +19,7 @@ allocator_t *allocator_new(size_t objectSize)
 	allocator->bitmap     = (uint8_t*)pmm_getptr(page) + sizeof(allocator_t);
 	allocator->memstart   = allocator->bitmap + (PMM_PAGESIZE / objectSize) / 8;
 	
-	for(int i = 0; i < objectSize; i += 8)
+	for(unsigned int i = 0; i < objectSize; i += 8)
 	{
 		allocator->bitmap[i] = 0;
 	}

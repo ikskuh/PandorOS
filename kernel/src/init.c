@@ -19,7 +19,6 @@ void os_tick()
 	// console_refresh();
 }
 
-
 static void catalog(menuitem_t *);
 static char const *catalog_result = NULL;
 
@@ -152,38 +151,6 @@ void os_init()
 	// menu_select(&mainmenu, -1);
 
 	select_shell(0);
-	
-	if(false) {  // Allocator test
-		allocator_t *menuAlloc = allocator_new(sizeof(menuitem_t));
-		
-		void *a = allocator_alloc(menuAlloc);
-		void *b = allocator_alloc(menuAlloc);
-		allocator_free(menuAlloc, a);
-		void *c = allocator_alloc(menuAlloc);
-		void *d = allocator_alloc(menuAlloc);
-		
-		printf("%d, %d, %d, %d\n", a, b, c, d);
-		
-		allocator_delete(menuAlloc);
-	}
-	
-	variable_t *var_a    = var_get("A");
-	variable_t *var_str0 = var_get("STR0");
-	
-	printf("%d, %d\n", var_type(var_a), var_type(var_str0));
-	
-	int i = 10;
-	var_setval(var_a, &i);
-	var_setval(var_str0, "hallo!");
-	
-	int j = 55;
-	var_getval(var_a, &j);
-	
-	char str0[64];
-	var_getval(var_str0, str0);
-	
-	printf("%d, %s\n", j, str0);
-	
 	
 	shell_main();
 	
