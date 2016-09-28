@@ -32,7 +32,7 @@ static void _setcursor(console_t *con)
 	if(stdcon->flags & CON_NOCURSOR)
 		hal_set_cursor(screenwidth, screenheight);
 	else
-		hal_set_cursor(con->cursor.x, con->cursor.y);
+		hal_set_cursor(con->cursor.x, con->cursor.y + 2);
 }
 
 void console_refresh()

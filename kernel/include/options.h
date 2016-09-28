@@ -5,6 +5,8 @@
 #define OPT_INT  2
 #define OPT_TXT  3
 
+#define OPT_STR_LIMIT 256
+
 typedef struct option
 {
 	int type;

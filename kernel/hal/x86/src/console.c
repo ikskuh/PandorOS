@@ -68,7 +68,7 @@ void hal_console_init(int *w, int *h)
 
 void hal_set_cursor(int x, int y)
 {
-	displaycursor(x, y + 2);
+	displaycursor(x, y);
 }
 
 void hal_render_raw(int x, int y, char c, int attribs)

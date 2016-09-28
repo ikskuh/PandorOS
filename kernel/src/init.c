@@ -247,6 +247,8 @@ static void catalog(menuitem_t *this)
 	console_t *prev = stdcon;
 	console_t *catcon = console_new();
 	
+	catcon->flags |= CON_NOCURSOR;
+	
 	console_set(catcon);
 	
 	int offset = 0;
