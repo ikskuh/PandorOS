@@ -62,7 +62,6 @@ static void displaycursor(uint8_t col, uint8_t row)
   outb(0x3D4,15);
   outb(0x3D5,tmp);
 }
- 
 
 void hal_console_init(int *w, int *h)
 {

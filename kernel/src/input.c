@@ -4,7 +4,7 @@
 
 #include <stdbool.h>
 
-int input_textfield(char *str, int x, int y, int len, int flags)
+int input_textfield(char *str, int limit, int x, int y, int len, int flags)
 {
 	char *work = malloc(MAX_TEXTFIELD_LENGTH);
 	str_copy(work, str);
@@ -58,9 +58,8 @@ int input_textfield(char *str, int x, int y, int len, int flags)
 			}
 		}
 		
-		if(hit.flags & khfCharInput)
+		if((hit.flags & khfCharInput) && (cursor < limit))
 		{
-			// TODO: Input text here
 			work[cursor++] = hit.codepoint;
 			work[cursor] = 0;
 		}

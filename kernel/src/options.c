@@ -12,7 +12,7 @@ static optiongroup_t optionsDemo = { "Example Options", NULL, NULL };
 
 int _ival;
 bool _bval;
-char _tval[64];
+char _tval[16];
 
 static option_t optionInt  = {
 	OPT_INT,  "Numeric",      &_ival, 
@@ -24,7 +24,7 @@ static option_t optionBool = { OPT_BOOL, "Boolean/Flag", &_bval, NULL, NULL };
 
 static option_t optionStr  = {
 	OPT_TXT,  "String/Text",   _tval, 
-	(optioncfg_txt_t[]) { { 63 } },
+	(optioncfg_txt_t[]) { { 15 } },
 	NULL
 };
 
@@ -115,7 +115,7 @@ static void options_editor_int(option_t *option, int x, int y, int len, int vkey
 	{
 		char buffer[64];
 		str_printf(buffer, "%d", *i);
-		if(input_textfield(buffer, x, y, len, TEXTFIELD_DEFAULT) != VK_ESCAPE)
+		if(input_textfield(buffer, 63, x, y, len, TEXTFIELD_DEFAULT) != VK_ESCAPE)
 		{
 			*i = str_to_int(buffer, 10);
 		}
@@ -150,10 +150,13 @@ static void options_editor_bool(option_t *option, int x, int y, int len, int vke
 
 static void options_editor_txt(option_t *option, int x, int y, int len, int vkey)
 {
-	// optioncfg_txt_t const *cfg = option->config;
+	optioncfg_txt_t const *cfg = option->config;
 	if(vkey != VK_RETURN)
 		return;
-	input_textfield(option->value, x, y, len, TEXTFIELD_DEFAULT);
+	int limit = 4096; // TODO: Replace with meaningful value.
+	if(cfg != NULL)
+		limit = cfg->length;
+	input_textfield(option->value, limit, x, y, len, TEXTFIELD_DEFAULT);
 }
 
 /**
