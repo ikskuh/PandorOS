@@ -116,6 +116,7 @@ static void shell_main()
 				char *str = currshell.input;
 				while(*str++) len++;
 				printf("\nYou entered: \"%s\" (Length=%d)\n", currshell.input, len);
+				
 				printf("%s", shell_prompt);
 				break;
 			default:

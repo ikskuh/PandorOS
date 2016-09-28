@@ -44,5 +44,4 @@ f:write("#pragma once", "\n")
 for i,v in pairs(virtual_keys) do
 	f:write("#define VK_", v, " ", i - 1, "\n")
 end
-
 f:close();
