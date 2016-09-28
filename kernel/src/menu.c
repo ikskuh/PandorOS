@@ -220,63 +220,56 @@ static menuitem_t *menu_subopen(
 			case VK_RETURN:
 			{
 				menuitem_t *sel = &ri->items[cursor];
-				if(sel->length > 0)
+				if(sel->length == 0)
+					return sel;
+				
+				renderinfo_t subri = {
+					sel->items,
+					sel->length,
+					999,
+					999,
+					strlen(ri->items[cursor].label),
+				};
+				if(sel->flags & MENU_RIGHTALIGN)
 				{
-					renderinfo_t subri = {
-						sel->items,
-						sel->length,
-						999,
-						999,
-						strlen(ri->items[cursor].label),
-					};
-					if(sel->flags & MENU_RIGHTALIGN)
-					{
-						subri.spacex = screenwidth - 1;
-						hal_debug("Start: %d\n", subri.spacex);
-						for(int i = ri->count-1; i >= cursor; i--) {
-							if((ri->items[i].flags & MENU_RIGHTALIGN) == 0)
-								continue;
-							int w = strlen(ri->items[i].label);
-							hal_debug("Segment: %d, %d, '%s'\n", subri.spacex, w, ri->items[i].label);
-							subri.spacex -= w;
-							subri.spacex -= 1;
-						}
-						hal_debug("End: %d\n", subri.spacex);
+					subri.spacex = screenwidth - 1;
+					hal_debug("Start: %d\n", subri.spacex);
+					for(int i = ri->count-1; i >= cursor; i--) {
+						if((ri->items[i].flags & MENU_RIGHTALIGN) == 0)
+							continue;
+						int w = strlen(ri->items[i].label);
+						hal_debug("Segment: %d, %d, '%s'\n", subri.spacex, w, ri->items[i].label);
+						subri.spacex -= w;
+						subri.spacex -= 1;
 					}
-					else
-					{
-						subri.spacex = 0;
-						for(int i = 0; i < cursor; i++) {
-							if(ri->items[i].flags & MENU_RIGHTALIGN)
-								continue;
-							subri.spacex += strlen(ri->items[i].label) + 1;
-						}
-					}
-					
-					// Adjust offset to spacex with boundary checks
-					{
-						int _w = submenuwidth(sel->items, sel->length);
-						subri.offset = subri.spacex;
-						if(subri.offset + _w >= (screenwidth - 1)) {
-							subri.offset = screenwidth - _w - 2;
-						}
-					}
-					menuitem_t *subsel = menu_subopen(
-						render_dropdown, 
-						&subri,
-						true);
-					console_refresh();
-					hal_set_cursor(0, screenheight);
-					if(subsel != NULL) {
-						return subsel;
-					}
+					hal_debug("End: %d\n", subri.spacex);
 				}
 				else
 				{
-					if(sel->callback != NULL) {
-						sel->callback(sel);
+					subri.spacex = 0;
+					for(int i = 0; i < cursor; i++) {
+						if(ri->items[i].flags & MENU_RIGHTALIGN)
+							continue;
+						subri.spacex += strlen(ri->items[i].label) + 1;
 					}
-					return sel;
+				}
+				
+				// Adjust offset to spacex with boundary checks
+				{
+					int _w = submenuwidth(sel->items, sel->length);
+					subri.offset = subri.spacex;
+					if(subri.offset + _w >= (screenwidth - 1)) {
+						subri.offset = screenwidth - _w - 2;
+					}
+				}
+				menuitem_t *subsel = menu_subopen(
+					render_dropdown, 
+					&subri,
+					true);
+				console_refresh();
+				hal_set_cursor(0, screenheight);
+				if(subsel != NULL) {
+					return subsel;
 				}
 				break;
 			}
@@ -301,6 +294,10 @@ menuitem_t *menu_open(menu_t const * menu)
 	render_menu(&ri);
 	
 	console_refresh();
+	
+	if(result != NULL && result->callback != NULL) {
+		result->callback(result);
+	}
 					
 	return result;
 }

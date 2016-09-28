@@ -6,6 +6,10 @@
 #define CHA_HIGHLIGHT (1<<0)
 #define CHA_RED       (1<<1)
 
+#define CON_DEFAULT      0
+#define CON_AUTOREFRESH (1<<0)
+#define CON_NOCURSOR    (1<<1)
+
 /**
  * An attributes character.
  */
@@ -19,6 +23,7 @@ typedef struct console
 {
 	const int width;
 	const int height;
+	int flags;
 	struct { int x, y; } cursor;
 	attrchar_t * const data;
 } console_t;

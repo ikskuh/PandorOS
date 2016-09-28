@@ -11,6 +11,8 @@ console_t *console = NULL;
 void options_init()
 {
 	console = console_new();
+	console->flags &= ~CON_AUTOREFRESH;
+	console->flags |=  CON_NOCURSOR;
 }
 
 void optiongroup_register(optiongroup_t *group)
@@ -58,10 +60,14 @@ void options_showmenu()
 	
 	int optionswidth = options_maxwidth();
 	
+	int cursor = 0;
+	
 	while(true)
 	{
 		// Render catalog
 		cls();
+		
+		int index = 0;
 		for(optiongroup_t *group = firstGroup; group != NULL; group = group->next)
 		{
 			putc(0xDA);
@@ -81,8 +87,16 @@ void options_showmenu()
 				putc(' ');
 				printf("%s", opt->name);
 				
+				if(index == cursor) {
+					for(int i = 0; i < optionswidth; i++) {
+						int idx = console->cursor.y * console->width + 2 + i;
+						console->data[idx].attribs = CHA_HIGHLIGHT;
+					}
+				}
+				
 				console->cursor.x = optionswidth + 3;
 				putc('=');
+				putc(' ');
 				putc(' ');
 				
 				switch(opt->type)
@@ -106,6 +120,8 @@ void options_showmenu()
 				
 				console->cursor.x = console->width - 1;
 				putc(0xB3);
+				
+				index++;
 			}
 			
 			putc(0xC0);
@@ -115,6 +131,8 @@ void options_showmenu()
 			}
 			putc(0xD9);
 		}
+		
+		console_refresh();
 		
 		keyhit_t hit = getkey(true);
 	}

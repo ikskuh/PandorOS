@@ -10,6 +10,4 @@ void hal_render_raw(int x, int y, char c, int attribs);
 
 void hal_render_console(console_t const * con, int x, int y, int w, int h);
 
-
-
 void hal_debug(char const *fmt, ...);

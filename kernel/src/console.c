@@ -6,9 +6,12 @@
 #include <stdarg.h>
 #include <stddef.h>
 
+
 int screenwidth, screenheight;
 
 console_t *stdcon = NULL;
+
+#define CON_WANTS_REFRESH(con) ((con) == stdcon && (con)->flags && CON_AUTOREFRESH)
 
 void console_init()
 {
@@ -39,6 +42,7 @@ console_t *console_new()
 		// Consoles are 2 rows less tall than the screen.
 		screenwidth, 
 		screenheight - 2,
+		CON_DEFAULT | CON_AUTOREFRESH,
 		{ 0, 0 },
 		(attrchar_t*)((uint8_t*)con + sizeof(*con)),
 	};
@@ -62,7 +66,7 @@ void console_clear(console_t *con)
 	}
 	con->cursor.x = 0;
 	con->cursor.y = 0;
-	if(con == stdcon) {
+	if(CON_WANTS_REFRESH(con))  {
 		hal_set_cursor(con->cursor.x, con->cursor.y);
 		hal_render_console(con, 0, 0, con->width, con->height);
 	}
@@ -72,7 +76,7 @@ void console_setcursor(console_t *con, int x, int y)
 {
 	con->cursor.x = x;
 	con->cursor.y = y;
-	if(con == stdcon) hal_set_cursor(con->cursor.x, con->cursor.y);
+	if(CON_WANTS_REFRESH(con)) hal_set_cursor(con->cursor.x, con->cursor.y);
 }
 
 void console_scroll(console_t *con, int lines)
@@ -92,13 +96,13 @@ void console_scroll(console_t *con, int lines)
 		}
 		con->cursor.y -= 1;
 	}
-	if(con == stdcon) hal_render_console(con, 0, 0, con->width, con->height);
+	if(CON_WANTS_REFRESH(con))  hal_render_console(con, 0, 0, con->width, con->height);
 }
 
 void console_setc(console_t *con, int x, int y, char c)
 {
 	con->data[con->width * y + x] = (attrchar_t) { c, 0x00 };
-	if(con == stdcon) hal_render_console(con, x, y, 1, 1);
+	if(CON_WANTS_REFRESH(con))  hal_render_console(con, x, y, 1, 1);
 }
 
 void console_newline(console_t *con)
@@ -134,7 +138,7 @@ void console_putc(console_t *con, char c)
 			}
 			break;
 	}
-	if(con == stdcon) hal_set_cursor(con->cursor.x, con->cursor.y);
+	if(CON_WANTS_REFRESH(con))  hal_set_cursor(con->cursor.x, con->cursor.y);
 }
 
 void console_puts(console_t *con, char const * str)
