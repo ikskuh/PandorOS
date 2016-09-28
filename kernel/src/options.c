@@ -104,7 +104,7 @@ static void options_editor_int(option_t *option, int x, int y, int len, int vkey
 	{
 		char buffer[64];
 		str_printf(buffer, "%d", *i);
-		if(input_textfield(buffer, x, y, len) != VK_ESCAPE)
+		if(input_textfield(buffer, x, y, len, TEXTFIELD_DEFAULT) != VK_ESCAPE)
 		{
 			*i = str_to_int(buffer, 10);
 		}
@@ -135,7 +135,7 @@ static void options_editor_txt(option_t *option, int x, int y, int len, int vkey
 	if(vkey != VK_RETURN)
 		return;
 	
-	input_textfield(option->value, x, y, len);
+	input_textfield(option->value, x, y, len, TEXTFIELD_DEFAULT);
 }
 
 /**

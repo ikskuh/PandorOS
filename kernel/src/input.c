@@ -4,7 +4,7 @@
 
 #include <stdbool.h>
 
-int input_textfield(char *str, int x, int y, int len)
+int input_textfield(char *str, int x, int y, int len, int flags)
 {
 	char *work = malloc(MAX_TEXTFIELD_LENGTH);
 	str_copy(work, str);
@@ -46,6 +46,8 @@ int input_textfield(char *str, int x, int y, int len)
 					str_copy(str, work);
 					// Pass through
 				case VK_ESCAPE:
+					if(flags & TEXTFIELD_NOCANCEL)
+						str_copy(str, work);
 					stdcon->flags = prevFlags;
 					free(work);
 					for(int i = 0; i < len; i++) {
