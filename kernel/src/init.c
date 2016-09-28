@@ -8,6 +8,7 @@
 #include "pmm.h"
 #include "alloc.h"
 #include "interpreter.h"
+#include "catalog.h"
 
 int ticks = 0;
 
@@ -18,9 +19,6 @@ void os_tick()
 	// console_refresh();
 }
 
-static void catalog(menuitem_t *);
-static char const *catalog_result = NULL;
-
 static void select_shell(int shellId);
 
 static void select_shell0() { select_shell(0); }
@@ -30,7 +28,7 @@ static void select_shell2() { select_shell(2); }
 menu_t mainmenu = {
 	3,
 	(menuitem_t[]) {
-		{ "Catalog", MENU_DEFAULT, &catalog, 0, NULL },
+		{ "Catalog", MENU_DEFAULT, &catalog_open, 0, NULL },
 		{ "Screen 0", MENU_DEFAULT, NULL,
 			3,
 			(menuitem_t[]) {
@@ -84,15 +82,14 @@ static void shell_main()
 		{
 			case '\t':
 			{
-				catalog_result = NULL;
 				// menuitem_t *selection = menu_open(&mainmenu);
 				menu_open(&mainmenu);
-				if(catalog_result != NULL)
+				char const * insertion = catalog_get();
+				if(insertion != NULL)
 				{
-					char const * str = catalog_result;
-					while(*str) {
-						putc(*str);
-						currshell.input[currshell.cursor++] = *str++;
+					while(*insertion) {
+						putc(*insertion);
+						currshell.input[currshell.cursor++] = *insertion++;
 					}
 				}
 				break;
@@ -134,6 +131,7 @@ void os_init()
 	// TODO: Initialize OS…
 	console_init();
 	options_init();
+	catalog_init();
 	
 	var_init();
 	
@@ -156,160 +154,3 @@ void os_init()
 	
 	while(true);
 }
-
-/*
-
-static void test_printf()
-{
-	printf("Starting the OS...\n");
-	
-	printf("String: %s\n", "Hello World!");
-	printf("Numbers: %b %d %x\n", 14, 15, 13);
-	printf("Numbers: %b %d %x\n", -14, -15, -13);
-	
-	printf("Character Map:\n");
-	for(int y = -1; y < 16; y++)
-	{
-		for(int x = -1; x < 16; x++) {
-			if(y < 0) {
-				if(x < 0) {
-					printf("  ");
-				} else {
-					printf("%x ", x);
-				}
-				continue;
-			}
-			if(x < 0) {
-				printf("%x ", y);
-			} else {
-				char c = 16*y+x;
-				if(c == '\n' || c == '\b')
-					printf("  ");
-				else
-					printf("%c ", c);
-			}
-		
-		}
-		printf("\n");
-	}
-	
-	printf("PMM Testing:\n");
-	{
-		page_t p0, p1;
-		printf("pmm_alloc[0] = %d\n", pmm_alloc());
-		printf("pmm_alloc[1] = %d\n", p0 = pmm_alloc());
-		printf("pmm_alloc[2] = %d\n", pmm_alloc());
-		printf("pmm_alloc[3] = %d\n", p1 = pmm_alloc());
-		pmm_free(p0);
-		printf("pmm_alloc[4] = %d\n", pmm_alloc());
-	}
-}
-*/
-static char const * catalog_selections[] = {
-	"Hallo",
-	"Welt",
-	"Teststring",
-	"Something Wicked!",
-	"Output(",
-	"Real(",
-	"Imag(",
-	"Conj(",
-	"SetPixel(",
-	"GetPixel(",
-	"ClearScreen(",
-	"ClearHome",
-	"a",
-	"b",
-	"c",
-	"d",
-	"e",
-	"f",
-	"g",
-	"h",
-	"i",
-	"j",
-	"k",
-	"l",
-	"m",
-	"n",
-	"o",
-	"p",
-	"q",
-	"r",
-	"s",
-	NULL,
-};
-
-static void catalog(menuitem_t *this)
-{
-	(void)this;
-	
-	console_t *prev = stdcon;
-	console_t *catcon = console_new();
-	
-	catcon->flags |= CON_NOCURSOR;
-	
-	console_set(catcon);
-	
-	int offset = 0;
-	int cursor = 0;
-	while(true)
-	{
-		// Render catalog
-		cls();
-		for(int i = 0; i < (catcon->height - 1); i++)
-		{
-			if(catalog_selections[offset + i] == NULL)
-				break;
-			if((offset + i) == cursor)
-				printf("->");
-			else
-				printf("  ");
-			printf(" %s\n", catalog_selections[offset + i]);
-		}
-		
-		keyhit_t hit;
-		do {
-			hit = getkey(true);
-		} while((hit.flags & khfKeyPress) == 0);
-		
-		switch(hit.key)
-		{
-			case VK_UP:
-				if(cursor > 0)
-					cursor--;
-				break;
-			case VK_DOWN:
-				if(catalog_selections[cursor + 1] != NULL)
-					cursor++;
-				break;
-			case VK_LEFT:
-				for(int i = 0; i < (catcon->height - 2); i++) {
-					if(cursor > 0) cursor--;
-				}
-				break;
-			case VK_RIGHT:
-				for(int i = 0; i < (catcon->height - 2); i++) {
-					if(catalog_selections[cursor + 1] != NULL)
-						cursor++;
-				}
-				break;
-			case VK_RETURN:
-				catalog_result = catalog_selections[cursor];
-				console_set(prev);
-				console_delete(catcon);
-				return;
-			case VK_ESCAPE:
-				catalog_result =  NULL;
-				console_set(prev);
-				console_delete(catcon);
-				return;
-		}
-		if(cursor < offset)
-			offset = cursor;
-		if(cursor > (offset + catcon->height - 2))
-			offset = cursor - catcon->height + 2;
-	}
-}
-
-//*/
