@@ -14,8 +14,8 @@ class Program
 	
 	static Dictionary<string, string> mapper = new Dictionary<string, string>()
 	{
-		{ ".c", "$(CC) $(CFLAGS) -c -o $@ $<" },
-		{ ".S", "$(AS) $(ASFLAGS) -c -o $@ $<" },
+		{ ".c",  "$(CC)  $(CFLAGS) -c -o $@ $<" },
+		{ ".S",  "$(AS)  $(ASFLAGS) -c -o $@ $<" },
 	};
 	
 	static int Main(string[] args)
@@ -57,23 +57,28 @@ class Program
 	
 	static void WriteFiles(TextWriter sw, string root)
 	{
-		var files = Directory.GetFiles(root);
+		var files = Directory.GetFiles(root, "*", SearchOption.AllDirectories);
 		foreach(var file in files)
 		{
-			var ext = Path.GetExtension(file);
-			if(mapper.ContainsKey(ext) == false)
-				continue;
-			
-			var obj = GetObjectFileName(file);
-			objects.Add(obj);
-			sw.WriteLine(
-				"{0}: ../{1}",
-				obj,
-				file);
-			sw.WriteLine(
-				"\t{0}",
-				mapper[ext]);
+			WriteRule(sw, file);
 		}
+	}
+	
+	static void WriteRule(TextWriter sw, string file)
+	{
+		var ext = Path.GetExtension(file);
+		if(mapper.ContainsKey(ext) == false)
+			return;
+		
+		var obj = GetObjectFileName(file);
+		objects.Add(obj);
+		sw.WriteLine(
+			"{0}: ../{1}",
+			obj,
+			file);
+		sw.WriteLine(
+			"\t{0}",
+			mapper[ext]);
 	}
 	
 	static string GetObjectFileName(string file)

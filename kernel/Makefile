@@ -9,12 +9,14 @@ HAL_ROOT=./hal/$(PLATFORM)/
 HAL_INIT=$(HAL_ROOT)init.lua
 HAL_CONFIG=$(HAL_ROOT)config.h
 
+LEX=flex
+
 all: kernel rmbuild
 
 kernel: initfiles makefile 
 	$(MAKE) -B -C build
 	mv build/kernel kernel
-
+	
 makefile:
 	mkdir -p build
 	mcs build.cs
