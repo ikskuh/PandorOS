@@ -1,11 +1,17 @@
 #pragma once
 
+#include "config.h"
 #include <stdbool.h>
 
 #define VAR_NULL 0
 #define VAR_INT  1
 #define VAR_TXT  2
 
+#define VAr_TXT_MAXLEN (PMM_PAGESIZE - 1)
+
+/**
+ * Opaque handle to a variable.
+ */
 typedef struct variable variable_t;
 
 /**

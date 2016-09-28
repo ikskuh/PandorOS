@@ -3,11 +3,12 @@
 #include "keyboard-drv.h"
 #include "console.h"
 #include "multiboot.h"
-#include <stdint.h>
-#include <stddef.h>
 #include "timer.h"
 #include "pmm.h"
 #include "printf.h"
+#include "options.h"
+#include <stdint.h>
+#include <stddef.h>
 
 
 // Prüft, ob man bereits schreiben kann
@@ -78,6 +79,14 @@ static struct cpu *timer_tick(struct cpu *cpu)
 	return cpu;
 }
 
+optiongroup_t halOptions = {
+	"x86 Options", NULL, NULL
+};
+
+extern option_t halOptConsoleForeground;
+extern option_t halOptConsoleBackground;
+extern option_t halOptConsoleHighlight;
+
 void x86_init(uint32_t bootmagic, struct multiboot_info const * info)
 {
 	// Checks for a correct multiboot magic
@@ -98,6 +107,12 @@ void x86_init(uint32_t bootmagic, struct multiboot_info const * info)
 	
 	interrupts[0x20] = &timer_tick;
 	interrupts[0x21] = &keyboard_isr;
+	
+	optiongroup_register(&halOptions);
+	
+	option_add(&halOptions, &halOptConsoleForeground);
+	option_add(&halOptions, &halOptConsoleBackground);
+	option_add(&halOptions, &halOptConsoleHighlight);
 }
 
 static void init_gdt()

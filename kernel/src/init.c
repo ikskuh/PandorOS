@@ -1,14 +1,13 @@
 #include <stddef.h>
 #include <stdbool.h>
 
-#include "console.h"
 #include "menu.h"
-#include "input.h"
-#include "stdlib.h"
+#include "standard.h"
+#include "io.h"
+#include "options.h"
 #include "pmm.h"
 #include "alloc.h"
 #include "interpreter.h"
-#include "string.h"
 
 int ticks = 0;
 
@@ -45,7 +44,7 @@ menu_t mainmenu = {
 			(menuitem_t[]) {
 				{ "Memory Management", MENU_DEFAULT, NULL, 0, NULL },
 				{ "OS Debugger",       MENU_DEFAULT, NULL, 0, NULL },
-				{ "Network Settings",  MENU_DEFAULT, NULL, 0, NULL },
+				{ "Settings",          MENU_DEFAULT, options_showmenu, 0, NULL },
 				{ "About",             MENU_DEFAULT, NULL, 0, NULL },
 				{ "Reboot",            MENU_DEFAULT, NULL, 0, NULL },
 				{ "Poweroff",          MENU_DEFAULT, NULL, 0, NULL },
@@ -134,6 +133,7 @@ void os_init()
 {
 	// TODO: Initialize OS…
 	console_init();
+	options_init();
 	
 	var_init();
 	

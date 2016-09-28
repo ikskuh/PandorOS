@@ -1,10 +1,45 @@
 #include "hal.h"
 #include "io.h"
 #include "console.h"
+#include "options.h"
 #include <stdint.h>
+#include <stddef.h>
 
 #define WIDTH 80
 #define HEIGHT 25
+
+int foreground = 0xF, background = 0x0, highlight = 0x2;
+
+
+option_t halOptConsoleForeground = {
+	OPT_INT, "Foreground Color", &foreground, NULL
+};
+
+option_t halOptConsoleBackground = {
+	OPT_INT, "Background Color", &background, NULL
+};
+
+option_t halOptConsoleHighlight = {
+	OPT_INT, "Highlight Color", &highlight, NULL
+};
+
+static uint8_t getcolor(int attribs)
+{
+	if(attribs & CHA_RED)
+	{
+		if(attribs & CHA_HIGHLIGHT)
+			return 0x8C;
+		else
+			return 0x04;
+	}
+	else
+	{
+		if(attribs & CHA_HIGHLIGHT)
+			return ((highlight&0xF) << 4) | (foreground&0xF);
+		else
+			return ((background&0xF) << 4) | (foreground&0xF);
+	}
+}
 
 struct _vchar
 {
@@ -34,24 +69,6 @@ void hal_console_init(int *w, int *h)
 void hal_set_cursor(int x, int y)
 {
 	displaycursor(x, y + 2);
-}
-
-static uint8_t getcolor(int attribs)
-{
-	if(attribs & CHA_RED)
-	{
-		if(attribs & CHA_HIGHLIGHT)
-			return 0x8C;
-		else
-			return 0x04;
-	}
-	else
-	{
-		if(attribs & CHA_HIGHLIGHT)
-			return 0x2F;
-		else
-			return 0x0F;
-	}
 }
 
 void hal_render_raw(int x, int y, char c, int attribs)

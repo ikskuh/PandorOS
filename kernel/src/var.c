@@ -28,12 +28,13 @@ void var_init()
 		variables_int[i].ro   = false;
 		variables_int[i].num  = 0;
 	}
-
+	
 	for(int i = 0; i < 10; i++)
 	{
 		variables_str[i].type = VAR_TXT;
 		variables_str[i].ro   = false;
 		variables_str[i].text = pmm_getptr(pmm_alloc());
+		str_copy(variables_str[i].text, "");
 	}
 }
 
