@@ -6,7 +6,6 @@
 #include <stdarg.h>
 #include <stddef.h>
 
-
 int screenwidth, screenheight;
 
 console_t *stdcon = NULL;
@@ -28,10 +27,18 @@ void console_set(console_t *con)
 	console_refresh();
 }
 
+static void _setcursor(console_t *con)
+{
+	if(stdcon->flags & CON_NOCURSOR)
+		hal_set_cursor(screenwidth, screenheight);
+	else
+		hal_set_cursor(con->cursor.x, con->cursor.y);
+}
+
 void console_refresh()
 {
 	hal_render_console(stdcon, 0, 0, stdcon->width, stdcon->height);
-	hal_set_cursor(stdcon->cursor.x, stdcon->cursor.y);
+	_setcursor(stdcon);
 }
 
 console_t *console_new()
@@ -67,7 +74,7 @@ void console_clear(console_t *con)
 	con->cursor.x = 0;
 	con->cursor.y = 0;
 	if(CON_WANTS_REFRESH(con))  {
-		hal_set_cursor(con->cursor.x, con->cursor.y);
+		_setcursor(con);
 		hal_render_console(con, 0, 0, con->width, con->height);
 	}
 }
@@ -76,7 +83,7 @@ void console_setcursor(console_t *con, int x, int y)
 {
 	con->cursor.x = x;
 	con->cursor.y = y;
-	if(CON_WANTS_REFRESH(con)) hal_set_cursor(con->cursor.x, con->cursor.y);
+	if(CON_WANTS_REFRESH(con)) _setcursor(con);
 }
 
 void console_scroll(console_t *con, int lines)
@@ -138,7 +145,7 @@ void console_putc(console_t *con, char c)
 			}
 			break;
 	}
-	if(CON_WANTS_REFRESH(con))  hal_set_cursor(con->cursor.x, con->cursor.y);
+	if(CON_WANTS_REFRESH(con))  _setcursor(con);
 }
 
 void console_puts(console_t *con, char const * str)
