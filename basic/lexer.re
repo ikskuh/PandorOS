@@ -2,13 +2,9 @@
 #include <string.h>
 #include <stdbool.h>
 
-struct token
-{
-	int type;
-	int length;
-};
+#include "lexer.h"
 
-static struct token lex(const char *input)
+struct token lex(const char *input)
 {
 	int len = strlen(input);
 	int marker;
@@ -37,33 +33,13 @@ static struct token lex(const char *input)
 		ass = "->";
 
 		*        { return (struct token){ 0, 0 }; }
-		dec      { return (struct token){ 1, index }; }
+		dec      { return (struct token){ TOK_INTEGER, index }; }
 		hex      { return (struct token){ 2, index }; }
-		[+\-*\/] { return (struct token){ 3, index }; }
-		ws+      { return (struct token){ 4, index }; }
-		var      { return (struct token){ 5, index }; }
-		ass      { return (struct token){ 6, index }; }
+		"+"      { return (struct token){ TOK_PLUS, index }; }
+		"-"      { return (struct token){ TOK_MINUS, index }; }
+		"*"      { return (struct token){ TOK_TIMES, index }; }
+		"/"      { return (struct token){ TOK_DIVIDE, index }; }
+		ws+      { return (struct token){ -1, index }; }
+		
 	*/
-}
-
-int main(int argc, char **argv)
-{
-    for (int i = 1; i < argc; ++i)
-		{
-			char *input = argv[i];
-			printf("%s\n", input);
-			while(true)
-			{
-				struct token token = lex(input);
-				printf ("  (%d, %d): '", token.type, token.length);
-				fwrite(input, token.length, 1, stdout);
-				printf("'\n");
-				if(token.type == 0)
-					break;
-				input += token.length;
-				if(*input == 0)
-					break;
-			}
-    }
-    return 0;
 }
