@@ -33,3 +33,5 @@
 *.su
 
 kernel/build
+*.o
+basic/basic-demo
