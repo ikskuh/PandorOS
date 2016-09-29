@@ -63,7 +63,7 @@
 **                       defined, then do no error processing.
 */
 #define YYCODETYPE unsigned char
-#define YYNOCODE 10
+#define YYNOCODE 12
 #define YYACTIONTYPE unsigned char
 #define ParseTOKENTYPE int
 typedef union {
@@ -77,8 +77,8 @@ typedef union {
 #define ParseARG_PDECL
 #define ParseARG_FETCH
 #define ParseARG_STORE
-#define YYNSTATE 11
-#define YYNRULE 6
+#define YYNSTATE 14
+#define YYNRULE 7
 #define YY_NO_ACTION      (YYNSTATE+YYNRULE+2)
 #define YY_ACCEPT_ACTION  (YYNSTATE+YYNRULE+1)
 #define YY_ERROR_ACTION   (YYNSTATE+YYNRULE)
@@ -147,32 +147,34 @@ static const YYMINORTYPE yyzerominor = { 0 };
 **                     shifting non-terminals after a reduce.
 **  yy_default[]       Default action for each state.
 */
-#define YY_ACTTAB_COUNT (15)
+#define YY_ACTTAB_COUNT (23)
 static const YYACTIONTYPE yy_action[] = {
- /*     0 */    11,    3,    4,    1,    2,    1,    2,    7,   18,    5,
- /*    10 */     8,    6,   10,   19,    9,
+ /*     0 */    14,    4,    5,    2,    3,    4,    5,    2,    3,    9,
+ /*    10 */    11,    2,    3,    8,    1,   13,   10,   12,   23,   23,
+ /*    20 */    22,    7,    6,
 };
 static const YYCODETYPE yy_lookahead[] = {
- /*     0 */     0,    1,    2,    3,    4,    3,    4,    8,    7,    8,
- /*    10 */     5,    8,    8,    9,    8,
+ /*     0 */     0,    1,    2,    3,    4,    1,    2,    3,    4,   10,
+ /*    10 */     6,    3,    4,   10,    5,   10,    7,   10,   11,   11,
+ /*    20 */     9,   10,   10,
 };
 #define YY_SHIFT_USE_DFLT (-1)
-#define YY_SHIFT_COUNT (7)
+#define YY_SHIFT_COUNT (9)
 #define YY_SHIFT_MIN   (0)
-#define YY_SHIFT_MAX   (5)
+#define YY_SHIFT_MAX   (9)
 static const signed char yy_shift_ofst[] = {
- /*     0 */     5,    5,    5,    5,    5,    0,    2,    2,
+ /*     0 */     9,    9,    9,    9,    9,    9,    4,    0,    8,    8,
 };
 #define YY_REDUCE_USE_DFLT (-2)
-#define YY_REDUCE_COUNT (4)
+#define YY_REDUCE_COUNT (5)
 #define YY_REDUCE_MIN   (-1)
-#define YY_REDUCE_MAX   (6)
+#define YY_REDUCE_MAX   (12)
 static const signed char yy_reduce_ofst[] = {
- /*     0 */     1,    6,    4,    3,   -1,
+ /*     0 */    11,   12,    7,    5,    3,   -1,
 };
 static const YYACTIONTYPE yy_default[] = {
- /*     0 */    17,   17,   17,   17,   17,   17,   13,   12,   16,   15,
- /*    10 */    14,
+ /*     0 */    21,   21,   21,   21,   21,   21,   21,   21,   16,   15,
+ /*    10 */    20,   19,   18,   17,
 };
 
 /* The next table maps tokens into fallback tokens.  If a construct
@@ -266,8 +268,8 @@ void ParseTrace(FILE *TraceFILE, char *zTracePrompt){
 ** are required.  The following table supplies these names */
 static const char *const yyTokenName[] = { 
   "$",             "PLUS",          "MINUS",         "DIVIDE",      
-  "TIMES",         "INTEGER",       "error",         "program",     
-  "expr",        
+  "TIMES",         "BRO",           "BRC",           "INTEGER",     
+  "error",         "program",       "expr",        
 };
 #endif /* NDEBUG */
 
@@ -280,7 +282,8 @@ static const char *const yyRuleName[] = {
  /*   2 */ "expr ::= expr PLUS expr",
  /*   3 */ "expr ::= expr TIMES expr",
  /*   4 */ "expr ::= expr DIVIDE expr",
- /*   5 */ "expr ::= INTEGER",
+ /*   5 */ "expr ::= BRO expr BRC",
+ /*   6 */ "expr ::= INTEGER",
 };
 #endif /* NDEBUG */
 
@@ -594,12 +597,13 @@ static const struct {
   YYCODETYPE lhs;         /* Symbol on the left-hand side of the rule */
   unsigned char nrhs;     /* Number of right-hand side symbols in the rule */
 } yyRuleInfo[] = {
-  { 7, 1 },
-  { 8, 3 },
-  { 8, 3 },
-  { 8, 3 },
-  { 8, 3 },
-  { 8, 1 },
+  { 9, 1 },
+  { 10, 3 },
+  { 10, 3 },
+  { 10, 3 },
+  { 10, 3 },
+  { 10, 3 },
+  { 10, 1 },
 };
 
 static void yy_accept(yyParser*);  /* Forward Declaration */
@@ -657,22 +661,22 @@ static void yy_reduce(
       case 0: /* program ::= expr */
 #line 20 "grammar.y"
 { printf("Result=%d\n", yymsp[0].minor.yy0); }
-#line 661 "grammar.c"
+#line 665 "grammar.c"
         break;
       case 1: /* expr ::= expr MINUS expr */
 #line 22 "grammar.y"
 { yygotominor.yy0 = yymsp[-2].minor.yy0 - yymsp[0].minor.yy0; }
-#line 666 "grammar.c"
+#line 670 "grammar.c"
         break;
       case 2: /* expr ::= expr PLUS expr */
 #line 23 "grammar.y"
 { yygotominor.yy0 = yymsp[-2].minor.yy0 + yymsp[0].minor.yy0; }
-#line 671 "grammar.c"
+#line 675 "grammar.c"
         break;
       case 3: /* expr ::= expr TIMES expr */
 #line 24 "grammar.y"
 { yygotominor.yy0 = yymsp[-2].minor.yy0 * yymsp[0].minor.yy0; }
-#line 676 "grammar.c"
+#line 680 "grammar.c"
         break;
       case 4: /* expr ::= expr DIVIDE expr */
 #line 25 "grammar.y"
@@ -683,12 +687,17 @@ static void yy_reduce(
 		printf("divide by zero\n");
 	}
 }
-#line 687 "grammar.c"
+#line 691 "grammar.c"
         break;
-      case 5: /* expr ::= INTEGER */
+      case 5: /* expr ::= BRO expr BRC */
 #line 33 "grammar.y"
+{ yygotominor.yy0 = yymsp[-1].minor.yy0; }
+#line 696 "grammar.c"
+        break;
+      case 6: /* expr ::= INTEGER */
+#line 35 "grammar.y"
 { yygotominor.yy0 = yymsp[0].minor.yy0; }
-#line 692 "grammar.c"
+#line 701 "grammar.c"
         break;
       default:
         break;
@@ -753,7 +762,7 @@ static void yy_syntax_error(
 #line 16 "grammar.y"
   
   printf("Syntax error!\n");
-#line 757 "grammar.c"
+#line 766 "grammar.c"
   ParseARG_STORE; /* Suppress warning about unused %extra_argument variable */
 }
 
@@ -944,7 +953,7 @@ void Parse(
   }while( yymajor!=YYNOCODE && yypParser->yyidx>=0 );
   return;
 }
-#line 35 "grammar.y"
+#line 37 "grammar.y"
 
 
 void *mwrap(size_t size)
@@ -993,4 +1002,4 @@ int main(int argc, char **argv)
 	return 0;
 }
 
-#line 997 "grammar.c"
+#line 1006 "grammar.c"

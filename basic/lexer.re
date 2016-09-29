@@ -39,6 +39,8 @@ struct token lex(const char *input)
 		"-"      { return (struct token){ TOK_MINUS, index }; }
 		"*"      { return (struct token){ TOK_TIMES, index }; }
 		"/"      { return (struct token){ TOK_DIVIDE, index }; }
+		"("      { return (struct token){ TOK_BRO, index }; }
+		")"      { return (struct token){ TOK_BRC, index }; }
 		ws+      { return (struct token){ -1, index }; }
 		
 	*/
