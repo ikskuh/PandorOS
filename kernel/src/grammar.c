@@ -16,9 +16,6 @@
 #include "longjmp.h"
 #include <stdbool.h>
 
-// Exclude all debug shit
-// #define NDEBUG
-
 #include "hal.h"
 #include <stdarg.h>
 typedef struct file FILE;
@@ -52,7 +49,7 @@ static value_t result;
 
 static allocator_t * argalloc;
 
-#line 56 "src/grammar.c"
+#line 53 "src/grammar.c"
 /* Next is all token values, in a form suitable for use by makeheaders.
 ** This section will be null unless lemon is run with the -m switch.
 */
@@ -741,84 +738,84 @@ static void yy_reduce(
   **     break;
   */
       case 0: /* program ::= expr */
-#line 62 "src/grammar.lg"
+#line 59 "src/grammar.lg"
 { result = yymsp[0].minor.yy0.val; }
-#line 747 "src/grammar.c"
+#line 744 "src/grammar.c"
         break;
       case 1: /* program ::= expr ASS variable */
-#line 63 "src/grammar.lg"
+#line 60 "src/grammar.lg"
 {
 	var_set(yymsp[0].minor.yy0.var, yymsp[-2].minor.yy0.val);
 	result = yymsp[-2].minor.yy0.val;
 }
-#line 755 "src/grammar.c"
+#line 752 "src/grammar.c"
         break;
       case 2: /* variable ::= VAR */
       case 13: /* expr ::= INTEGER */ yytestcase(yyruleno==13);
       case 14: /* expr ::= STRING */ yytestcase(yyruleno==14);
-#line 68 "src/grammar.lg"
+#line 65 "src/grammar.lg"
 { yygotominor.yy0 = yymsp[0].minor.yy0; }
-#line 762 "src/grammar.c"
+#line 759 "src/grammar.c"
         break;
       case 3: /* expr ::= expr MINUS expr */
-#line 70 "src/grammar.lg"
+#line 67 "src/grammar.lg"
 { yygotominor.yy0.val = val_sub(yymsp[-2].minor.yy0.val, yymsp[0].minor.yy0.val); }
-#line 767 "src/grammar.c"
+#line 764 "src/grammar.c"
         break;
       case 4: /* expr ::= expr PLUS expr */
-#line 71 "src/grammar.lg"
+#line 68 "src/grammar.lg"
 { yygotominor.yy0.val = val_add(yymsp[-2].minor.yy0.val, yymsp[0].minor.yy0.val); }
-#line 772 "src/grammar.c"
+#line 769 "src/grammar.c"
         break;
       case 5: /* expr ::= expr TIMES expr */
-#line 72 "src/grammar.lg"
+#line 69 "src/grammar.lg"
 { yygotominor.yy0.val = val_mul(yymsp[-2].minor.yy0.val, yymsp[0].minor.yy0.val); }
-#line 777 "src/grammar.c"
+#line 774 "src/grammar.c"
         break;
       case 6: /* expr ::= expr DIVIDE expr */
-#line 73 "src/grammar.lg"
+#line 70 "src/grammar.lg"
 { yygotominor.yy0.val = val_div(yymsp[-2].minor.yy0.val, yymsp[0].minor.yy0.val); }
-#line 782 "src/grammar.c"
+#line 779 "src/grammar.c"
         break;
       case 7: /* expr ::= expr AND expr */
-#line 75 "src/grammar.lg"
+#line 72 "src/grammar.lg"
 { yygotominor.yy0.val = val_and(yymsp[-2].minor.yy0.val, yymsp[0].minor.yy0.val); }
-#line 787 "src/grammar.c"
+#line 784 "src/grammar.c"
         break;
       case 8: /* expr ::= expr OR expr */
-#line 76 "src/grammar.lg"
+#line 73 "src/grammar.lg"
 { yygotominor.yy0.val = val_or(yymsp[-2].minor.yy0.val, yymsp[0].minor.yy0.val); }
-#line 792 "src/grammar.c"
+#line 789 "src/grammar.c"
         break;
       case 9: /* expr ::= expr XOR expr */
-#line 77 "src/grammar.lg"
+#line 74 "src/grammar.lg"
 { yygotominor.yy0.val = val_xor(yymsp[-2].minor.yy0.val, yymsp[0].minor.yy0.val); }
-#line 797 "src/grammar.c"
+#line 794 "src/grammar.c"
         break;
       case 10: /* expr ::= BRO expr BRC */
-#line 79 "src/grammar.lg"
+#line 76 "src/grammar.lg"
 { yygotominor.yy0 = yymsp[-1].minor.yy0; }
-#line 802 "src/grammar.c"
+#line 799 "src/grammar.c"
         break;
       case 11: /* expr ::= MINUS expr */
-#line 81 "src/grammar.lg"
+#line 78 "src/grammar.lg"
 { yygotominor.yy0.val = val_neg(yymsp[0].minor.yy0.val); }
-#line 807 "src/grammar.c"
+#line 804 "src/grammar.c"
         break;
       case 12: /* expr ::= NOT expr */
-#line 82 "src/grammar.lg"
+#line 79 "src/grammar.lg"
 { yygotominor.yy0.val = val_not(yymsp[0].minor.yy0.val); }
-#line 812 "src/grammar.c"
+#line 809 "src/grammar.c"
         break;
       case 15: /* expr ::= VAR */
-#line 87 "src/grammar.lg"
+#line 84 "src/grammar.lg"
 { 
 	var_get(yymsp[0].minor.yy0.var, &yygotominor.yy0.val);
 }
-#line 819 "src/grammar.c"
+#line 816 "src/grammar.c"
         break;
       case 16: /* expr ::= FUN arglist BRC */
-#line 91 "src/grammar.lg"
+#line 88 "src/grammar.lg"
 {
 	arg_t *a;
 
@@ -840,30 +837,30 @@ static void yy_reduce(
 		yygotominor.yy0.val = yymsp[-2].minor.yy0.fun(cnt, args);
 	}
 }
-#line 844 "src/grammar.c"
+#line 841 "src/grammar.c"
         break;
       case 17: /* arglist ::= */
-#line 113 "src/grammar.lg"
+#line 110 "src/grammar.lg"
 { yygotominor.yy0.arg = NULL; }
-#line 849 "src/grammar.c"
+#line 846 "src/grammar.c"
         break;
       case 18: /* arglist ::= expr */
-#line 115 "src/grammar.lg"
+#line 112 "src/grammar.lg"
 { 
 	yygotominor.yy0.arg = allocator_alloc(argalloc);
 	yygotominor.yy0.arg->value = yymsp[0].minor.yy0.val;
 	yygotominor.yy0.arg->next = NULL;
 }
-#line 858 "src/grammar.c"
+#line 855 "src/grammar.c"
         break;
       case 19: /* arglist ::= expr COMMA arglist */
-#line 121 "src/grammar.lg"
+#line 118 "src/grammar.lg"
 {
 	yygotominor.yy0.arg = allocator_alloc(argalloc);
 	yygotominor.yy0.arg->value = yymsp[-2].minor.yy0.val;
 	yygotominor.yy0.arg->next = yymsp[0].minor.yy0.arg;
 }
-#line 867 "src/grammar.c"
+#line 864 "src/grammar.c"
         break;
       default:
         break;
@@ -925,10 +922,10 @@ static void yy_syntax_error(
 ){
   ParseARG_FETCH;
 #define TOKEN (yyminor.yy0)
-#line 58 "src/grammar.lg"
+#line 55 "src/grammar.lg"
   
   basic_error(ERR_SYNTAX_ERROR);
-#line 932 "src/grammar.c"
+#line 929 "src/grammar.c"
   ParseARG_STORE; /* Suppress warning about unused %extra_argument variable */
 }
 
@@ -1119,7 +1116,7 @@ void Parse(
   }while( yymajor!=YYNOCODE && yypParser->yyidx>=0 );
   return;
 }
-#line 127 "src/grammar.lg"
+#line 124 "src/grammar.lg"
 
 	static char prealloc[1024];
 
@@ -1260,4 +1257,4 @@ void Parse(
 		}
 		return NULL;
 	}
-#line 1264 "src/grammar.c"
+#line 1261 "src/grammar.c"

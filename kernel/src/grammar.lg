@@ -9,9 +9,6 @@
 #include "longjmp.h"
 #include <stdbool.h>
 
-// Exclude all debug shit
-// #define NDEBUG
-
 #include "hal.h"
 #include <stdarg.h>
 typedef struct file FILE;
