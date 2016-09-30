@@ -1,6 +1,5 @@
 #include "alloc.h"
 #include "pmm.h"
-#include "console.h"
 
 struct allocator
 {
@@ -23,12 +22,6 @@ allocator_t *allocator_new(size_t objectSize)
 	{
 		allocator->bitmap[i] = 0;
 	}
-	
-	printf("new allocator (%d,%d,%d,%d)\n",
-		page,
-		objectSize,
-		allocator->bitmap,
-		allocator->memstart);
 	
 	return allocator;
 }

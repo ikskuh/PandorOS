@@ -7,3 +7,5 @@
 #define TOK_BRO                             7
 #define TOK_BRC                             8
 #define TOK_INTEGER                         9
+#define TOK_FUN                            10
+#define TOK_COMMA                          11

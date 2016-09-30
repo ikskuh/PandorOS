@@ -3,6 +3,7 @@
 #include "basic/lexer.h"
 #include "string.h"
 #include "standard.h"
+#include "alloc.h"
 #include <stdbool.h>
 
 // Exclude all debug shit
@@ -23,12 +24,25 @@ static void assert(int x, char const * xstr)
 }
 #define assert(x) assert(x, #x);
 
+typedef int value_t;
+
+typedef value_t (*basfunc_f)(int argc, value_t *argv);
+
+typedef struct arg {
+	value_t value;
+	struct arg *next;
+} arg_t;
+
 typedef union {
-	int number;
+	value_t number;
 	variable_t * var;
+	arg_t * arg;
+	basfunc_f fun;
 } token_t;
 
 static int result;
+
+static allocator_t * argalloc;
 
 }
 
@@ -69,12 +83,62 @@ expr(A) ::= VAR(B). {
 	var_get(B.var, &A.number);
 }
 
+expr(A) ::= FUN(F) arglist(B) BRC. {
+	arg_t *a;
+
+	int cnt = 0;
+	for(a = B.arg; a != NULL; a = a->next)
+	{
+		cnt++;
+	}
+
+	value_t args[cnt];
+	
+	int i;
+	for(a = B.arg, i = 0; a != NULL; a = a->next, i++)
+	{
+		args[i] = a->value;
+	}
+
+	if(F.fun != NULL) {
+		A.number = F.fun(cnt, args);
+	} else {
+		printf("Function not found.\n");
+	}
+	
+}
+
+arglist(A) ::= . { A.arg = NULL; }
+
+arglist(A) ::= expr(B). { 
+	A.arg = allocator_alloc(argalloc);
+	A.arg->value = B.number;
+	A.arg->next = NULL;
+}
+
+arglist(A) ::= expr(B) COMMA arglist(C). {
+	A.arg = allocator_alloc(argalloc);
+	A.arg->value = B.number;
+	A.arg->next = C.arg;
+}
+
 % code {
 	static char prealloc[1024];
 
 	static void *mwrap(size_t size)
 	{
 		return prealloc;
+	}
+	
+	static value_t demofun(int argc, value_t *argv)
+	{
+		value_t sum = 0;
+		for(int i = 0; i < argc; i++)
+		{
+			sum += argv[i];
+			// printf("[%d] = %d\n", i, argv[i]);
+		}
+		return sum;
 	}
 
 	static token_t nulltoken = { 0 };
@@ -83,6 +147,8 @@ expr(A) ::= VAR(B). {
 	{
 		// Enables tracing on parser errors
 		// ParseTrace(10, "TRACE: ");
+		
+		argalloc = allocator_new(sizeof(arg_t));
 		
 		void* pParser = ParseAlloc (mwrap);
 		while(true)
@@ -108,6 +174,12 @@ expr(A) ::= VAR(B). {
 						currtok.var = var_byname(buffer);
 						break;
 					}
+					case TOK_FUN:
+					{
+						// TODO: Set registered function.
+						currtok.fun = &demofun;
+						break;
+					}
 				}
 				
 				hal_debug("Recognized token: %s(%d)\n", yyTokenName[token.type], token.type);
@@ -125,6 +197,8 @@ expr(A) ::= VAR(B). {
 		Parse(pParser, 0, nulltoken);
 		
 		ParseFree(pParser, free );
+		
+		allocator_delete(argalloc);
 		
 		return result;
 	}
