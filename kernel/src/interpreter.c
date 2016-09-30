@@ -31,11 +31,25 @@ number_t basic_getnum(value_t value)
 	return value.number;
 }
 
+string_t basic_getstr(value_t value)
+{
+	if(value.type != TYPE_TEXT) basic_error(ERR_INVALID_ARG);
+	return value.string;
+}
+
 value_t basic_mknum(number_t num)
 {
 	value_t val;
 	val.type = TYPE_NUM;
 	val.number = num;
+	return val;
+}
+
+value_t basic_mkstr(string_t str)
+{
+	value_t val;
+	val.type = TYPE_TEXT;
+	val.string = str;
 	return val;
 }
 

@@ -22,6 +22,8 @@ variable_t variable_null = { TYPE_NULL, true, {} };
 variable_t variables_int[26];
 variable_t variables_str[10];
 
+static char *ansstring;
+
 void var_init()
 {
 	for(int i = 0; i < 26; i++)
@@ -38,6 +40,8 @@ void var_init()
 		variables_str[i].text = pmm_getptr(pmm_alloc());
 		str_copy(variables_str[i].text, "");
 	}
+	
+	ansstring = pmm_getptr(pmm_alloc());
 }
 
 variable_t * var_byname(char const * name)
@@ -118,6 +122,10 @@ void var_setans(value_t value)
 {
 	variable_ans.type = value.type;
 	variable_ans.ro = false;
+	if(value.type == TYPE_TEXT) {
+		// We have a shared string ptr that will change on numeric stuff...
+		variable_ans.text = ansstring;
+	}
 	var_set(&variable_ans, value);
 	variable_ans.ro = true;
 }

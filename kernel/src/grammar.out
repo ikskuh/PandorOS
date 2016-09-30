@@ -12,6 +12,7 @@ State 0:
           expr ::= * MINUS expr
           expr ::= * NOT expr
           expr ::= * INTEGER
+          expr ::= * STRING
           expr ::= * VAR
           expr ::= * FUN arglist BRC
 
@@ -19,7 +20,8 @@ State 0:
                            NOT shift  3
                            VAR shift  26
                            BRO shift  5
-                       INTEGER shift  27
+                       INTEGER shift  28
+                        STRING shift  27
                            FUN shift  2
                        program accept
                           expr shift  14
@@ -36,9 +38,10 @@ State 1:
           expr ::= * MINUS expr
           expr ::= * NOT expr
           expr ::= * INTEGER
+          expr ::= * STRING
           expr ::= * VAR
           expr ::= * FUN arglist BRC
-     (16) arglist ::= *
+     (17) arglist ::= *
           arglist ::= * expr
           arglist ::= * expr COMMA arglist
           arglist ::= expr COMMA * arglist
@@ -47,11 +50,12 @@ State 1:
                            NOT shift  3
                            VAR shift  26
                            BRO shift  5
-                       INTEGER shift  27
+                       INTEGER shift  28
+                        STRING shift  27
                            FUN shift  2
                           expr shift  15
                        arglist shift  25
-                     {default} reduce 16
+                     {default} reduce 17
 
 State 2:
           expr ::= * expr MINUS expr
@@ -65,10 +69,11 @@ State 2:
           expr ::= * MINUS expr
           expr ::= * NOT expr
           expr ::= * INTEGER
+          expr ::= * STRING
           expr ::= * VAR
           expr ::= * FUN arglist BRC
           expr ::= FUN * arglist BRC
-     (16) arglist ::= *
+     (17) arglist ::= *
           arglist ::= * expr
           arglist ::= * expr COMMA arglist
 
@@ -76,11 +81,12 @@ State 2:
                            NOT shift  3
                            VAR shift  26
                            BRO shift  5
-                       INTEGER shift  27
+                       INTEGER shift  28
+                        STRING shift  27
                            FUN shift  2
                           expr shift  15
                        arglist shift  22
-                     {default} reduce 16
+                     {default} reduce 17
 
 State 3:
           expr ::= * expr MINUS expr
@@ -95,6 +101,7 @@ State 3:
           expr ::= * NOT expr
           expr ::= NOT * expr
           expr ::= * INTEGER
+          expr ::= * STRING
           expr ::= * VAR
           expr ::= * FUN arglist BRC
 
@@ -102,9 +109,10 @@ State 3:
                            NOT shift  3
                            VAR shift  26
                            BRO shift  5
-                       INTEGER shift  27
+                       INTEGER shift  28
+                        STRING shift  27
                            FUN shift  2
-                          expr shift  28
+                          expr shift  29
 
 State 4:
           expr ::= * expr MINUS expr
@@ -119,6 +127,7 @@ State 4:
           expr ::= MINUS * expr
           expr ::= * NOT expr
           expr ::= * INTEGER
+          expr ::= * STRING
           expr ::= * VAR
           expr ::= * FUN arglist BRC
 
@@ -126,7 +135,8 @@ State 4:
                            NOT shift  3
                            VAR shift  26
                            BRO shift  5
-                       INTEGER shift  27
+                       INTEGER shift  28
+                        STRING shift  27
                            FUN shift  2
                           expr shift  17
 
@@ -143,6 +153,7 @@ State 5:
           expr ::= * MINUS expr
           expr ::= * NOT expr
           expr ::= * INTEGER
+          expr ::= * STRING
           expr ::= * VAR
           expr ::= * FUN arglist BRC
 
@@ -150,7 +161,8 @@ State 5:
                            NOT shift  3
                            VAR shift  26
                            BRO shift  5
-                       INTEGER shift  27
+                       INTEGER shift  28
+                        STRING shift  27
                            FUN shift  2
                           expr shift  16
 
@@ -167,6 +179,7 @@ State 6:
           expr ::= * MINUS expr
           expr ::= * NOT expr
           expr ::= * INTEGER
+          expr ::= * STRING
           expr ::= * VAR
           expr ::= * FUN arglist BRC
 
@@ -174,9 +187,10 @@ State 6:
                            NOT shift  3
                            VAR shift  26
                            BRO shift  5
-                       INTEGER shift  27
+                       INTEGER shift  28
+                        STRING shift  27
                            FUN shift  2
-                          expr shift  30
+                          expr shift  31
 
 State 7:
           expr ::= * expr MINUS expr
@@ -191,6 +205,7 @@ State 7:
           expr ::= * MINUS expr
           expr ::= * NOT expr
           expr ::= * INTEGER
+          expr ::= * STRING
           expr ::= * VAR
           expr ::= * FUN arglist BRC
 
@@ -198,9 +213,10 @@ State 7:
                            NOT shift  3
                            VAR shift  26
                            BRO shift  5
-                       INTEGER shift  27
+                       INTEGER shift  28
+                        STRING shift  27
                            FUN shift  2
-                          expr shift  31
+                          expr shift  32
 
 State 8:
           expr ::= * expr MINUS expr
@@ -215,6 +231,7 @@ State 8:
           expr ::= * MINUS expr
           expr ::= * NOT expr
           expr ::= * INTEGER
+          expr ::= * STRING
           expr ::= * VAR
           expr ::= * FUN arglist BRC
 
@@ -222,9 +239,10 @@ State 8:
                            NOT shift  3
                            VAR shift  26
                            BRO shift  5
-                       INTEGER shift  27
+                       INTEGER shift  28
+                        STRING shift  27
                            FUN shift  2
-                          expr shift  32
+                          expr shift  33
 
 State 9:
           expr ::= * expr MINUS expr
@@ -239,6 +257,7 @@ State 9:
           expr ::= * MINUS expr
           expr ::= * NOT expr
           expr ::= * INTEGER
+          expr ::= * STRING
           expr ::= * VAR
           expr ::= * FUN arglist BRC
 
@@ -246,7 +265,8 @@ State 9:
                            NOT shift  3
                            VAR shift  26
                            BRO shift  5
-                       INTEGER shift  27
+                       INTEGER shift  28
+                        STRING shift  27
                            FUN shift  2
                           expr shift  20
 
@@ -263,6 +283,7 @@ State 10:
           expr ::= * MINUS expr
           expr ::= * NOT expr
           expr ::= * INTEGER
+          expr ::= * STRING
           expr ::= * VAR
           expr ::= * FUN arglist BRC
 
@@ -270,7 +291,8 @@ State 10:
                            NOT shift  3
                            VAR shift  26
                            BRO shift  5
-                       INTEGER shift  27
+                       INTEGER shift  28
+                        STRING shift  27
                            FUN shift  2
                           expr shift  21
 
@@ -287,6 +309,7 @@ State 11:
           expr ::= * MINUS expr
           expr ::= * NOT expr
           expr ::= * INTEGER
+          expr ::= * STRING
           expr ::= * VAR
           expr ::= * FUN arglist BRC
 
@@ -294,7 +317,8 @@ State 11:
                            NOT shift  3
                            VAR shift  26
                            BRO shift  5
-                       INTEGER shift  27
+                       INTEGER shift  28
+                        STRING shift  27
                            FUN shift  2
                           expr shift  18
 
@@ -311,6 +335,7 @@ State 12:
           expr ::= * MINUS expr
           expr ::= * NOT expr
           expr ::= * INTEGER
+          expr ::= * STRING
           expr ::= * VAR
           expr ::= * FUN arglist BRC
 
@@ -318,7 +343,8 @@ State 12:
                            NOT shift  3
                            VAR shift  26
                            BRO shift  5
-                       INTEGER shift  27
+                       INTEGER shift  28
+                        STRING shift  27
                            FUN shift  2
                           expr shift  19
 
@@ -326,7 +352,7 @@ State 13:
           program ::= expr ASS * variable
           variable ::= * VAR
 
-                           VAR shift  33
+                           VAR shift  34
                       variable shift  23
 
 State 14:
@@ -358,7 +384,7 @@ State 15:
           expr ::= expr * AND expr
           expr ::= expr * OR expr
           expr ::= expr * XOR expr
-     (17) arglist ::= expr *
+     (18) arglist ::= expr *
           arglist ::= expr * COMMA arglist
 
                           PLUS shift  11
@@ -369,7 +395,7 @@ State 15:
                             OR shift  7
                            XOR shift  6
                          COMMA shift  1
-                     {default} reduce 17
+                     {default} reduce 18
 
 State 16:
           expr ::= expr * MINUS expr
@@ -388,7 +414,7 @@ State 16:
                            AND shift  8
                             OR shift  7
                            XOR shift  6
-                           BRC shift  29
+                           BRC shift  30
 
 State 17:
           expr ::= expr * MINUS expr
@@ -482,26 +508,31 @@ State 23:
                              $ reduce 1
 
 State 24:
-     (15) expr ::= FUN arglist BRC *
+     (16) expr ::= FUN arglist BRC *
+
+                     {default} reduce 16
+
+State 25:
+     (19) arglist ::= expr COMMA arglist *
+
+                     {default} reduce 19
+
+State 26:
+     (15) expr ::= VAR *
 
                      {default} reduce 15
 
-State 25:
-     (18) arglist ::= expr COMMA arglist *
-
-                     {default} reduce 18
-
-State 26:
-     (14) expr ::= VAR *
+State 27:
+     (14) expr ::= STRING *
 
                      {default} reduce 14
 
-State 27:
+State 28:
      (13) expr ::= INTEGER *
 
                      {default} reduce 13
 
-State 28:
+State 29:
           expr ::= expr * MINUS expr
           expr ::= expr * PLUS expr
           expr ::= expr * TIMES expr
@@ -513,12 +544,12 @@ State 28:
 
                      {default} reduce 12
 
-State 29:
+State 30:
      (10) expr ::= BRO expr BRC *
 
                      {default} reduce 10
 
-State 30:
+State 31:
           expr ::= expr * MINUS expr
           expr ::= expr * PLUS expr
           expr ::= expr * TIMES expr
@@ -530,7 +561,7 @@ State 30:
 
                      {default} reduce 9
 
-State 31:
+State 32:
           expr ::= expr * MINUS expr
           expr ::= expr * PLUS expr
           expr ::= expr * TIMES expr
@@ -542,7 +573,7 @@ State 31:
 
                      {default} reduce 8
 
-State 32:
+State 33:
           expr ::= expr * MINUS expr
           expr ::= expr * PLUS expr
           expr ::= expr * TIMES expr
@@ -554,7 +585,7 @@ State 32:
 
                      {default} reduce 7
 
-State 33:
+State 34:
       (2) variable ::= VAR *
 
                      {default} reduce 2
@@ -575,10 +606,11 @@ Symbols:
    11: BRO
    12: BRC
    13: INTEGER
-   14: FUN
-   15: COMMA
-   16: error:
-   17: program: MINUS NOT VAR BRO INTEGER FUN
-   18: expr: MINUS NOT VAR BRO INTEGER FUN
-   19: variable: VAR
-   20: arglist: <lambda> MINUS NOT VAR BRO INTEGER FUN
+   14: STRING
+   15: FUN
+   16: COMMA
+   17: error:
+   18: program: MINUS NOT VAR BRO INTEGER STRING FUN
+   19: expr: MINUS NOT VAR BRO INTEGER STRING FUN
+   20: variable: VAR
+   21: arglist: <lambda> MINUS NOT VAR BRO INTEGER STRING FUN

@@ -37,6 +37,7 @@ struct token lex(const char *input)
 		ass = "->";
 		fun = [A-Za-z][A-Za-z0-9]* "(";
 		com = ",";
+		str = "\"" [^"]* "\"";
 
 		*        { return (struct token){ 0, 0 }; }
 		dec      { return (struct token){ TOK_INTEGER, index }; }
@@ -52,6 +53,7 @@ struct token lex(const char *input)
 		fun      { return (struct token){ TOK_FUN, index }; }
 		com      { return (struct token){ TOK_COMMA, index }; }
 		ws+      { return (struct token){ -1, index }; }
+		str      { return (struct token){ TOK_STRING, index }; }
 		
 		" And "  { return (struct token){ TOK_AND, index }; }
 		" Xor "  { return (struct token){ TOK_XOR, index }; }

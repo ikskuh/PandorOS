@@ -81,6 +81,7 @@ expr(A) ::= MINUS expr(B). { A.val = val_neg(B.val); }
 expr(A) ::= NOT expr(B). { A.val = val_not(B.val); }
 
 expr(A) ::= INTEGER(B). { A = B; }
+expr(A) ::= STRING(B). { A = B; }
 
 expr(A) ::= VAR(B). { 
 	var_get(B.var, &A.val);
@@ -140,6 +141,8 @@ arglist(A) ::= expr(B) COMMA arglist(C). {
 		// Enables tracing on parser errors
 		// ParseTrace(10, "TRACE: ");
 		
+		page_t strpage = pmm_alloc();
+		char *literalloc = pmm_getptr(strpage);
 		argalloc = allocator_new(sizeof(arg_t));
 		
 		void* pParser = ParseAlloc (mwrap);
@@ -159,6 +162,20 @@ arglist(A) ::= expr(B) COMMA arglist(C). {
 					case TOK_INTEGER:
 					{
 						currtok.val = basic_mknum(str_to_int(buffer, 10));
+						break;
+					}
+					case TOK_STRING:
+					{
+						// Initialize with uninitialized pointer
+						currtok.val = basic_mkstr(literalloc);
+						
+						// then initialize pointer:
+						mem_copy(literalloc, buffer + 1, token.length - 2);
+						literalloc[token.length - 2] = 0;
+						
+						// then advande allocation pointer
+						literalloc += token.length - 1;
+						
 						break;
 					}
 					case TOK_VAR:
@@ -194,6 +211,8 @@ arglist(A) ::= expr(B) COMMA arglist(C). {
 		ParseFree(pParser, free );
 		
 		allocator_delete(argalloc);
+		
+		pmm_free(strpage);
 		
 		if(basic_isnull(result) == false) {
 			var_setans(result);
