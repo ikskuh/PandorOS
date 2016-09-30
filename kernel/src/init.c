@@ -114,7 +114,7 @@ static void shell_main()
 				currshell.input[currshell.cursor] = 0;
 				currshell.cursor = 0;
 				
-				int result = execute(currshell.input);
+				value_t result = basic_execute(currshell.input);
 				
 				printf("= %d\n", result);
 				
@@ -134,6 +134,7 @@ void os_init()
 	console_init();
 	options_init();
 	catalog_init();
+	basic_init();
 	
 	var_init();
 	

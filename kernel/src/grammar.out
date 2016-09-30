@@ -6,16 +6,18 @@ State 0:
           expr ::= * expr TIMES expr
           expr ::= * expr DIVIDE expr
           expr ::= * BRO expr BRC
+          expr ::= * MINUS expr
           expr ::= * INTEGER
           expr ::= * VAR
           expr ::= * FUN arglist BRC
 
-                           VAR shift  18
-                           BRO shift  3
-                       INTEGER shift  19
+                         MINUS shift  3
+                           VAR shift  20
+                           BRO shift  4
+                       INTEGER shift  21
                            FUN shift  2
                        program accept
-                          expr shift  9
+                          expr shift  10
 
 State 1:
           expr ::= * expr MINUS expr
@@ -23,21 +25,23 @@ State 1:
           expr ::= * expr TIMES expr
           expr ::= * expr DIVIDE expr
           expr ::= * BRO expr BRC
+          expr ::= * MINUS expr
           expr ::= * INTEGER
           expr ::= * VAR
           expr ::= * FUN arglist BRC
-     (11) arglist ::= *
+     (12) arglist ::= *
           arglist ::= * expr
           arglist ::= * expr COMMA arglist
           arglist ::= expr COMMA * arglist
 
-                           VAR shift  18
-                           BRO shift  3
-                       INTEGER shift  19
+                         MINUS shift  3
+                           VAR shift  20
+                           BRO shift  4
+                       INTEGER shift  21
                            FUN shift  2
-                          expr shift  10
-                       arglist shift  17
-                     {default} reduce 11
+                          expr shift  11
+                       arglist shift  19
+                     {default} reduce 12
 
 State 2:
           expr ::= * expr MINUS expr
@@ -45,21 +49,23 @@ State 2:
           expr ::= * expr TIMES expr
           expr ::= * expr DIVIDE expr
           expr ::= * BRO expr BRC
+          expr ::= * MINUS expr
           expr ::= * INTEGER
           expr ::= * VAR
           expr ::= * FUN arglist BRC
           expr ::= FUN * arglist BRC
-     (11) arglist ::= *
+     (12) arglist ::= *
           arglist ::= * expr
           arglist ::= * expr COMMA arglist
 
-                           VAR shift  18
-                           BRO shift  3
-                       INTEGER shift  19
+                         MINUS shift  3
+                           VAR shift  20
+                           BRO shift  4
+                       INTEGER shift  21
                            FUN shift  2
-                          expr shift  10
-                       arglist shift  14
-                     {default} reduce 11
+                          expr shift  11
+                       arglist shift  16
+                     {default} reduce 12
 
 State 3:
           expr ::= * expr MINUS expr
@@ -67,93 +73,122 @@ State 3:
           expr ::= * expr TIMES expr
           expr ::= * expr DIVIDE expr
           expr ::= * BRO expr BRC
-          expr ::= BRO * expr BRC
+          expr ::= * MINUS expr
+          expr ::= MINUS * expr
           expr ::= * INTEGER
           expr ::= * VAR
           expr ::= * FUN arglist BRC
 
-                           VAR shift  18
-                           BRO shift  3
-                       INTEGER shift  19
+                         MINUS shift  3
+                           VAR shift  20
+                           BRO shift  4
+                       INTEGER shift  21
                            FUN shift  2
-                          expr shift  11
+                          expr shift  13
 
 State 4:
           expr ::= * expr MINUS expr
           expr ::= * expr PLUS expr
           expr ::= * expr TIMES expr
           expr ::= * expr DIVIDE expr
-          expr ::= expr DIVIDE * expr
           expr ::= * BRO expr BRC
+          expr ::= BRO * expr BRC
+          expr ::= * MINUS expr
           expr ::= * INTEGER
           expr ::= * VAR
           expr ::= * FUN arglist BRC
 
-                           VAR shift  18
-                           BRO shift  3
-                       INTEGER shift  19
+                         MINUS shift  3
+                           VAR shift  20
+                           BRO shift  4
+                       INTEGER shift  21
                            FUN shift  2
-                          expr shift  21
+                          expr shift  12
 
 State 5:
+          expr ::= * expr MINUS expr
+          expr ::= * expr PLUS expr
+          expr ::= * expr TIMES expr
+          expr ::= * expr DIVIDE expr
+          expr ::= expr DIVIDE * expr
+          expr ::= * BRO expr BRC
+          expr ::= * MINUS expr
+          expr ::= * INTEGER
+          expr ::= * VAR
+          expr ::= * FUN arglist BRC
+
+                         MINUS shift  3
+                           VAR shift  20
+                           BRO shift  4
+                       INTEGER shift  21
+                           FUN shift  2
+                          expr shift  23
+
+State 6:
           expr ::= * expr MINUS expr
           expr ::= * expr PLUS expr
           expr ::= * expr TIMES expr
           expr ::= expr TIMES * expr
           expr ::= * expr DIVIDE expr
           expr ::= * BRO expr BRC
+          expr ::= * MINUS expr
           expr ::= * INTEGER
           expr ::= * VAR
           expr ::= * FUN arglist BRC
 
-                           VAR shift  18
-                           BRO shift  3
-                       INTEGER shift  19
+                         MINUS shift  3
+                           VAR shift  20
+                           BRO shift  4
+                       INTEGER shift  21
                            FUN shift  2
-                          expr shift  22
+                          expr shift  24
 
-State 6:
+State 7:
           expr ::= * expr MINUS expr
           expr ::= * expr PLUS expr
           expr ::= expr PLUS * expr
           expr ::= * expr TIMES expr
           expr ::= * expr DIVIDE expr
           expr ::= * BRO expr BRC
+          expr ::= * MINUS expr
           expr ::= * INTEGER
           expr ::= * VAR
           expr ::= * FUN arglist BRC
 
-                           VAR shift  18
-                           BRO shift  3
-                       INTEGER shift  19
+                         MINUS shift  3
+                           VAR shift  20
+                           BRO shift  4
+                       INTEGER shift  21
                            FUN shift  2
-                          expr shift  12
+                          expr shift  14
 
-State 7:
+State 8:
           expr ::= * expr MINUS expr
           expr ::= expr MINUS * expr
           expr ::= * expr PLUS expr
           expr ::= * expr TIMES expr
           expr ::= * expr DIVIDE expr
           expr ::= * BRO expr BRC
+          expr ::= * MINUS expr
           expr ::= * INTEGER
           expr ::= * VAR
           expr ::= * FUN arglist BRC
 
-                           VAR shift  18
-                           BRO shift  3
-                       INTEGER shift  19
+                         MINUS shift  3
+                           VAR shift  20
+                           BRO shift  4
+                       INTEGER shift  21
                            FUN shift  2
-                          expr shift  13
+                          expr shift  15
 
-State 8:
+State 9:
           program ::= expr ASS * variable
           variable ::= * VAR
 
-                           VAR shift  23
-                      variable shift  15
+                           VAR shift  25
+                      variable shift  17
 
-State 9:
+State 10:
       (0) program ::= expr *
           program ::= expr * ASS variable
           expr ::= expr * MINUS expr
@@ -162,98 +197,109 @@ State 9:
           expr ::= expr * DIVIDE expr
 
                              $ reduce 0
-                          PLUS shift  6
-                         MINUS shift  7
-                        DIVIDE shift  4
-                         TIMES shift  5
-                           ASS shift  8
-
-State 10:
-          expr ::= expr * MINUS expr
-          expr ::= expr * PLUS expr
-          expr ::= expr * TIMES expr
-          expr ::= expr * DIVIDE expr
-     (12) arglist ::= expr *
-          arglist ::= expr * COMMA arglist
-
-                          PLUS shift  6
-                         MINUS shift  7
-                        DIVIDE shift  4
-                         TIMES shift  5
-                         COMMA shift  1
-                     {default} reduce 12
+                          PLUS shift  7
+                         MINUS shift  8
+                        DIVIDE shift  5
+                         TIMES shift  6
+                           ASS shift  9
 
 State 11:
           expr ::= expr * MINUS expr
           expr ::= expr * PLUS expr
           expr ::= expr * TIMES expr
           expr ::= expr * DIVIDE expr
-          expr ::= BRO expr * BRC
+     (13) arglist ::= expr *
+          arglist ::= expr * COMMA arglist
 
-                          PLUS shift  6
-                         MINUS shift  7
-                        DIVIDE shift  4
-                         TIMES shift  5
-                           BRC shift  20
+                          PLUS shift  7
+                         MINUS shift  8
+                        DIVIDE shift  5
+                         TIMES shift  6
+                         COMMA shift  1
+                     {default} reduce 13
 
 State 12:
+          expr ::= expr * MINUS expr
+          expr ::= expr * PLUS expr
+          expr ::= expr * TIMES expr
+          expr ::= expr * DIVIDE expr
+          expr ::= BRO expr * BRC
+
+                          PLUS shift  7
+                         MINUS shift  8
+                        DIVIDE shift  5
+                         TIMES shift  6
+                           BRC shift  22
+
+State 13:
+          expr ::= expr * MINUS expr
+          expr ::= expr * PLUS expr
+          expr ::= expr * TIMES expr
+          expr ::= expr * DIVIDE expr
+      (8) expr ::= MINUS expr *
+
+                        DIVIDE shift  5
+                         TIMES shift  6
+                     {default} reduce 8
+
+State 14:
           expr ::= expr * MINUS expr
           expr ::= expr * PLUS expr
       (4) expr ::= expr PLUS expr *
           expr ::= expr * TIMES expr
           expr ::= expr * DIVIDE expr
 
-                        DIVIDE shift  4
-                         TIMES shift  5
+                        DIVIDE shift  5
+                         TIMES shift  6
                      {default} reduce 4
 
-State 13:
+State 15:
           expr ::= expr * MINUS expr
       (3) expr ::= expr MINUS expr *
           expr ::= expr * PLUS expr
           expr ::= expr * TIMES expr
           expr ::= expr * DIVIDE expr
 
-                        DIVIDE shift  4
-                         TIMES shift  5
+                        DIVIDE shift  5
+                         TIMES shift  6
                      {default} reduce 3
 
-State 14:
+State 16:
           expr ::= FUN arglist * BRC
 
-                           BRC shift  16
+                           BRC shift  18
 
-State 15:
+State 17:
       (1) program ::= expr ASS variable *
 
                              $ reduce 1
 
-State 16:
-     (10) expr ::= FUN arglist BRC *
+State 18:
+     (11) expr ::= FUN arglist BRC *
+
+                     {default} reduce 11
+
+State 19:
+     (14) arglist ::= expr COMMA arglist *
+
+                     {default} reduce 14
+
+State 20:
+     (10) expr ::= VAR *
 
                      {default} reduce 10
 
-State 17:
-     (13) arglist ::= expr COMMA arglist *
-
-                     {default} reduce 13
-
-State 18:
-      (9) expr ::= VAR *
+State 21:
+      (9) expr ::= INTEGER *
 
                      {default} reduce 9
 
-State 19:
-      (8) expr ::= INTEGER *
-
-                     {default} reduce 8
-
-State 20:
+State 22:
       (7) expr ::= BRO expr BRC *
 
                      {default} reduce 7
 
-State 21:
+State 23:
           expr ::= expr * MINUS expr
           expr ::= expr * PLUS expr
           expr ::= expr * TIMES expr
@@ -262,7 +308,7 @@ State 21:
 
                      {default} reduce 6
 
-State 22:
+State 24:
           expr ::= expr * MINUS expr
           expr ::= expr * PLUS expr
           expr ::= expr * TIMES expr
@@ -271,7 +317,7 @@ State 22:
 
                      {default} reduce 5
 
-State 23:
+State 25:
       (2) variable ::= VAR *
 
                      {default} reduce 2
@@ -291,7 +337,7 @@ Symbols:
    10: FUN
    11: COMMA
    12: error:
-   13: program: VAR BRO INTEGER FUN
-   14: expr: VAR BRO INTEGER FUN
+   13: program: MINUS VAR BRO INTEGER FUN
+   14: expr: MINUS VAR BRO INTEGER FUN
    15: variable: VAR
-   16: arglist: <lambda> VAR BRO INTEGER FUN
+   16: arglist: <lambda> MINUS VAR BRO INTEGER FUN

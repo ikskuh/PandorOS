@@ -28,6 +28,13 @@ static inline void str_copy(char * dst, char const * src)
 	while(((*dst++) = (*src++)));
 }
 
+static inline void str_cat(char * dst, char const * src)
+{
+	while(*dst++);
+	dst--;
+	while(((*dst++) = (*src++)));
+}
+
 static inline int str_len(char const *str)
 {
 	int len = 0;

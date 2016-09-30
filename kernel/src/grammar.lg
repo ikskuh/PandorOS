@@ -1,4 +1,5 @@
 %include {
+#include "interpreter.h"
 #include "var.h"
 #include "basic/lexer.h"
 #include "string.h"
@@ -24,9 +25,7 @@ static void assert(int x, char const * xstr)
 }
 #define assert(x) assert(x, #x);
 
-typedef int value_t;
-
-typedef value_t (*basfunc_f)(int argc, value_t *argv);
+basfunc_f basic_getfunc(char const *name);
 
 typedef struct arg {
 	value_t value;
@@ -40,7 +39,7 @@ typedef union {
 	basfunc_f fun;
 } token_t;
 
-static int result;
+static value_t result;
 
 static allocator_t * argalloc;
 
@@ -76,6 +75,8 @@ expr(A) ::= expr(B) DIVIDE expr(C). {
 }
 
 expr(A) ::= BRO expr(B) BRC. { A = B; }
+
+expr(A) ::= MINUS expr(B). { A.number = -B.number; }
 
 expr(A) ::= INTEGER(B). { A = B; }
 
@@ -129,21 +130,10 @@ arglist(A) ::= expr(B) COMMA arglist(C). {
 	{
 		return prealloc;
 	}
-	
-	static value_t demofun(int argc, value_t *argv)
-	{
-		value_t sum = 0;
-		for(int i = 0; i < argc; i++)
-		{
-			sum += argv[i];
-			// printf("[%d] = %d\n", i, argv[i]);
-		}
-		return sum;
-	}
 
 	static token_t nulltoken = { 0 };
 	
-	int execute(char const *input)
+	value_t basic_execute(char const *input)
 	{
 		// Enables tracing on parser errors
 		// ParseTrace(10, "TRACE: ");
@@ -177,7 +167,10 @@ arglist(A) ::= expr(B) COMMA arglist(C). {
 					case TOK_FUN:
 					{
 						// TODO: Set registered function.
-						currtok.fun = &demofun;
+						currtok.fun = basic_getfunc(buffer);
+						if(currtok.fun == NULL) {
+							printf("Function %s not found!", buffer);
+						}
 						break;
 					}
 				}
@@ -201,5 +194,33 @@ arglist(A) ::= expr(B) COMMA arglist(C). {
 		allocator_delete(argalloc);
 		
 		return result;
+	}
+
+	struct basreg {
+		char name[64];
+		basfunc_f func;
+	};
+
+	static struct basreg functions[1024];
+	static int basfunc_cnt = 0;
+
+	void basic_register(char const *name, basfunc_f function)
+	{
+		functions[basfunc_cnt] = (struct basreg){ "", function };
+		
+		str_copy(functions[basfunc_cnt].name, name);
+		str_cat(functions[basfunc_cnt].name, "("); // Fancy hack to find the tokens instead of the names.
+		
+		++basfunc_cnt;
+	}
+
+	basfunc_f basic_getfunc(char const *name)
+	{
+		for(int i = 0; i < basfunc_cnt; i++)
+		{
+			if(str_eq(name, functions[i].name))
+				return functions[i].func;
+		}
+		return NULL;
 	}
 }

@@ -6,6 +6,7 @@
 #include <stdio.h>
 #line 1 "src/grammar.lg"
 
+#include "interpreter.h"
 #include "var.h"
 #include "basic/lexer.h"
 #include "string.h"
@@ -31,9 +32,7 @@ static void assert(int x, char const * xstr)
 }
 #define assert(x) assert(x, #x);
 
-typedef int value_t;
-
-typedef value_t (*basfunc_f)(int argc, value_t *argv);
+basfunc_f basic_getfunc(char const *name);
 
 typedef struct arg {
 	value_t value;
@@ -47,11 +46,11 @@ typedef union {
 	basfunc_f fun;
 } token_t;
 
-static int result;
+static value_t result;
 
 static allocator_t * argalloc;
 
-#line 55 "src/grammar.c"
+#line 54 "src/grammar.c"
 /* Next is all token values, in a form suitable for use by makeheaders.
 ** This section will be null unless lemon is run with the -m switch.
 */
@@ -116,8 +115,8 @@ typedef union {
 #define ParseARG_PDECL
 #define ParseARG_FETCH
 #define ParseARG_STORE
-#define YYNSTATE 24
-#define YYNRULE 14
+#define YYNSTATE 26
+#define YYNRULE 15
 #define YY_NO_ACTION      (YYNSTATE+YYNRULE+2)
 #define YY_ACCEPT_ACTION  (YYNSTATE+YYNRULE+1)
 #define YY_ERROR_ACTION   (YYNSTATE+YYNRULE)
@@ -186,38 +185,40 @@ static const YYMINORTYPE yyzerominor = { 0 };
 **                     shifting non-terminals after a reduce.
 **  yy_default[]       Default action for each state.
 */
-#define YY_ACTTAB_COUNT (38)
+#define YY_ACTTAB_COUNT (42)
 static const YYACTIONTYPE yy_action[] = {
- /*     0 */    24,    6,    7,    4,    5,    8,    6,    7,    4,    5,
- /*    10 */     4,    5,   10,   20,   14,    6,    7,    4,    5,   25,
- /*    20 */    10,   16,   17,   18,    3,    1,   19,    2,   39,    9,
- /*    30 */    23,   15,   13,   40,   12,   22,   21,   11,
+ /*     0 */    26,    7,    8,    5,    6,    9,    7,    8,    5,    6,
+ /*    10 */     5,    6,   11,   22,   16,    7,    8,    5,    6,    3,
+ /*    20 */    11,   27,   19,   20,    4,    1,   21,    2,   42,   10,
+ /*    30 */    18,   17,   25,   15,   14,   43,   43,   24,   23,   12,
+ /*    40 */    43,   13,
 };
 static const YYCODETYPE yy_lookahead[] = {
  /*     0 */     0,    1,    2,    3,    4,    5,    1,    2,    3,    4,
- /*    10 */     3,    4,   14,    8,   16,    1,    2,    3,    4,    0,
- /*    20 */    14,    8,   16,    6,    7,   11,    9,   10,   13,   14,
- /*    30 */     6,   15,   14,   17,   14,   14,   14,   14,
+ /*    10 */     3,    4,   14,    8,   16,    1,    2,    3,    4,    2,
+ /*    20 */    14,    0,   16,    6,    7,   11,    9,   10,   13,   14,
+ /*    30 */     8,   15,    6,   14,   14,   17,   17,   14,   14,   14,
+ /*    40 */    17,   14,
 };
 #define YY_SHIFT_USE_DFLT (-1)
-#define YY_SHIFT_COUNT (15)
+#define YY_SHIFT_COUNT (17)
 #define YY_SHIFT_MIN   (0)
-#define YY_SHIFT_MAX   (24)
+#define YY_SHIFT_MAX   (26)
 static const signed char yy_shift_ofst[] = {
- /*     0 */    17,   17,   17,   17,   17,   17,   17,   17,   24,    0,
- /*    10 */    14,    5,    7,    7,   13,   19,
+ /*     0 */    17,   17,   17,   17,   17,   17,   17,   17,   17,   26,
+ /*    10 */     0,   14,    5,    7,    7,    7,   22,   21,
 };
 #define YY_REDUCE_USE_DFLT (-3)
-#define YY_REDUCE_COUNT (8)
+#define YY_REDUCE_COUNT (9)
 #define YY_REDUCE_MIN   (-2)
-#define YY_REDUCE_MAX   (23)
+#define YY_REDUCE_MAX   (27)
 static const signed char yy_reduce_ofst[] = {
- /*     0 */    15,    6,   -2,   23,   22,   21,   20,   18,   16,
+ /*     0 */    15,    6,   -2,   27,   25,   24,   23,   20,   19,   16,
 };
 static const YYACTIONTYPE yy_default[] = {
- /*     0 */    38,   35,   35,   38,   38,   38,   38,   38,   38,   38,
- /*    10 */    36,   38,   28,   27,   38,   38,   34,   37,   33,   32,
- /*    20 */    31,   30,   29,   26,
+ /*     0 */    41,   38,   38,   41,   41,   41,   41,   41,   41,   41,
+ /*    10 */    41,   39,   41,   34,   30,   29,   41,   41,   37,   40,
+ /*    20 */    36,   35,   33,   32,   31,   28,
 };
 
 /* The next table maps tokens into fallback tokens.  If a construct
@@ -330,12 +331,13 @@ static const char *const yyRuleName[] = {
  /*   5 */ "expr ::= expr TIMES expr",
  /*   6 */ "expr ::= expr DIVIDE expr",
  /*   7 */ "expr ::= BRO expr BRC",
- /*   8 */ "expr ::= INTEGER",
- /*   9 */ "expr ::= VAR",
- /*  10 */ "expr ::= FUN arglist BRC",
- /*  11 */ "arglist ::=",
- /*  12 */ "arglist ::= expr",
- /*  13 */ "arglist ::= expr COMMA arglist",
+ /*   8 */ "expr ::= MINUS expr",
+ /*   9 */ "expr ::= INTEGER",
+ /*  10 */ "expr ::= VAR",
+ /*  11 */ "expr ::= FUN arglist BRC",
+ /*  12 */ "arglist ::=",
+ /*  13 */ "arglist ::= expr",
+ /*  14 */ "arglist ::= expr COMMA arglist",
 };
 #endif /* NDEBUG */
 
@@ -657,6 +659,7 @@ static const struct {
   { 14, 3 },
   { 14, 3 },
   { 14, 3 },
+  { 14, 2 },
   { 14, 1 },
   { 14, 1 },
   { 14, 3 },
@@ -718,41 +721,41 @@ static void yy_reduce(
   **     break;
   */
       case 0: /* program ::= expr */
-#line 59 "src/grammar.lg"
+#line 58 "src/grammar.lg"
 { result = yymsp[0].minor.yy0.number; }
-#line 724 "src/grammar.c"
+#line 727 "src/grammar.c"
         break;
       case 1: /* program ::= expr ASS variable */
-#line 60 "src/grammar.lg"
+#line 59 "src/grammar.lg"
 {
 	var_set(yymsp[0].minor.yy0.var, &yymsp[-2].minor.yy0.number);
 	result = yymsp[-2].minor.yy0.number;
 }
-#line 732 "src/grammar.c"
+#line 735 "src/grammar.c"
         break;
       case 2: /* variable ::= VAR */
-      case 8: /* expr ::= INTEGER */ yytestcase(yyruleno==8);
-#line 65 "src/grammar.lg"
+      case 9: /* expr ::= INTEGER */ yytestcase(yyruleno==9);
+#line 64 "src/grammar.lg"
 { yygotominor.yy0 = yymsp[0].minor.yy0; }
-#line 738 "src/grammar.c"
+#line 741 "src/grammar.c"
         break;
       case 3: /* expr ::= expr MINUS expr */
-#line 67 "src/grammar.lg"
+#line 66 "src/grammar.lg"
 { yygotominor.yy0.number = yymsp[-2].minor.yy0.number - yymsp[0].minor.yy0.number; }
-#line 743 "src/grammar.c"
+#line 746 "src/grammar.c"
         break;
       case 4: /* expr ::= expr PLUS expr */
-#line 68 "src/grammar.lg"
+#line 67 "src/grammar.lg"
 { yygotominor.yy0.number = yymsp[-2].minor.yy0.number + yymsp[0].minor.yy0.number; }
-#line 748 "src/grammar.c"
+#line 751 "src/grammar.c"
         break;
       case 5: /* expr ::= expr TIMES expr */
-#line 69 "src/grammar.lg"
+#line 68 "src/grammar.lg"
 { yygotominor.yy0.number = yymsp[-2].minor.yy0.number * yymsp[0].minor.yy0.number; }
-#line 753 "src/grammar.c"
+#line 756 "src/grammar.c"
         break;
       case 6: /* expr ::= expr DIVIDE expr */
-#line 70 "src/grammar.lg"
+#line 69 "src/grammar.lg"
 {
 	if(yymsp[0].minor.yy0.number != 0){
 		yygotominor.yy0.number = yymsp[-2].minor.yy0.number / yymsp[0].minor.yy0.number;
@@ -760,22 +763,27 @@ static void yy_reduce(
 		printf("divide by zero\n");
 	}
 }
-#line 764 "src/grammar.c"
+#line 767 "src/grammar.c"
         break;
       case 7: /* expr ::= BRO expr BRC */
-#line 78 "src/grammar.lg"
+#line 77 "src/grammar.lg"
 { yygotominor.yy0 = yymsp[-1].minor.yy0; }
-#line 769 "src/grammar.c"
+#line 772 "src/grammar.c"
         break;
-      case 9: /* expr ::= VAR */
-#line 82 "src/grammar.lg"
+      case 8: /* expr ::= MINUS expr */
+#line 79 "src/grammar.lg"
+{ yygotominor.yy0.number = -yymsp[0].minor.yy0.number; }
+#line 777 "src/grammar.c"
+        break;
+      case 10: /* expr ::= VAR */
+#line 83 "src/grammar.lg"
 { 
 	var_get(yymsp[0].minor.yy0.var, &yygotominor.yy0.number);
 }
-#line 776 "src/grammar.c"
+#line 784 "src/grammar.c"
         break;
-      case 10: /* expr ::= FUN arglist BRC */
-#line 86 "src/grammar.lg"
+      case 11: /* expr ::= FUN arglist BRC */
+#line 87 "src/grammar.lg"
 {
 	arg_t *a;
 
@@ -800,30 +808,30 @@ static void yy_reduce(
 	}
 	
 }
-#line 804 "src/grammar.c"
+#line 812 "src/grammar.c"
         break;
-      case 11: /* arglist ::= */
-#line 111 "src/grammar.lg"
+      case 12: /* arglist ::= */
+#line 112 "src/grammar.lg"
 { yygotominor.yy0.arg = NULL; }
-#line 809 "src/grammar.c"
+#line 817 "src/grammar.c"
         break;
-      case 12: /* arglist ::= expr */
-#line 113 "src/grammar.lg"
+      case 13: /* arglist ::= expr */
+#line 114 "src/grammar.lg"
 { 
 	yygotominor.yy0.arg = allocator_alloc(argalloc);
 	yygotominor.yy0.arg->value = yymsp[0].minor.yy0.number;
 	yygotominor.yy0.arg->next = NULL;
 }
-#line 818 "src/grammar.c"
+#line 826 "src/grammar.c"
         break;
-      case 13: /* arglist ::= expr COMMA arglist */
-#line 119 "src/grammar.lg"
+      case 14: /* arglist ::= expr COMMA arglist */
+#line 120 "src/grammar.lg"
 {
 	yygotominor.yy0.arg = allocator_alloc(argalloc);
 	yygotominor.yy0.arg->value = yymsp[-2].minor.yy0.number;
 	yygotominor.yy0.arg->next = yymsp[0].minor.yy0.arg;
 }
-#line 827 "src/grammar.c"
+#line 835 "src/grammar.c"
         break;
       default:
         break;
@@ -885,10 +893,10 @@ static void yy_syntax_error(
 ){
   ParseARG_FETCH;
 #define TOKEN (yyminor.yy0)
-#line 55 "src/grammar.lg"
+#line 54 "src/grammar.lg"
   
   printf("Syntax error!\n");
-#line 892 "src/grammar.c"
+#line 900 "src/grammar.c"
   ParseARG_STORE; /* Suppress warning about unused %extra_argument variable */
 }
 
@@ -1079,7 +1087,7 @@ void Parse(
   }while( yymajor!=YYNOCODE && yypParser->yyidx>=0 );
   return;
 }
-#line 125 "src/grammar.lg"
+#line 126 "src/grammar.lg"
 
 	static char prealloc[1024];
 
@@ -1087,21 +1095,10 @@ void Parse(
 	{
 		return prealloc;
 	}
-	
-	static value_t demofun(int argc, value_t *argv)
-	{
-		value_t sum = 0;
-		for(int i = 0; i < argc; i++)
-		{
-			sum += argv[i];
-			// printf("[%d] = %d\n", i, argv[i]);
-		}
-		return sum;
-	}
 
 	static token_t nulltoken = { 0 };
 	
-	int execute(char const *input)
+	value_t basic_execute(char const *input)
 	{
 		// Enables tracing on parser errors
 		// ParseTrace(10, "TRACE: ");
@@ -1135,7 +1132,10 @@ void Parse(
 					case TOK_FUN:
 					{
 						// TODO: Set registered function.
-						currtok.fun = &demofun;
+						currtok.fun = basic_getfunc(buffer);
+						if(currtok.fun == NULL) {
+							printf("Function %s not found!", buffer);
+						}
 						break;
 					}
 				}
@@ -1160,4 +1160,32 @@ void Parse(
 		
 		return result;
 	}
-#line 1164 "src/grammar.c"
+
+	struct basreg {
+		char name[64];
+		basfunc_f func;
+	};
+
+	static struct basreg functions[1024];
+	static int basfunc_cnt = 0;
+
+	void basic_register(char const *name, basfunc_f function)
+	{
+		functions[basfunc_cnt] = (struct basreg){ "", function };
+		
+		str_copy(functions[basfunc_cnt].name, name);
+		str_cat(functions[basfunc_cnt].name, "("); // Fancy hack to find the tokens instead of the names.
+		
+		++basfunc_cnt;
+	}
+
+	basfunc_f basic_getfunc(char const *name)
+	{
+		for(int i = 0; i < basfunc_cnt; i++)
+		{
+			if(str_eq(name, functions[i].name))
+				return functions[i].func;
+		}
+		return NULL;
+	}
+#line 1192 "src/grammar.c"
