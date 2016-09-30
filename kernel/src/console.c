@@ -174,7 +174,13 @@ void console_printf(console_t *con, char const * fmt, ...)
 	printf_target = NULL;
 }
 
-
+void console_write(console_t *con, char const * text, int length)
+{
+	for(int i = 0; i < length; i++)
+	{
+		console_putc(con, text[i]);
+	}
+}
 
 void cls()
 {
@@ -207,4 +213,9 @@ void printf(char const * fmt, ...)
 	va_start(list, fmt);
 	gprintf(putc, fmt, list);
 	va_end(list);
+}
+
+void conwrite(char const * text, int length)
+{
+	console_write(stdcon, text, length);
 }

@@ -96,6 +96,11 @@ void console_puts(console_t *con, char const * str);
 void console_printf(console_t *con, char const * fmt, ...);
 
 /**
+ * Writes a given text with a given length to the console.
+ */
+void console_write(console_t *con, char const * text, int length);
+
+/**
  * Clears the current console.
  */
 void cls();
@@ -124,3 +129,8 @@ void setcursor(int x, int y);
  * Prints a formatted string.
  */
 void printf(char const * fmt, ...);
+
+/**
+ * Writes text to the console.
+ */
+void conwrite(char const * text, int length);

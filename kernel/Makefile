@@ -13,10 +13,15 @@ LEX=flex
 
 all: kernel rmbuild
 
-kernel: initfiles makefile 
+kernel: initfiles basicfiles makefile 
 	$(MAKE) -B -C build
 	mv build/kernel kernel
-	
+
+basicfiles: src/grammar.lg src/lexer.re
+	re2c --input custom -o src/lexer.c src/lexer.re
+	lemon src/grammar.lg
+	mv src/grammar.h include/basic/grammar.h
+
 makefile:
 	mkdir -p build
 	mcs build.cs

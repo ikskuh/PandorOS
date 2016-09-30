@@ -110,12 +110,13 @@ static void shell_main()
 				}
 				break;
 			case '\n':
+				printf("\n"); // end line the input
 				currshell.input[currshell.cursor] = 0;
 				currshell.cursor = 0;
-				int len = 0;
-				char *str = currshell.input;
-				while(*str++) len++;
-				printf("\nYou entered: \"%s\" (Length=%d)\n", currshell.input, len);
+				
+				int result = execute(currshell.input);
+				
+				printf("= %d\n", result);
 				
 				printf("%s", shell_prompt);
 				break;
