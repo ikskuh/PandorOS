@@ -46,6 +46,8 @@ struct token lex(const char *input)
 		"/"      { return (struct token){ TOK_DIVIDE, index }; }
 		"("      { return (struct token){ TOK_BRO, index }; }
 		")"      { return (struct token){ TOK_BRC, index }; }
+		ass      { return (struct token){ TOK_ASS, index }; }
+		var      { return (struct token){ TOK_VAR, index }; }
 		ws+      { return (struct token){ -1, index }; }
 		
 	*/

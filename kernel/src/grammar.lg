@@ -1,10 +1,5 @@
-	%token_type {int}  
-%token_prefix TOK_
-
-%left PLUS MINUS.   
-%left DIVIDE TIMES.  
-   
 %include {
+#include "var.h"
 #include "basic/lexer.h"
 #include "string.h"
 #include "standard.h"
@@ -28,22 +23,39 @@ static void assert(int x, char const * xstr)
 }
 #define assert(x) assert(x, #x);
 
+typedef union {
+	int number;
+	variable_t * var;
+} token_t;
 
 static int result;
-}  
+
+}
+
+%token_type {token_t}  
+%token_prefix TOK_
+
+%left PLUS MINUS.
+%left DIVIDE TIMES.
    
 %syntax_error {  
   printf("Syntax error!\n");
-}   
+}
    
-program ::= expr(A).   { result = A; }  
+program ::= expr(A).                  { result = A.number; }
+program ::= expr(A) ASS variable(V).  {
+	var_set(V.var, &A.number);
+	result = A.number;
+}
 
-expr(A) ::= expr(B) MINUS  expr(C). { A = B - C; }  
-expr(A) ::= expr(B) PLUS   expr(C). { A = B + C; }  
-expr(A) ::= expr(B) TIMES  expr(C). { A = B * C; }  
+variable(V) ::= VAR(A).                { V = A; }
+
+expr(A) ::= expr(B) MINUS  expr(C). { A.number = B.number - C.number; }  
+expr(A) ::= expr(B) PLUS   expr(C). { A.number = B.number + C.number; }  
+expr(A) ::= expr(B) TIMES  expr(C). { A.number = B.number * C.number; }  
 expr(A) ::= expr(B) DIVIDE expr(C). {
-	if(C != 0){
-		A = B / C;
+	if(C.number != 0){
+		A.number = B.number / C.number;
 	}else{
 		printf("divide by zero\n");
 	}
@@ -51,7 +63,11 @@ expr(A) ::= expr(B) DIVIDE expr(C). {
 
 expr(A) ::= BRO expr(B) BRC. { A = B; }
 
-expr(A) ::= INTEGER(B). { A = B; } 
+expr(A) ::= INTEGER(B). { A = B; }
+
+expr(A) ::= VAR(B). { 
+	var_get(B.var, &A.number);
+}
 
 % code {
 	static char prealloc[1024];
@@ -61,6 +77,8 @@ expr(A) ::= INTEGER(B). { A = B; }
 		return prealloc;
 	}
 
+	static token_t nulltoken = { 0 };
+	
 	int execute(char const *input)
 	{
 		// Enables tracing on parser errors
@@ -72,15 +90,29 @@ expr(A) ::= INTEGER(B). { A = B; }
 			struct token token = lex(input);
 			if(token.type >= 0)
 			{
-				// printf ("  (%d, %d): '", token.type, token.length);
-				// conwrite(input, token.length);
-				// printf("'\n");
+				token_t currtok;
+				
 				static char buffer[64];
 				mem_set(buffer, 0, sizeof(buffer));
 				mem_copy(buffer, input, token.length);
-				int value = str_to_int(buffer, 10);
 				
-				Parse(pParser, token.type, value);
+				switch(token.type)
+				{
+					case TOK_INTEGER:
+					{
+						currtok.number = str_to_int(buffer, 10);
+						break;
+					}
+					case TOK_VAR:
+					{
+						currtok.var = var_byname(buffer);
+						break;
+					}
+				}
+				
+				hal_debug("Recognized token: %s(%d)\n", yyTokenName[token.type], token.type);
+				
+				Parse(pParser, token.type, currtok);
 				
 				if(token.type == 0)
 					break;
@@ -90,7 +122,7 @@ expr(A) ::= INTEGER(B). { A = B; }
 				break;
 		}
 		
-		Parse(pParser, 0, 0);
+		Parse(pParser, 0, nulltoken);
 		
 		ParseFree(pParser, free );
 		
