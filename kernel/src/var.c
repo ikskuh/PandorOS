@@ -45,7 +45,7 @@ variable_t * var_byname(char const * name)
 	if(str_eq(name, "Ans")) {
 		return &variable_ans;
 	}
-	if(str_startswith(name, "STR"))
+	if(str_startswith(name, "Str"))
 	{
 		if(name[3] >= '0' && name[3] <= '9') {
 			return &variables_str[name[3] - '0'];
