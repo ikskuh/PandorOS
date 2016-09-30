@@ -75,6 +75,17 @@ value_t basic_mknull();
  */
 void basic_error(error_t reason);
 
+/**
+ * Returns the last error that occured.
+ * @returns The last error or ERR_SUCCESS on success.
+ */
+error_t basic_lasterror();
+
+/**
+ * Returns the human-readable name of the error code
+ */
+char const * basic_err_to_string(error_t err);
+
 /** 
  * Resets execution-time memory.
  */

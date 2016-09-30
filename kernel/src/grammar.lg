@@ -6,6 +6,7 @@
 #include "string.h"
 #include "standard.h"
 #include "alloc.h"
+#include "longjmp.h"
 #include <stdbool.h>
 
 // Exclude all debug shit
@@ -22,7 +23,7 @@ static void assert(int x, char const * xstr)
 {
 	if(x) return;
 	hal_debug("Assertion failed: '%s'\n", xstr);
-	while(true);
+	basic_error(ERR_ASSERTION);
 }
 #define assert(x) assert(x, #x);
 
@@ -55,7 +56,7 @@ static allocator_t * argalloc;
 %left NOT.
    
 %syntax_error {  
-  printf("Syntax error!\n");
+  basic_error(ERR_SYNTAX_ERROR);
 }
    
 program ::= expr(A).                  { result = A.val; }
@@ -106,10 +107,7 @@ expr(A) ::= FUN(F) arglist(B) BRC. {
 
 	if(F.fun != NULL) {
 		A.val = F.fun(cnt, args);
-	} else {
-		printf("Function not found.\n");
 	}
-	
 }
 
 arglist(A) ::= . { A.arg = NULL; }
@@ -136,6 +134,15 @@ arglist(A) ::= expr(B) COMMA arglist(C). {
 
 	static token_t nulltoken = { };
 	
+	bool errorhandler_valid = false;
+	jmp_buf errorhandler;
+	static error_t lastError = ERR_SUCCESS;
+
+	error_t basic_lasterror()
+	{
+		return lastError;
+	}
+	
 	value_t basic_execute(char const *input)
 	{
 		// Enables tracing on parser errors
@@ -146,65 +153,77 @@ arglist(A) ::= expr(B) COMMA arglist(C). {
 		argalloc = allocator_new(sizeof(arg_t));
 		
 		void* pParser = ParseAlloc (mwrap);
-		while(true)
-		{
-			struct token token = lex(input);
-			if(token.type >= 0)
-			{
-				token_t currtok;
-				
-				static char buffer[64];
-				mem_set(buffer, 0, sizeof(buffer));
-				mem_copy(buffer, input, token.length);
-				
-				switch(token.type)
-				{
-					case TOK_INTEGER:
-					{
-						currtok.val = basic_mknum(str_to_int(buffer, 10));
-						break;
-					}
-					case TOK_STRING:
-					{
-						// Initialize with uninitialized pointer
-						
-						char *str = basic_alloc(token.length - 1);
-						mem_copy(str, buffer + 1, token.length - 2);
-						str[token.length - 2] = 0;
-						
-						currtok.val = basic_mkstr(str);
-						
-						break;
-					}
-					case TOK_VAR:
-					{
-						currtok.var = var_byname(buffer);
-						break;
-					}
-					case TOK_FUN:
-					{
-						// TODO: Set registered function.
-						currtok.fun = basic_getfunc(buffer);
-						if(currtok.fun == NULL) {
-							printf("Function %s not found!", buffer);
-						}
-						break;
-					}
-				}
-				
-				hal_debug("Recognized token: %s(%d)\n", yyTokenName[token.type], token.type);
-				
-				Parse(pParser, token.type, currtok);
-				
-				if(token.type == 0)
-					break;
-			}
-			input += token.length;
-			if(*input == 0)
-				break;
-		}
 		
-		Parse(pParser, 0, nulltoken);
+		errorhandler_valid = true;
+		int errcode = setjmp(errorhandler);
+		if(errcode == 0)
+		{
+			result = basic_mknull();
+			while(*input)
+			{
+				struct token token = lex(input);
+				if(token.type >= 0)
+				{
+					token_t currtok;
+					
+					static char buffer[64];
+					mem_set(buffer, 0, sizeof(buffer));
+					mem_copy(buffer, input, token.length);
+					
+					switch(token.type)
+					{
+						case TOK_INTEGER:
+						{
+							currtok.val = basic_mknum(str_to_int(buffer, 10));
+							break;
+						}
+						case TOK_STRING:
+						{
+							// Initialize with uninitialized pointer
+							
+							char *str = basic_alloc(token.length - 1);
+							mem_copy(str, buffer + 1, token.length - 2);
+							str[token.length - 2] = 0;
+							
+							currtok.val = basic_mkstr(str);
+							
+							break;
+						}
+						case TOK_VAR:
+						{
+							currtok.var = var_byname(buffer);
+							break;
+						}
+						case TOK_FUN:
+						{
+							// TODO: Set registered function.
+							currtok.fun = basic_getfunc(buffer);
+							if(currtok.fun == NULL) {
+								basic_error(ERR_FUNC_NOT_FOUND);
+							}
+							break;
+						}
+					}
+					
+					Parse(pParser, token.type, currtok);
+					
+					if(token.type == 0)
+						break;
+				}
+				input += token.length;
+			}
+		
+			Parse(pParser, 0, nulltoken);
+		
+			lastError = ERR_SUCCESS;
+		}
+		else
+		{
+			// We got an error!
+			result = basic_mknull();
+			lastError = (error_t)errcode;
+		}
+		errorhandler_valid = false;
 		
 		ParseFree(pParser, free );
 		

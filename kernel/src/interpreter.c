@@ -1,24 +1,36 @@
 #include "interpreter.h"
 #include "io.h"
 #include "pmm.h"
+#include "longjmp.h"
 
+// declared in grammar.lg
+extern bool errorhandler_valid;
+extern jmp_buf errorhandler;
+	
 /**
  * Throws an error.
  */
 void basic_error(error_t reason)
 {
-	switch(reason)
-	{
-#define ERR(i,n) case ERR_##n: \
-	printf("Fault: %s\n", #n); \
-	break; 
-#include "basic/errors.lst"
-#undef ERR
-		default:
-			printf("Failt: ERR_UNKNOWN\n");
-			break;
+	if(reason == ERR_SUCCESS) return;
+	if(errorhandler_valid == false) {
+		printf("Critical fault: ");
+		switch(reason)
+		{
+	#define ERR(i,n) case ERR_##n: \
+		printf("%s\n", #n); \
+		break; 
+	#include "basic/errors.lst"
+	#undef ERR
+			default:
+				printf("ERR_UNKNOWN\n");
+				break;
+		}
+		while(1);
+	} else {
+		longjmp(errorhandler, reason);
+		printf("?longjmp?");
 	}
-	while(1);
 }
 
 static page_t stringpage;
@@ -80,4 +92,15 @@ void *basic_alloc(size_t size)
 	void *ptr = basicmemory;
 	basicmemory += size;
 	return ptr;
+}
+
+char const * basic_err_to_string(error_t err)
+{
+	switch(err)
+	{
+#define ERR(i,n) case ERR_##n: return #n;
+#include "basic/errors.lst"
+#undef ERR
+	default: return "UNKNWON";
+	}
 }

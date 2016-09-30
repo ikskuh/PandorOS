@@ -116,8 +116,15 @@ static void shell_main()
 				
 				value_t result = basic_execute(currshell.input);
 				
-				if(basic_isnull(result) == false) {
-					printf("= %v\n", result);
+				if(basic_lasterror() != ERR_SUCCESS)
+				{
+					printf("ERROR: %s\n", basic_err_to_string(basic_lasterror()));
+				}
+				else
+				{
+					if(basic_isnull(result) == false) {
+						printf("= %v\n", result);
+					}
 				}
 				printf("%s", shell_prompt);
 				break;
