@@ -3,12 +3,18 @@
 #include "basic/types.h"
 #include "basic/var.h"
 
+#include <stddef.h>
 #include <stdbool.h>
 
 /**
  * Initializes the basic interpreter.
  */
 void basic_init();
+
+/**
+ * Initializes the basic stdlib.
+ */
+void stdlib_init();
 
 /**
  * A function that can be called from basic.
@@ -68,3 +74,13 @@ value_t basic_mknull();
  * Throws an error.
  */
 void basic_error(error_t reason);
+
+/** 
+ * Resets execution-time memory.
+ */
+void basic_memreset();
+
+/**
+ * Allocates execution-time memory.
+ */
+void *basic_alloc(size_t size);

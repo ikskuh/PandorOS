@@ -135,7 +135,9 @@ void os_init()
 	console_init();
 	options_init();
 	catalog_init();
+	
 	basic_init();
+	stdlib_init();
 	
 	var_init();
 	

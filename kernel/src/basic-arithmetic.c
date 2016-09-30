@@ -1,9 +1,47 @@
 #include "basic/arithmetic.h"
 #include "interpreter.h"
+#include "standard.h"
+#include "hal.h"
 
 value_t val_add(value_t lhs, value_t rhs)
 {
-	return basic_mknum(basic_getnum(lhs) + basic_getnum(rhs));
+	if(lhs.type == TYPE_TEXT || rhs.type == TYPE_TEXT) {
+		char const *left, *right;
+		switch(lhs.type)
+		{
+			case TYPE_TEXT: left = basic_getstr(lhs); break;
+			case TYPE_NUM: {
+				left = basic_alloc(TYPE_NUM_LEN);
+				int_to_string((char*)left, basic_getnum(lhs), 10);
+				break;
+			}
+			default: basic_error(ERR_INVALID_TYPE); break;
+		}
+		switch(rhs.type)
+		{
+			case TYPE_TEXT: right = basic_getstr(rhs); break;
+			case TYPE_NUM: {
+				right = basic_alloc(TYPE_NUM_LEN);
+				int_to_string((char*)right, basic_getnum(rhs), 10);
+				break;
+			}
+			default: basic_error(ERR_INVALID_TYPE); break;
+		}
+		
+		int leftlen = str_len(left);
+		int totlen = leftlen + str_len(right) + 1;
+		
+		hal_debug("'%s' + '%s'\n", left, right);
+		
+		char *result = basic_alloc(totlen);
+		str_copy(result, left);
+		str_copy(result + leftlen, right);
+		
+		return basic_mkstr(result);
+		
+	} else {
+		return basic_mknum(basic_getnum(lhs) + basic_getnum(rhs));
+	}
 }
 
 value_t val_sub(value_t lhs, value_t rhs)

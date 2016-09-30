@@ -1137,8 +1137,8 @@ void Parse(
 		// Enables tracing on parser errors
 		// ParseTrace(10, "TRACE: ");
 		
-		page_t strpage = pmm_alloc();
-		char *literalloc = pmm_getptr(strpage);
+		basic_memreset();
+		
 		argalloc = allocator_new(sizeof(arg_t));
 		
 		void* pParser = ParseAlloc (mwrap);
@@ -1163,14 +1163,12 @@ void Parse(
 					case TOK_STRING:
 					{
 						// Initialize with uninitialized pointer
-						currtok.val = basic_mkstr(literalloc);
 						
-						// then initialize pointer:
-						mem_copy(literalloc, buffer + 1, token.length - 2);
-						literalloc[token.length - 2] = 0;
+						char *str = basic_alloc(token.length - 1);
+						mem_copy(str, buffer + 1, token.length - 2);
+						str[token.length - 2] = 0;
 						
-						// then advande allocation pointer
-						literalloc += token.length - 1;
+						currtok.val = basic_mkstr(str);
 						
 						break;
 					}
@@ -1208,7 +1206,6 @@ void Parse(
 		
 		allocator_delete(argalloc);
 		
-		pmm_free(strpage);
 		
 		if(basic_isnull(result) == false) {
 			var_setans(result);
@@ -1244,4 +1241,4 @@ void Parse(
 		}
 		return NULL;
 	}
-#line 1248 "src/grammar.c"
+#line 1245 "src/grammar.c"

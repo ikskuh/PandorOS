@@ -74,7 +74,7 @@ static struct reg {
 	{ NULL, NULL },
 };
 
-void basic_init()
+void stdlib_init()
 {
 	struct reg * it = functions;
 	

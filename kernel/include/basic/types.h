@@ -5,6 +5,9 @@
 #define TYPE_NUM  1
 #define TYPE_TEXT 2
 
+#define TYPE_NUM_LEN 16
+#define TYPE_STR_LEN 4095
+
 /**
  * The numeric type of the interpreter.
  */

@@ -1,5 +1,6 @@
 #include "interpreter.h"
 #include "io.h"
+#include "pmm.h"
 
 /**
  * Throws an error.
@@ -18,6 +19,13 @@ void basic_error(error_t reason)
 			break;
 	}
 	while(1);
+}
+
+static page_t stringpage;
+
+void basic_init()
+{
+	stringpage = pmm_alloc();
 }
 
 bool basic_isnull(value_t value)
@@ -58,4 +66,18 @@ value_t basic_mknull()
 	value_t val;
 	val.type = TYPE_NULL;
 	return val;
+}
+
+static char *basicmemory;
+
+void basic_memreset()
+{
+	basicmemory = pmm_getptr(stringpage);
+}
+
+void *basic_alloc(size_t size)
+{
+	void *ptr = basicmemory;
+	basicmemory += size;
+	return ptr;
 }
