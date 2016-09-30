@@ -13,9 +13,13 @@ typedef struct cataloginfo
 } cataloginfo_t;
 
 static cataloginfo_t entries[] = {
-	{ "Output(", "Output(x, y, value)",   "This function..." },
-	{ "Input(",  "Input(x, y, variable)", "This function blabla..." },
-	{ "Print(", "Print(value)", "Prints the given value and appends a newline." ,}
+// { "Output(", "Output(x, y, value)",   "This function..." },
+// { "Input(",  "Input(x, y, variable)", "This function blabla..." },
+// { "Print(", "Print(value)", "Prints the given value and appends a newline." },
+	
+#define FUNCTION(name, synpsis, desc, code) { #name "(", synpsis, desc },
+#include "stdlib.lst"
+#undef FUNCTION
 };
 
 #define CATALOG_SIZE ((int)(sizeof(entries) / sizeof(entries[0])))

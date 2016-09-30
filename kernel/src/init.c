@@ -129,6 +129,8 @@ static void shell_main()
 	}
 }
 
+#define BLOCKSTR(x) #x
+
 void os_init()
 {
 	// TODO: Initialize OS…

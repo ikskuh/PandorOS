@@ -3,7 +3,6 @@
 
 #include <stddef.h>
 
-#define FUNCTION(name) static value_t name(int argc, value_t *argv)
 
 void assert_argc(int argc, int i)
 {
@@ -17,59 +16,19 @@ void assert_type(value_t val, int type)
 		basic_error(ERR_INVALID_ARG);
 }
 
-FUNCTION(Abs)
-{
-	assert_argc(argc, 1);
-	number_t num = basic_getnum(argv[0]);
-	if(num)
-		return basic_mknum(-num);
-	else
-		return basic_mknum(num);
-}
-
-FUNCTION(Print)
-{
-	for(int i = 0; i < argc; i++)
-	{
-		if(i > 0) printf(" ");
-		printf("%v", argv[i]);
-	}
-	printf("\n");
-	return basic_mknull();
-}
-
-FUNCTION(Sum)
-{
-	number_t sum = 0;
-	for(int i = 0; i < argc; i++)
-	{
-		sum += basic_getnum(argv[i]);
-	}
-	return basic_mknum(sum);
-}
-
-FUNCTION(Product)
-{
-	number_t sum = 1;
-	for(int i = 0; i < argc; i++)
-	{
-		sum *= basic_getnum(argv[i]);
-	}
-	return basic_mknum(sum);
-}
-
-#define REG(fn) { #fn, fn }
+#define FUNCTION(name, synpsis, desc, code) static value_t name(int argc, value_t *argv) \
+	code
+#include "stdlib.lst"
+#undef FUNCTION
 
 static struct reg {
 	char *name;
 	basfunc_f fn;
 } functions[] = {
 
-	REG(Abs),
-	REG(Print),
-	REG(Sum),
-	REG(Product),
-	
+#define FUNCTION(name, synpsis, desc, code) { #name, &name },
+#include "stdlib.lst"
+#undef FUNCTION
 	
 	{ NULL, NULL },
 };
