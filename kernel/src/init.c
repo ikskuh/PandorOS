@@ -116,8 +116,9 @@ static void shell_main()
 				
 				value_t result = basic_execute(currshell.input);
 				
-				printf("= %d\n", result);
-				
+				if(basic_isnull(result) == false) {
+					printf("= %v\n", result);
+				}
 				printf("%s", shell_prompt);
 				break;
 			default:

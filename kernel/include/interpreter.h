@@ -1,11 +1,9 @@
 #pragma once
 
-#include "var.h"
+#include "basic/types.h"
+#include "basic/var.h"
 
-/**
- * A typed interpreter value.
- */
-typedef int value_t;
+#include <stdbool.h>
 
 /**
  * Initializes the basic interpreter.
@@ -34,3 +32,39 @@ value_t basic_execute(char const *input);
  * @param function The function itself.
  */
 void basic_register(char const *name, basfunc_f function);
+
+
+/**
+ * Returns true if a value is null.
+ */
+bool basic_isnull(value_t value);
+
+/**
+ * Extracts the number from a value.
+ */
+number_t basic_getnum(value_t value);
+
+/**
+ * Extracts the string from a value.
+ */
+string_t basic_getstr(value_t value);
+
+/**
+ * Makes a numeric value.
+ */
+value_t basic_mknum(number_t num);
+
+/**
+ * Makes a string value.
+ */
+value_t basic_mkstr(string_t num);
+
+/**
+ * Makes a null value.
+ */
+value_t basic_mknull();
+
+/**
+ * Throws an error.
+ */
+void basic_error(error_t reason);

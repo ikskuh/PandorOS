@@ -1,13 +1,9 @@
 #pragma once
 
 #include "config.h"
+#include "types.h"
 #include <stdbool.h>
 
-#define VAR_NULL 0
-#define VAR_INT  1
-#define VAR_TXT  2
-
-#define VAr_TXT_MAXLEN (PMM_PAGESIZE - 1)
 
 /**
  * Opaque handle to a variable.
@@ -40,20 +36,17 @@ int var_type(variable_t const * var);
  * Gets the value of a variable.
  * @param var    The variable of which the value should be get.
  * @param target A pointer to the variable contents.
- *
- * for VAR_NULL the target is ignored.
- * for VAR_INT target should point to an int.
- * for VAR_TEXT target should point to a char array with sufficient storage.
  */
-void var_get(variable_t * var, void *target);
+void var_get(variable_t * var, value_t * target);
 
 /**
  * Sets the value of a variable.
  * @param var    The variable of which the value should be set.
  * @param target A pointer to the variable contents.
- *
- * for VAR_NULL the target is ignored.
- * for VAR_INT target should point to an int.
- * for VAR_TEXT target is a nullterminated char *;
  */
-void var_set(variable_t * var, void const * target);
+void var_set(variable_t * var, value_t source);
+
+/**
+ * Sets the answer variable.
+ */ 
+void var_setans(value_t value);

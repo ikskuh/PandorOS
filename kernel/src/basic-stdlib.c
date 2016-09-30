@@ -5,12 +5,26 @@
 
 #define FUNCTION(name) static value_t name(int argc, value_t *argv)
 
+void assert_argc(int argc, int i)
+{
+	if(argc != i)
+		basic_error(ERR_ARG_COUNT);
+}
+
+void assert_type(value_t val, int type)
+{
+	if(val.type != type)
+		basic_error(ERR_INVALID_ARG);
+}
+
 FUNCTION(Abs)
 {
-	if(argv[0] < 0)
-		return -argv[0];
+	assert_argc(argc, 1);
+	number_t num = basic_getnum(argv[0]);
+	if(num)
+		return basic_mknum(-num);
 	else
-		return argv[0];
+		return basic_mknum(num);
 }
 
 FUNCTION(Print)
@@ -18,32 +32,30 @@ FUNCTION(Print)
 	for(int i = 0; i < argc; i++)
 	{
 		if(i > 0) printf(" ");
-		printf("%d", argv[i]);
+		printf("%v", argv[i]);
 	}
 	printf("\n");
-	return 0;
+	return basic_mknull();
 }
 
 FUNCTION(Sum)
 {
-	value_t sum = 0;
+	number_t sum = 0;
 	for(int i = 0; i < argc; i++)
 	{
-		sum += argv[i];
-		// printf("[%d] = %d\n", i, argv[i]);
+		sum += basic_getnum(argv[i]);
 	}
-	return sum;
+	return basic_mknum(sum);
 }
 
 FUNCTION(Product)
 {
-	value_t sum = 1;
+	number_t sum = 1;
 	for(int i = 0; i < argc; i++)
 	{
-		sum *= argv[i];
-		// printf("[%d] = %d\n", i, argv[i]);
+		sum *= basic_getnum(argv[i]);
 	}
-	return sum;
+	return basic_mknum(sum);
 }
 
 #define REG(fn) { #fn, fn }

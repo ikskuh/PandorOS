@@ -1,6 +1,7 @@
-#include "var.h"
+#include "interpreter.h"
 #include "string.h"
 #include "pmm.h"
+#include "hal.h"
 
 #include <stddef.h>
 #include <stdbool.h>
@@ -10,12 +11,13 @@ typedef struct variable
 	int type;
 	bool ro;
 	union {
-		int num;
+		number_t num;
 		char * text;
 	};
 } variable_t;
 
-variable_t variable_ans = { VAR_NULL, true, {} };
+variable_t variable_ans = { TYPE_NULL, true, {} };
+variable_t variable_null = { TYPE_NULL, true, {} };
 
 variable_t variables_int[26];
 variable_t variables_str[10];
@@ -24,24 +26,23 @@ void var_init()
 {
 	for(int i = 0; i < 26; i++)
 	{
-		variables_int[i].type = VAR_INT;
+		variables_int[i].type = TYPE_NUM;
 		variables_int[i].ro   = false;
 		variables_int[i].num  = 0;
 	}
 	
 	for(int i = 0; i < 10; i++)
 	{
-		variables_str[i].type = VAR_TXT;
+		variables_str[i].type = TYPE_TEXT;
 		variables_str[i].ro   = false;
 		variables_str[i].text = pmm_getptr(pmm_alloc());
 		str_copy(variables_str[i].text, "");
 	}
 }
 
-
 variable_t * var_byname(char const * name)
 {
-	if(str_eq(name, "ANS")) {
+	if(str_eq(name, "Ans")) {
 		return &variable_ans;
 	}
 	if(str_startswith(name, "STR"))
@@ -58,7 +59,7 @@ variable_t * var_byname(char const * name)
 	// } else if(n >= 'a' && n <= 'z') {
 	// 	return &variables_int[n - 'a'];
 	} else {
-		return NULL;
+		return &variable_null;
 	}
 }
 
@@ -67,38 +68,56 @@ int var_type(variable_t const * var)
 	if(var != NULL)
 		return var->type;
 	else
-		return VAR_NULL;
+		return TYPE_NULL;
 }
 
 
-void var_get(variable_t * var, void *target)
+void var_get(variable_t * var, value_t * target)
 {
-	if(var == NULL || var->type == VAR_NULL)
+	if(var == NULL || var->type == TYPE_NULL || var == &variable_null) {
+		basic_error(ERR_INVALID_VAR);
 		return;
+	}
+	target->type = var->type;
 	switch(var->type)
 	{
-		case VAR_INT:
-			*((int*)target) = var->num;
+		case TYPE_NUM:
+			target->number = var->num;
 			break;
-		case VAR_TXT:
-			str_copy(target, var->text);
+		case TYPE_TEXT:
+			target->string = var->text;
 			break;
 	}
 }
 
-void var_set(variable_t * var, void const * target)
+void var_set(variable_t * var, value_t source)
 {
-	if(var == NULL || var->type == VAR_NULL)
+	if(var == NULL || var->type == TYPE_NULL) {
+		hal_debug("Trying to write '%v' to invalid variable.\n", source);
 		return;
-	if(var->ro)
+	}
+	if(var->ro) {
+		hal_debug("Trying to write '%v' to read-only variable.\n", source);
 		return;
+	}
+	if(var->type != source.type)
+		basic_error(ERR_INVALID_TYPE);
+	hal_debug("Setting varibale to '%v'.\n", source);
 	switch(var->type)
 	{
-		case VAR_INT:
-			var->num = *((int const*)target);
+		case TYPE_NUM:
+			var->num = source.number;
 			break;
-		case VAR_TXT:
-			str_copy(var->text, target);
+		case TYPE_TEXT:
+			str_copy(var->text, source.string);
 			break;
 	}
+}
+
+void var_setans(value_t value)
+{
+	variable_ans.type = value.type;
+	variable_ans.ro = false;
+	var_set(&variable_ans, value);
+	variable_ans.ro = true;
 }

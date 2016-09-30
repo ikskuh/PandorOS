@@ -1,5 +1,6 @@
 #include <stdarg.h>
 #include "standard.h"
+#include "interpreter.h"
 
 static char buffer[128];
 
@@ -58,6 +59,38 @@ int gprintf(void (*_putc)(char c), char const *fmt, va_list list)
 					while(*str) {
 						_putc(*str++);
 						chars++;
+					}
+					break;
+				}
+				case 'v':
+				{
+					value_t val = va_arg(list, value_t);
+					switch(val.type)
+					{
+						case TYPE_NULL:
+							_putc('N');
+							_putc('U');
+							_putc('L');
+							_putc('L');
+							break;
+						case TYPE_NUM:
+						{
+							int len = int_to_string(buffer, val.number, 10);
+							for(int i = 0; i < len; i++) {
+								_putc(buffer[i]);
+							}
+							chars += len;
+							break;
+						}
+						case TYPE_TEXT:
+						{
+							char const *str = val.string;
+							while(*str) {
+								_putc(*str++);
+								chars++;
+							}
+							break;
+						}
 					}
 					break;
 				}

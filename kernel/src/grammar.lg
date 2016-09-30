@@ -1,7 +1,8 @@
 %include {
 #include "interpreter.h"
-#include "var.h"
+#include "basic/var.h"
 #include "basic/lexer.h"
+#include "basic/arithmetic.h"
 #include "string.h"
 #include "standard.h"
 #include "alloc.h"
@@ -33,7 +34,7 @@ typedef struct arg {
 } arg_t;
 
 typedef union {
-	value_t number;
+	value_t val;
 	variable_t * var;
 	arg_t * arg;
 	basfunc_f fun;
@@ -50,38 +51,39 @@ static allocator_t * argalloc;
 
 %left PLUS MINUS.
 %left DIVIDE TIMES.
+%left AND OR XOR.
+%left NOT.
    
 %syntax_error {  
   printf("Syntax error!\n");
 }
    
-program ::= expr(A).                  { result = A.number; }
+program ::= expr(A).                  { result = A.val; }
 program ::= expr(A) ASS variable(V).  {
-	var_set(V.var, &A.number);
-	result = A.number;
+	var_set(V.var, A.val);
+	result = A.val;
 }
 
 variable(V) ::= VAR(A).                { V = A; }
 
-expr(A) ::= expr(B) MINUS  expr(C). { A.number = B.number - C.number; }  
-expr(A) ::= expr(B) PLUS   expr(C). { A.number = B.number + C.number; }  
-expr(A) ::= expr(B) TIMES  expr(C). { A.number = B.number * C.number; }  
-expr(A) ::= expr(B) DIVIDE expr(C). {
-	if(C.number != 0){
-		A.number = B.number / C.number;
-	}else{
-		printf("divide by zero\n");
-	}
-}
+expr(A) ::= expr(B) MINUS  expr(C). { A.val = val_sub(B.val, C.val); }
+expr(A) ::= expr(B) PLUS   expr(C). { A.val = val_add(B.val, C.val); }
+expr(A) ::= expr(B) TIMES  expr(C). { A.val = val_mul(B.val, C.val); }
+expr(A) ::= expr(B) DIVIDE expr(C). { A.val = val_div(B.val, C.val); }
+
+expr(A) ::= expr(B) AND expr(C). { A.val = val_and(B.val, C.val); }
+expr(A) ::= expr(B) OR expr(C).  { A.val = val_or(B.val, C.val); }
+expr(A) ::= expr(B) XOR expr(C). { A.val = val_xor(B.val, C.val); }
 
 expr(A) ::= BRO expr(B) BRC. { A = B; }
 
-expr(A) ::= MINUS expr(B). { A.number = -B.number; }
+expr(A) ::= MINUS expr(B). { A.val = val_neg(B.val); }
+expr(A) ::= NOT expr(B). { A.val = val_not(B.val); }
 
 expr(A) ::= INTEGER(B). { A = B; }
 
 expr(A) ::= VAR(B). { 
-	var_get(B.var, &A.number);
+	var_get(B.var, &A.val);
 }
 
 expr(A) ::= FUN(F) arglist(B) BRC. {
@@ -102,7 +104,7 @@ expr(A) ::= FUN(F) arglist(B) BRC. {
 	}
 
 	if(F.fun != NULL) {
-		A.number = F.fun(cnt, args);
+		A.val = F.fun(cnt, args);
 	} else {
 		printf("Function not found.\n");
 	}
@@ -113,13 +115,13 @@ arglist(A) ::= . { A.arg = NULL; }
 
 arglist(A) ::= expr(B). { 
 	A.arg = allocator_alloc(argalloc);
-	A.arg->value = B.number;
+	A.arg->value = B.val;
 	A.arg->next = NULL;
 }
 
 arglist(A) ::= expr(B) COMMA arglist(C). {
 	A.arg = allocator_alloc(argalloc);
-	A.arg->value = B.number;
+	A.arg->value = B.val;
 	A.arg->next = C.arg;
 }
 
@@ -131,7 +133,7 @@ arglist(A) ::= expr(B) COMMA arglist(C). {
 		return prealloc;
 	}
 
-	static token_t nulltoken = { 0 };
+	static token_t nulltoken = { };
 	
 	value_t basic_execute(char const *input)
 	{
@@ -156,7 +158,7 @@ arglist(A) ::= expr(B) COMMA arglist(C). {
 				{
 					case TOK_INTEGER:
 					{
-						currtok.number = str_to_int(buffer, 10);
+						currtok.val = basic_mknum(str_to_int(buffer, 10));
 						break;
 					}
 					case TOK_VAR:
@@ -192,6 +194,10 @@ arglist(A) ::= expr(B) COMMA arglist(C). {
 		ParseFree(pParser, free );
 		
 		allocator_delete(argalloc);
+		
+		if(basic_isnull(result) == false) {
+			var_setans(result);
+		}
 		
 		return result;
 	}
