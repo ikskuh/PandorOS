@@ -6,6 +6,9 @@
 #include <stddef.h>
 #include <stdbool.h>
 
+#define BASIC_FUNCTION 1
+#define BASIC_ORDER    2
+
 /**
  * Initializes the basic interpreter.
  */
@@ -36,8 +39,9 @@ value_t basic_execute(char const *input);
  * Registers a basic function.
  * @param name     The case sensitive name of the function
  * @param function The function itself.
+ * @param type     The type of the function (BASIC_ORDER or BASIC_FUNCTION)
  */
-void basic_register(char const *name, basfunc_f function);
+void basic_register(char const *name, basfunc_f function, int type);
 
 
 /**

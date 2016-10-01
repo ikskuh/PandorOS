@@ -26,20 +26,24 @@ value_t getarg(int argc, value_t *argv, int i)
 #define STR(n) basic_getstr(getarg(argc, argv, n))
 #define NUM(n) basic_getnum(getarg(argc, argv, n))
 
-#define FUNCTION(name, synpsis, desc, code) static value_t name(int argc, value_t *argv) { code return basic_mknull(); }
+#define FUNCTION(name, synpsis, desc, code) static value_t fun_##name(int argc, value_t *argv) { code return basic_mknull(); }
+#define ORDER(name, synpsis, desc, code) static value_t ord_##name(int argc, value_t *argv) { code return basic_mknull(); }
 #include "stdlib.lst"
+#undef ORDER
 #undef FUNCTION
 
 static struct reg {
 	char *name;
+	int type;
 	basfunc_f fn;
 } functions[] = {
 
-#define FUNCTION(name, synpsis, desc, code) { #name, &name },
+#define FUNCTION(name, synpsis, desc, code) { #name, BASIC_FUNCTION, &fun_##name },
+#define ORDER(name, synpsis, desc, code) { #name, BASIC_ORDER, &ord_##name },
 #include "stdlib.lst"
 #undef FUNCTION
 	
-	{ NULL, NULL },
+	{ NULL, 0, NULL },
 };
 
 void stdlib_init()
@@ -48,7 +52,7 @@ void stdlib_init()
 	
 	while(it->name)
 	{
-		basic_register(it->name, it->fn);
+		basic_register(it->name, it->fn, it->type);
 		it++;
 	}
 }

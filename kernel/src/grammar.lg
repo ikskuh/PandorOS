@@ -24,7 +24,7 @@ static void assert(int x, char const * xstr)
 }
 #define assert(x) assert(x, #x);
 
-basfunc_f basic_getfunc(char const *name);
+basfunc_f basic_getfunc(int type, char const *name);
 
 typedef struct arg {
 	value_t value;
@@ -60,6 +60,26 @@ program ::= expr(A).                  { result = A.val; }
 program ::= expr(A) ASS variable(V).  {
 	var_set(V.var, A.val);
 	result = A.val;
+}
+program ::= ORDER(O) arglist(A). {
+	
+	arg_t *a;
+
+	int cnt = 0;
+	for(a = A.arg; a != NULL; a = a->next)
+	{
+		cnt++;
+	}
+
+	value_t args[cnt];
+	
+	int i;
+	for(a = A.arg, i = 0; a != NULL; a = a->next, i++)
+	{
+		args[i] = a->value;
+	}
+
+	result = O.fun(cnt, args);
 }
 
 variable(V) ::= VAR(A).                { V = A; }
@@ -102,9 +122,7 @@ expr(A) ::= FUN(F) arglist(B) BRC. {
 		args[i] = a->value;
 	}
 
-	if(F.fun != NULL) {
-		A.val = F.fun(cnt, args);
-	}
+	A.val = F.fun(cnt, args);
 }
 
 arglist(A) ::= . { A.arg = NULL; }
@@ -199,8 +217,20 @@ arglist(A) ::= expr(B) COMMA arglist(C). {
 						}
 						case TOK_FUN:
 						{
-							// TODO: Set registered function.
-							currtok.fun = basic_getfunc(buffer);
+							currtok.fun = basic_getfunc(BASIC_FUNCTION, buffer);
+							if(currtok.fun == NULL) {
+								basic_error(ERR_FUNC_NOT_FOUND);
+							}
+							break;
+						}
+						case TOK_ORDER:
+						{
+							for(int i = 0; buffer[i]; i++)
+							{
+								if(buffer[i] == ' ')
+									buffer[i] = 0;
+							}
+							currtok.fun = basic_getfunc(BASIC_ORDER, buffer);
 							if(currtok.fun == NULL) {
 								basic_error(ERR_FUNC_NOT_FOUND);
 							}
@@ -242,26 +272,30 @@ arglist(A) ::= expr(B) COMMA arglist(C). {
 
 	struct basreg {
 		char name[64];
+		int type;
 		basfunc_f func;
 	};
 
 	static struct basreg functions[1024];
 	static int basfunc_cnt = 0;
 
-	void basic_register(char const *name, basfunc_f function)
+	void basic_register(char const *name, basfunc_f function, int type)
 	{
-		functions[basfunc_cnt] = (struct basreg){ "", function };
+		functions[basfunc_cnt] = (struct basreg){ "", type, function };
 		
 		str_copy(functions[basfunc_cnt].name, name);
-		str_cat(functions[basfunc_cnt].name, "("); // Fancy hack to find the tokens instead of the names.
+		if(type == BASIC_FUNCTION)
+			str_cat(functions[basfunc_cnt].name, "("); // Fancy hack to find the tokens instead of the names.
 		
 		++basfunc_cnt;
 	}
 
-	basfunc_f basic_getfunc(char const *name)
+	basfunc_f basic_getfunc(int type, char const *name)
 	{
 		for(int i = 0; i < basfunc_cnt; i++)
 		{
+			if(functions[i].type != type)
+				continue;
 			if(str_eq(name, functions[i].name))
 				return functions[i].func;
 		}

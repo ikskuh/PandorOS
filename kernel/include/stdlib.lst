@@ -1,3 +1,15 @@
+
+
+ORDER(Print, "Print ...", "Prints its arguments and adds a newline.",
+{
+	for(int i = 0; i < argc; i++)
+	{
+		printf("%v", argv[i]);
+	}
+	printf("\n");
+	return basic_mknull();
+})
+
 FUNCTION(Abs, "Abs(x)", "Returns *x* as a positive value.",
 {
 	assert_argc(argc, 1);
@@ -6,16 +18,6 @@ FUNCTION(Abs, "Abs(x)", "Returns *x* as a positive value.",
 		return basic_mknum(-num);
 	else
 		return basic_mknum(num);
-})
-
-FUNCTION(Print, "Print(...)", "Prints its arguments and adds a newline.",
-{
-	for(int i = 0; i < argc; i++)
-	{
-		printf("%v", argv[i]);
-	}
-	printf("\n");
-	return basic_mknull();
 })
 
 FUNCTION(Sum, "Sum(...)", "Sums up all arguments.",
@@ -70,7 +72,6 @@ FUNCTION(Length, "Length(str)", "Returns the length of the string.",
 	string_t src = STR(0);
 	return basic_mknum(str_len(src));
 })
-
 
 FUNCTION(Malloc, "Malloc(len)", "Allocates *len* bytes of memory and returns a handle to it.",
 {
