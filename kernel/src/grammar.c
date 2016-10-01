@@ -1122,9 +1122,15 @@ void Parse(
 
 	static void *mwrap(size_t size)
 	{
+		(void)size;
 		return prealloc;
 	}
 
+	static void prefree(void * ptr)
+	{
+		(void)ptr;
+	}
+	
 	static token_t nulltoken = { };
 	
 	bool errorhandler_valid = false;
@@ -1218,7 +1224,7 @@ void Parse(
 		}
 		errorhandler_valid = false;
 		
-		ParseFree(pParser, free );
+		ParseFree(pParser, prefree );
 		
 		allocator_delete(argalloc);
 		
@@ -1257,4 +1263,4 @@ void Parse(
 		}
 		return NULL;
 	}
-#line 1261 "src/grammar.c"
+#line 1267 "src/grammar.c"

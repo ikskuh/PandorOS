@@ -126,9 +126,15 @@ arglist(A) ::= expr(B) COMMA arglist(C). {
 
 	static void *mwrap(size_t size)
 	{
+		(void)size;
 		return prealloc;
 	}
 
+	static void prefree(void * ptr)
+	{
+		(void)ptr;
+	}
+	
 	static token_t nulltoken = { };
 	
 	bool errorhandler_valid = false;
@@ -222,7 +228,7 @@ arglist(A) ::= expr(B) COMMA arglist(C). {
 		}
 		errorhandler_valid = false;
 		
-		ParseFree(pParser, free );
+		ParseFree(pParser, prefree );
 		
 		allocator_delete(argalloc);
 		

@@ -8,7 +8,7 @@
  */
 static uint32_t bitmap[BITMAP_LENGTH];
 
-page_t pmm_getpage(void *ptr)
+page_t pmm_getpage(void const * ptr)
 {
 	return ((uint32_t)ptr) / PMM_PAGESIZE;
 }
@@ -62,4 +62,36 @@ page_t pmm_alloc()
 void pmm_free(page_t page)
 {
 	pmm_mark(page, PMM_FREE);
+}
+
+bool pmm_isfree(page_t page)
+{
+  uint32_t idx = page / 32;
+  uint32_t bit = page % 32;
+  
+	if(bitmap[idx] & (1<<bit))
+		return true;
+	else
+		return false;
+}
+
+#include "hal.h"
+
+void pmm_dumpmap()
+{
+	hal_debug("BEGIN OF BITMAP\n");
+  for(uint32_t idx = 0; idx < BITMAP_LENGTH; idx++) {
+    hal_debug("|");
+		for(uint32_t bit = 0; bit < 32; bit++) {
+      uint32_t mask = (1<<bit);
+      if((bitmap[idx] & mask) == 0) {
+        // If bit is not set, ignore the bit.
+				hal_debug("█");
+      } else {
+				hal_debug("░");
+			}
+    }
+		hal_debug("|%d\n", (PMM_PAGESIZE * 32 * idx) >> 10);
+  }
+	hal_debug("\nEND OF BITMAP\n");
 }

@@ -2,6 +2,7 @@
 
 #include "string.h"
 #include "memory.h"
+#include "malloc.h"
 #include "pmm.h"
 
 #include <stddef.h>
@@ -29,13 +30,4 @@ static inline int min(int a, int b)
 static inline int clamp(int a, int lower, int upper)
 {
 	return min(max(a, lower), upper);
-}
-
-static inline void *malloc(size_t size) {
-	(void)size;
-	return pmm_getptr(pmm_alloc());
-}
-
-static inline void free(void *ptr) {
-	pmm_free(pmm_getpage(ptr));
 }

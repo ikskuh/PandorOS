@@ -8,7 +8,7 @@
 #define WIDTH 80
 #define HEIGHT 25
 
-int foreground = 0xF, background = 0x0, highlight = 0x2, boldcolor = 0x4;
+int foreground = 0xF, background = 0x0, highlight = 0x2, boldcolor = 0xC;
 
 optioncfg_int_t halOptColorLimit = {
 	0,  // min

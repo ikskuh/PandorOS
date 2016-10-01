@@ -9,6 +9,7 @@
 #include "alloc.h"
 #include "interpreter.h"
 #include "catalog.h"
+#include "malloc.h"
 
 int ticks = 0;
 
@@ -138,6 +139,8 @@ static void shell_main()
 
 #define BLOCKSTR(x) #x
 
+void pmm_dumpmap();
+
 void os_init()
 {
 	// TODO: Initialize OS…
@@ -158,6 +161,9 @@ void os_init()
 		
 		console_printf(shells[i].console, "%s", shell_prompt);
 	}
+	
+	// Initialize malloc last
+	malloc_init();
 	
 	menu_render(&mainmenu);
 	

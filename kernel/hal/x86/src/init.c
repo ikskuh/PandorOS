@@ -236,6 +236,9 @@ struct multiboot_mmap_entry
 } __attribute__((packed));
 */
 
+extern const void kernel_start;
+extern const void kernel_end;
+
 static void init_pmm(struct multiboot_info const * info)
 {
 	if((info->flags & MULTIBOOT_INFO_MEM_MAP) == 0)
@@ -274,4 +277,9 @@ static void init_pmm(struct multiboot_info const * info)
 		ptr += mmap->size + 0x04;
 	}
 	hal_debug("End of mmap.\n");
+	
+	for(char const *ptr = &kernel_start; ptr <= (char const*)&kernel_end; ptr += 0x1000)
+	{
+		pmm_mark(pmm_getpage(ptr), PMM_USED);
+	}
 }
