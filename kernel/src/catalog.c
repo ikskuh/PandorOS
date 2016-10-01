@@ -17,8 +17,8 @@ static cataloginfo_t entries[] = {
 // { "Input(",  "Input(x, y, variable)", "This function blabla..." },
 // { "Print(", "Print(value)", "Prints the given value and appends a newline." },
 	
-#define FUNCTION(name, synpsis, desc, code) { #name "(", synpsis, desc },
-#define ORDER(name, synpsis, desc, code) { #name " ", synpsis, desc },
+#define FUNCTION(name, synpsis, desc, code) { #name "(", #name "(" synpsis ")", desc },
+#define ORDER(name, synpsis, desc, code) { #name " ", #name " " synpsis, desc },
 #include "stdlib.lst"
 #undef ORDER
 #undef FUNCTION

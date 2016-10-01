@@ -10,6 +10,7 @@
 #include "interpreter.h"
 #include "catalog.h"
 #include "malloc.h"
+#include "shell.h"
 
 int ticks = 0;
 
@@ -52,11 +53,9 @@ menu_t mainmenu = {
 	},
 };
 
-static struct {
-	console_t *console;
-	char input[128];
-	int cursor;
-} shells[3];
+shell_t shells[3];
+
+bool shell_has_echo;
 
 int currentShell = 0;
 #define currshell shells[currentShell]
@@ -115,7 +114,15 @@ static void shell_main()
 				currshell.input[currshell.cursor] = 0;
 				currshell.cursor = 0;
 				
+				shell_has_echo = (currshell.flags & SHELL_ECHO);
+				
 				value_t result = basic_execute(currshell.input);
+				
+				if(shell_has_echo) {
+					currshell.flags |= SHELL_ECHO;
+				} else {
+					currshell.flags &= ~SHELL_ECHO;
+				}
 				
 				if(basic_lasterror() != ERR_SUCCESS)
 				{
@@ -123,7 +130,7 @@ static void shell_main()
 				}
 				else
 				{
-					if(basic_isnull(result) == false) {
+					if(basic_isnull(result) == false && (currshell.flags & SHELL_ECHO)) {
 						printf("= %v\n", result);
 					}
 				}
@@ -158,6 +165,7 @@ void os_init()
 		shells[i].console = console_new();
 		shells[i].input[0] = 0;
 		shells[i].cursor = 0;
+		shells[i].flags = SHELL_ECHO;
 		
 		console_printf(shells[i].console, "%s", shell_prompt);
 	}

@@ -26,11 +26,13 @@ value_t getarg(int argc, value_t *argv, int i)
 #define STR(n) basic_getstr(getarg(argc, argv, n))
 #define NUM(n) basic_getnum(getarg(argc, argv, n))
 
+#define IMPORT(x) x
 #define FUNCTION(name, synpsis, desc, code) static value_t fun_##name(int argc, value_t *argv) { code return basic_mknull(); }
 #define ORDER(name, synpsis, desc, code) static value_t ord_##name(int argc, value_t *argv) { code return basic_mknull(); }
 #include "stdlib.lst"
 #undef ORDER
 #undef FUNCTION
+#undef IMPORT
 
 static struct reg {
 	char *name;

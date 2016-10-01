@@ -1,6 +1,9 @@
+#ifndef IMPORT
+#define IMPORT(x)
+#define _IMPORT_GENERATED_
+#endif
 
-
-ORDER(Print, "Print ...", "Prints its arguments and adds a newline.",
+ORDER(Print, "...", "Prints its arguments and adds a newline.",
 {
 	for(int i = 0; i < argc; i++)
 	{
@@ -10,7 +13,15 @@ ORDER(Print, "Print ...", "Prints its arguments and adds a newline.",
 	return basic_mknull();
 })
 
-FUNCTION(Abs, "Abs(x)", "Returns *x* as a positive value.",
+IMPORT(extern bool shell_has_echo;) 
+
+ORDER(Echo, "state", "Sets the echo state of the console. When the state is *On*, the console will echo the results of expressions, when state is *Off* nothing will be printed.",
+{
+	assert_argc(argc, 1);
+	shell_has_echo = (NUM(0) != 0);
+})
+
+FUNCTION(Abs, "x", "Returns *x* as a positive value.",
 {
 	assert_argc(argc, 1);
 	number_t num = NUM(0);
@@ -20,7 +31,7 @@ FUNCTION(Abs, "Abs(x)", "Returns *x* as a positive value.",
 		return basic_mknum(num);
 })
 
-FUNCTION(Sum, "Sum(...)", "Sums up all arguments.",
+FUNCTION(Sum, "...", "Sums up all arguments.",
 {
 	number_t sum = 0;
 	for(int i = 0; i < argc; i++)
@@ -30,7 +41,7 @@ FUNCTION(Sum, "Sum(...)", "Sums up all arguments.",
 	return basic_mknum(sum);
 })
 
-FUNCTION(Product, "Product(...)", "Multiplies all arguments.",
+FUNCTION(Product, "...", "Multiplies all arguments.",
 {
 	number_t sum = 1;
 	for(int i = 0; i < argc; i++)
@@ -40,7 +51,7 @@ FUNCTION(Product, "Product(...)", "Multiplies all arguments.",
 	return basic_mknum(sum);
 })
 
-FUNCTION(Sub, "Sub(str, index, [len])", "Returns a substring of *str* starting at 1-based *index*.\nIf *len* is given, the length of the substring is limited to *len*.",
+FUNCTION(Sub, "str, index, [len]", "Returns a substring of *str* starting at 1-based *index*.\nIf *len* is given, the length of the substring is limited to *len*.",
 {
 	if(argc < 2 || argc > 3)
 		basic_error(ERR_ARG_COUNT);
@@ -66,28 +77,28 @@ FUNCTION(Sub, "Sub(str, index, [len])", "Returns a substring of *str* starting a
 	return basic_mkstr(dst);
 })
 
-FUNCTION(Length, "Length(str)", "Returns the length of the string.",
+FUNCTION(Length, "str", "Returns the length of the string.",
 {
 	if(argc != 1) basic_error(ERR_ARG_COUNT);
 	string_t src = STR(0);
 	return basic_mknum(str_len(src));
 })
 
-FUNCTION(Malloc, "Malloc(len)", "Allocates *len* bytes of memory and returns a handle to it.",
+FUNCTION(Malloc, "len", "Allocates *len* bytes of memory and returns a handle to it.",
 {
 	if(argc != 1) basic_error(ERR_ARG_COUNT);
 	int len = NUM(0);
 	return basic_mknum((int)malloc(len));
 })
 
-FUNCTION(Free, "Free(h)", "Frees the handle *h* previously allocated by *Malloc()*.",
+FUNCTION(Free, "h", "Frees the handle *h* previously allocated by *Malloc()*.",
 {
 	if(argc != 1) basic_error(ERR_ARG_COUNT);
 	void *ptr = (void*)(int)NUM(0);
 	free(ptr);
 })
 
-FUNCTION(Peek, "Peek(h, off)", "Reads the byte from the memory handle *h* with the given offset *off*",
+FUNCTION(Peek, "h, off", "Reads the byte from the memory handle *h* with the given offset *off*",
 {
 	if(argc != 2) basic_error(ERR_ARG_COUNT);
 	char * ptr = (char*)(int)NUM(0);
@@ -95,7 +106,7 @@ FUNCTION(Peek, "Peek(h, off)", "Reads the byte from the memory handle *h* with t
 	return basic_mknum(ptr[off]);
 })
 
-FUNCTION(Poke, "Poke(h, off, val)", "Writes the byte *val* to the memory handle *h* with the given offset *off*",
+FUNCTION(Poke, "h, off, val", "Writes the byte *val* to the memory handle *h* with the given offset *off*",
 {
 	if(argc != 3) basic_error(ERR_ARG_COUNT);
 	char * ptr = (char*)(int)NUM(0);
@@ -104,3 +115,9 @@ FUNCTION(Poke, "Poke(h, off, val)", "Writes the byte *val* to the memory handle 
 	ptr[off] = val;
 	return basic_mknum(val);
 })
+
+
+
+#ifdef _IMPORT_GENERATED_
+#undef IMPORT
+#endif

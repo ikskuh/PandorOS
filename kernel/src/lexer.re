@@ -39,6 +39,7 @@ struct token lex(const char *input)
 		com = ",";
 		str = "\"" [^"]* "\"";
 		ord = [A-Za-z][A-Za-z0-9]* " "*;
+		bool = "On" | "Off" | "True" | "False";
 
 		*        { return (struct token){ 0, 0 }; }
 		dec      { return (struct token){ TOK_INTEGER, index }; }
@@ -55,6 +56,7 @@ struct token lex(const char *input)
 		com      { return (struct token){ TOK_COMMA, index }; }
 		ws+      { return (struct token){ -1, index }; }
 		str      { return (struct token){ TOK_STRING, index }; }
+		bool     { return (struct token){ TOK_BOOL, index }; }
 		ord      { return (struct token){ TOK_ORDER, index }; }
 		
 		" And "  { return (struct token){ TOK_AND, index }; }

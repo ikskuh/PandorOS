@@ -55,7 +55,8 @@ static allocator_t * argalloc;
 %syntax_error {  
   basic_error(ERR_SYNTAX_ERROR);
 }
-   
+	
+program ::= . { result = basic_mknull(); }
 program ::= expr(A).                  { result = A.val; }
 program ::= expr(A) ASS variable(V).  {
 	var_set(V.var, A.val);
@@ -99,6 +100,7 @@ expr(A) ::= MINUS expr(B). { A.val = val_neg(B.val); }
 expr(A) ::= NOT expr(B). { A.val = val_not(B.val); }
 
 expr(A) ::= INTEGER(B). { A = B; }
+expr(A) ::= BOOL(B). { A = B; }
 expr(A) ::= STRING(B). { A = B; }
 
 expr(A) ::= VAR(B). { 
@@ -196,6 +198,11 @@ arglist(A) ::= expr(B) COMMA arglist(C). {
 						case TOK_INTEGER:
 						{
 							currtok.val = basic_mknum(str_to_int(buffer, 10));
+							break;
+						}
+						case TOK_BOOL:
+						{
+							currtok.val = basic_mknum(str_eq(buffer, "True") || str_eq(buffer, "On"));
 							break;
 						}
 						case TOK_STRING:

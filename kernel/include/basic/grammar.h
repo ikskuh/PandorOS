@@ -12,6 +12,7 @@
 #define TOK_BRO                            12
 #define TOK_BRC                            13
 #define TOK_INTEGER                        14
-#define TOK_STRING                         15
-#define TOK_FUN                            16
-#define TOK_COMMA                          17
+#define TOK_BOOL                           15
+#define TOK_STRING                         16
+#define TOK_FUN                            17
+#define TOK_COMMA                          18
