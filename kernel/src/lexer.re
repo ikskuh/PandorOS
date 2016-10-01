@@ -34,7 +34,7 @@ struct token lex(const char *input)
 		hex = '0x' [0-9a-fA-F]+;
 		ws  = [ \t];
 		var = 'str'[0-9] | [A-Z] | "Ans";
-		ass = "->";
+		ass = "->" | "\x1A";
 		fun = [A-Za-z][A-Za-z0-9]* "(";
 		com = ",";
 		str = "\"" [^"]* "\"";

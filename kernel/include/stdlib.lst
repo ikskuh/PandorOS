@@ -1,4 +1,4 @@
-FUNCTION(Abs, "Abs(x)", "Returns x as a positive value.",
+FUNCTION(Abs, "Abs(x)", "Returns *x* as a positive value.",
 {
 	assert_argc(argc, 1);
 	number_t num = NUM(0);
@@ -38,7 +38,7 @@ FUNCTION(Product, "Product(...)", "Multiplies all arguments.",
 	return basic_mknum(sum);
 })
 
-FUNCTION(Sub, "Sub(str, index, [len])", "Returns a substring starting at 1-based index.\nIf len is given, the length of the substring is limited to len.",
+FUNCTION(Sub, "Sub(str, index, [len])", "Returns a substring of *str* starting at 1-based *index*.\nIf *len* is given, the length of the substring is limited to *len*.",
 {
 	if(argc < 2 || argc > 3)
 		basic_error(ERR_ARG_COUNT);
@@ -62,4 +62,11 @@ FUNCTION(Sub, "Sub(str, index, [len])", "Returns a substring starting at 1-based
 	mem_copy(dst, src + index, length);
 	dst[length] = 0;
 	return basic_mkstr(dst);
+})
+
+FUNCTION(Length, "Length(str)", "Returns the length of the string.",
+{
+	if(argc != 1) basic_error(ERR_ARG_COUNT);
+	string_t src = STR(0);
+	return basic_mknum(str_len(src));
 })

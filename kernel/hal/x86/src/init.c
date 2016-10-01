@@ -86,6 +86,7 @@ optiongroup_t halOptions = {
 extern option_t halOptConsoleForeground;
 extern option_t halOptConsoleBackground;
 extern option_t halOptConsoleHighlight;
+extern option_t halOptConsoleBoldtext;
 
 void x86_init(uint32_t bootmagic, struct multiboot_info const * info)
 {
@@ -113,6 +114,7 @@ void x86_init(uint32_t bootmagic, struct multiboot_info const * info)
 	option_add(&halOptions, &halOptConsoleForeground);
 	option_add(&halOptions, &halOptConsoleBackground);
 	option_add(&halOptions, &halOptConsoleHighlight);
+	option_add(&halOptions, &halOptConsoleBoldtext);
 }
 
 static void init_gdt()

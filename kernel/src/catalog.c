@@ -102,8 +102,14 @@ void catalog_open()
 		setcursor(leftside_width + 5, 1);
 		puts(entries[cursor].synopsis);
 		
-		setcursor(leftside_width + 5, 3);
-		puts(entries[cursor].documentation);
+		console_textbox(
+			stdcon, 
+			leftside_width + 5,
+			3,
+			stdcon->width - leftside_width - 7,
+			stdcon->height - 4,
+			entries[cursor].documentation,
+			TEXTBOX_WORDWRAP | TEXTBOX_MARKDOWN);
 		
 		if(scroll > 0)
 		{

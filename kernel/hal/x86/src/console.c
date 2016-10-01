@@ -8,7 +8,7 @@
 #define WIDTH 80
 #define HEIGHT 25
 
-int foreground = 0xF, background = 0x0, highlight = 0x2;
+int foreground = 0xF, background = 0x0, highlight = 0x2, boldcolor = 0x4;
 
 optioncfg_int_t halOptColorLimit = {
 	0,  // min
@@ -27,14 +27,18 @@ option_t halOptConsoleHighlight = {
 	OPT_INT, "Highlight Color", &highlight, &halOptColorLimit, NULL
 };
 
+option_t halOptConsoleBoldtext = {
+	OPT_INT, "Bold Text Color", &boldcolor, &halOptColorLimit, NULL
+};
+
 static uint8_t getcolor(int attribs)
 {
-	if(attribs & CHA_RED)
+	if(attribs & CHA_BOLD)
 	{
 		if(attribs & CHA_HIGHLIGHT)
-			return 0x8C;
+			return ((highlight&0xF) << 4) | (boldcolor&0xF);
 		else
-			return 0x04;
+			return ((background&0xF) << 4) | (boldcolor&0xF);
 	}
 	else
 	{

@@ -8,20 +8,10 @@ extern int screenwidth, screenheight;
 
 static int menucolor(menuitem_t * const item)
 {
-	if(item->flags & MENU_RED)
-	{
-		if(item->flags & MENU_SELECTED)
-			return CHA_RED | CHA_HIGHLIGHT;
-		else
-			return CHA_RED;
-	}
+	if(item->flags & MENU_SELECTED)
+		return CHA_HIGHLIGHT;
 	else
-	{
-		if(item->flags & MENU_SELECTED)
-			return CHA_HIGHLIGHT;
-		else
-			return CHA_DEFAULT;
-	}
+		return CHA_DEFAULT;
 }
 
 static void menu_select(menuitem_t *items, int count, int index)

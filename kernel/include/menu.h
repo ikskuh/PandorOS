@@ -5,7 +5,6 @@
 
 #define MENU_DEFAULT    0
 #define MENU_SELECTED   CHA_HIGHLIGHT
-#define MENU_RED        CHA_RED
 #define MENU_RIGHTALIGN (1<<2)
 #define MENU_OPENED     (1<<3)
 
