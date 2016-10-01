@@ -70,3 +70,36 @@ FUNCTION(Length, "Length(str)", "Returns the length of the string.",
 	string_t src = STR(0);
 	return basic_mknum(str_len(src));
 })
+
+
+FUNCTION(Malloc, "Malloc(len)", "Allocates *len* bytes of memory and returns a handle to it.",
+{
+	if(argc != 1) basic_error(ERR_ARG_COUNT);
+	int len = NUM(0);
+	return basic_mknum((int)malloc(len));
+})
+
+FUNCTION(Free, "Free(h)", "Frees the handle *h* previously allocated by *Malloc()*.",
+{
+	if(argc != 1) basic_error(ERR_ARG_COUNT);
+	void *ptr = (void*)(int)NUM(0);
+	free(ptr);
+})
+
+FUNCTION(Peek, "Peek(h, off)", "Reads the byte from the memory handle *h* with the given offset *off*",
+{
+	if(argc != 2) basic_error(ERR_ARG_COUNT);
+	char * ptr = (char*)(int)NUM(0);
+	int off = NUM(1);
+	return basic_mknum(ptr[off]);
+})
+
+FUNCTION(Poke, "Poke(h, off, val)", "Writes the byte *val* to the memory handle *h* with the given offset *off*",
+{
+	if(argc != 3) basic_error(ERR_ARG_COUNT);
+	char * ptr = (char*)(int)NUM(0);
+	int off = NUM(1);
+	int val = NUM(2);
+	ptr[off] = val;
+	return basic_mknum(val);
+})
