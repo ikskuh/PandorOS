@@ -244,12 +244,13 @@ static void init_pmm(struct multiboot_info const * info)
 	if((info->flags & MULTIBOOT_INFO_MEM_MAP) == 0)
 		return;
 	
-	hal_debug("Reading mmap...\n");
+	// hal_debug("Reading mmap...\n");
 	
 	uint32_t ptr = info->mmap_addr;
 	for(uint32_t i = 0; i < info->mmap_length; i++) {
 		struct multiboot_mmap_entry *mmap = (void*)ptr;
 		
+		/*
 		hal_debug(
 			"[%d] = { .size=%d, .addr=%d, .len=%d, .type=%d }\n",
 			i,
@@ -257,6 +258,7 @@ static void init_pmm(struct multiboot_info const * info)
 			(uint32_t)mmap->addr,
 			(uint32_t)mmap->len,
 			mmap->type);
+		*/
 		
 		if((mmap->type == MULTIBOOT_MEMORY_AVAILABLE || mmap->type == MULTIBOOT_MEMORY_RESERVED)
 			&& mmap->addr < PMM_MEMSIZE)
@@ -276,7 +278,7 @@ static void init_pmm(struct multiboot_info const * info)
 		}
 		ptr += mmap->size + 0x04;
 	}
-	hal_debug("End of mmap.\n");
+	// hal_debug("End of mmap.\n");
 	
 	for(char const *ptr = &kernel_start; ptr <= (char const*)&kernel_end; ptr += 0x1000)
 	{

@@ -72,8 +72,14 @@ void console_scroll(console_t *con, int lines);
 
 /**
  * Sets a character on the console.
+ * @remarks Overrides the character attributes.
  */
 void console_setc(console_t *con, int x, int y, char c);
+
+/**
+ * Sets the character attributes on the console.
+ */
+void console_seta(console_t *con, int x, int y, int attribs);
 
 /**
  * Sets the cursor position of the console.

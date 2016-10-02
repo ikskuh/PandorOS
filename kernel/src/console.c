@@ -112,6 +112,12 @@ void console_setc(console_t *con, int x, int y, char c)
 	if(CON_WANTS_REFRESH(con))  hal_render_console(con, x, y, 1, 1);
 }
 
+void console_seta(console_t *con, int x, int y, int attribs)
+{
+	con->data[con->width * y + x].attribs = attribs;
+	if(CON_WANTS_REFRESH(con))  hal_render_console(con, x, y, 1, 1);
+}
+
 void console_newline(console_t *con)
 {
 	con->cursor.x = 0;

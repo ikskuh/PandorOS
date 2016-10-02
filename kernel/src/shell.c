@@ -5,6 +5,7 @@
 #include "interpreter.h"
 #include "standard.h"
 #include "io.h"
+#include "charmap.h"
 
 static void select_shell(shell_t * shell);
 
@@ -12,12 +13,18 @@ shell_t *currentShell = NULL;
 
 #define currshell (*currentShell)
 
+#define MAINMENU_CATALOG 0
+#define MAINMENU_CHARMAP 1
+#define MAINMENU_SHELL   2
+#define MAINMENU_SYSTEM  3
+
 menu_t mainmenu = {
-	3,
+	4,
 	(menuitem_t[]) {
-		{ "Catalog", MENU_DEFAULT, &catalog_open, NULL, 0, NULL },
+		{ "Catalog",  MENU_DEFAULT, &catalog_open, NULL, 0, NULL },
+		{ "Char Map", MENU_DEFAULT, &charmap_open, NULL, 0, NULL },
 		{ "Screen ?", MENU_DEFAULT, NULL, NULL, 0, NULL },
-		{ "System", MENU_DEFAULT | MENU_RIGHTALIGN, NULL, NULL,
+		{ "System",   MENU_DEFAULT | MENU_RIGHTALIGN, NULL, NULL,
 			6, 
 			(menuitem_t[]) {
 				{ "Memory Management", MENU_DEFAULT, NULL, NULL, 0, NULL },
@@ -36,15 +43,15 @@ static void select_shell(shell_t * shell)
 	if(shell == NULL) return;
 	currentShell = shell;
 	
-	str_copy(mainmenu.items[1].label, shell->name);
+	str_copy(mainmenu.items[MAINMENU_SHELL].label, shell->name);
 	
 	console_set(currshell.console);
 }
 
 void shell_init(int shellCount)
 {
-	mainmenu.items[1].length = shellCount;
-	mainmenu.items[1].items = malloc(shellCount * sizeof(menuitem_t));
+	mainmenu.items[MAINMENU_SHELL].length = shellCount;
+	mainmenu.items[MAINMENU_SHELL].items = malloc(shellCount * sizeof(menuitem_t));
 	for(int i = 0; i  < shellCount; i++)
 	{
 		shell_t *shell = malloc(sizeof(shell_t));
@@ -57,8 +64,8 @@ void shell_init(int shellCount)
 		shell->flags = SHELL_ECHO;
 
 		str_copy(mainmenu.items[1].items[i].label, shell->name);
-		mainmenu.items[1].items[i].callback = (menucallback_f)select_shell;
-		mainmenu.items[1].items[i].userdata = shell;
+		mainmenu.items[MAINMENU_SHELL].items[i].callback = (menucallback_f)select_shell;
+		mainmenu.items[MAINMENU_SHELL].items[i].userdata = shell;
 		
 		if(i == 0) {
 			select_shell(shell);
@@ -90,6 +97,11 @@ void shell_main()
 						putc(*insertion);
 						currshell.input[currshell.cursor++] = *insertion++;
 					}
+				}
+				int cmap = charmap_last();
+				if(cmap >= 0) {
+					currshell.input[currshell.cursor++] = cmap;
+					putc(cmap);
 				}
 				break;
 			}
