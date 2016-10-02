@@ -24,10 +24,21 @@ ORDER(PrintSep, "separator", "Sets the separator that will be printed inbetween 
 	str_copy(printsep, STR(0));
 })
 
+ORDER(Prompt, "str", "Sets the shell prompt for the current shell.",
+{
+	assert_argc(argc, 1);
+	str_copy(currentShell->prompt, STR(0));
+})
+
+
 ORDER(Echo, "state", "Sets the echo state of the console. When the state is *On*, the console will echo the results of expressions, when state is *Off* nothing will be printed.",
 {
 	assert_argc(argc, 1);
-	shell_has_echo = (NUM(0) != 0);
+	if(NUM(0)) {
+		currentShell->flags |= SHELL_ECHO;
+	} else {
+		currentShell->flags &= ~SHELL_ECHO;
+	}
 })
 
 FUNCTION(Abs, "x", "Returns *x* as a positive value.",

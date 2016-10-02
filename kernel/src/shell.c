@@ -6,74 +6,69 @@
 #include "standard.h"
 #include "io.h"
 
-static void select_shell(int shellId);
+static void select_shell(shell_t * shell);
 
-static void select_shell0() { select_shell(0); }
-static void select_shell1() { select_shell(1); }
-static void select_shell2() { select_shell(2); }
+shell_t *currentShell = NULL;
 
-shell_t shells[3];
-
-bool shell_has_echo;
-
-int currentShell = 0;
-#define currshell shells[currentShell]
-static char const * shell_prompt = "#> ";
+#define currshell (*currentShell)
 
 menu_t mainmenu = {
 	3,
 	(menuitem_t[]) {
-		{ "Catalog", MENU_DEFAULT, &catalog_open, 0, NULL },
-		{ "Screen 0", MENU_DEFAULT, NULL,
-			3,
-			(menuitem_t[]) {
-				{ "Screen 0", MENU_DEFAULT, &select_shell0, 0, NULL },
-				{ "Screen 1", MENU_DEFAULT, &select_shell1, 0, NULL },
-				{ "Screen 2", MENU_DEFAULT, &select_shell2, 0, NULL },
-			}
-		},
-		{ "System", MENU_DEFAULT | MENU_RIGHTALIGN, NULL, 
+		{ "Catalog", MENU_DEFAULT, &catalog_open, NULL, 0, NULL },
+		{ "Screen ?", MENU_DEFAULT, NULL, NULL, 0, NULL },
+		{ "System", MENU_DEFAULT | MENU_RIGHTALIGN, NULL, NULL,
 			6, 
 			(menuitem_t[]) {
-				{ "Memory Management", MENU_DEFAULT, NULL, 0, NULL },
-				{ "OS Debugger",       MENU_DEFAULT, NULL, 0, NULL },
-				{ "Settings",          MENU_DEFAULT, options_showmenu, 0, NULL },
-				{ "About",             MENU_DEFAULT, NULL, 0, NULL },
-				{ "Reboot",            MENU_DEFAULT, NULL, 0, NULL },
-				{ "Poweroff",          MENU_DEFAULT, NULL, 0, NULL },
+				{ "Memory Management", MENU_DEFAULT, NULL, NULL, 0, NULL },
+				{ "OS Debugger",       MENU_DEFAULT, NULL, NULL, 0, NULL },
+				{ "Settings",          MENU_DEFAULT, options_showmenu, NULL, 0, NULL },
+				{ "About",             MENU_DEFAULT, NULL, NULL, 0, NULL },
+				{ "Reboot",            MENU_DEFAULT, NULL, NULL, 0, NULL },
+				{ "Poweroff",          MENU_DEFAULT, NULL, NULL, 0, NULL },
 			}
 		},
 	},
 };
 
-static void select_shell(int shellId)
+static void select_shell(shell_t * shell)
 {
-	if(shellId < 0 || shellId > 2)
-		return;
-	currentShell = shellId;
+	if(shell == NULL) return;
+	currentShell = shell;
 	
-	mainmenu.items[1].label[7] = '0' + shellId;
+	str_copy(mainmenu.items[1].label, shell->name);
 	
 	console_set(currshell.console);
 }
 
 void shell_init(int shellCount)
 {
-	shellCount = 3; // HÖHÖ!
-	
-	for(int i = 0; i < shellCount; i++)
+	mainmenu.items[1].length = shellCount;
+	mainmenu.items[1].items = malloc(shellCount * sizeof(menuitem_t));
+	for(int i = 0; i  < shellCount; i++)
 	{
-		shells[i].console = console_new();
-		shells[i].input[0] = 0;
-		shells[i].cursor = 0;
-		shells[i].flags = SHELL_ECHO;
+		shell_t *shell = malloc(sizeof(shell_t));
 		
-		console_printf(shells[i].console, "%s", shell_prompt);
+		str_printf(shell->name, "Shell %d", i);
+		str_copy(shell->prompt, "#> ");
+		shell->console = console_new();
+		shell->input[0] = 0;
+		shell->cursor = 0;
+		shell->flags = SHELL_ECHO;
+		
+
+		str_copy(mainmenu.items[1].items[i].label, shell->name);
+		mainmenu.items[1].items[i].callback = (menucallback_f)select_shell;
+		mainmenu.items[1].items[i].userdata = shell;
+		
+		if(i == 0) {
+			select_shell(shell);
+		}
+		
+		console_printf(shell->console, "%s", shell->prompt);
 	}
 	
 	menu_render(&mainmenu);
-	
-	select_shell(0);
 }
 
 
@@ -119,15 +114,7 @@ void shell_main()
 				currshell.input[currshell.cursor] = 0;
 				currshell.cursor = 0;
 				
-				shell_has_echo = (currshell.flags & SHELL_ECHO);
-				
 				value_t result = basic_execute(currshell.input);
-				
-				if(shell_has_echo) {
-					currshell.flags |= SHELL_ECHO;
-				} else {
-					currshell.flags &= ~SHELL_ECHO;
-				}
 				
 				if(basic_lasterror() != ERR_SUCCESS)
 				{
@@ -139,7 +126,7 @@ void shell_main()
 						printf("= %v\n", result);
 					}
 				}
-				printf("%s", shell_prompt);
+				printf("%s", currshell.prompt);
 				break;
 			default:
 				currshell.input[currshell.cursor++] = c;

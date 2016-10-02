@@ -10,13 +10,14 @@
 
 struct menuitem;
 
-typedef void (*menucallback_f)(struct menuitem *);
+typedef void (*menucallback_f)(void *userdata);
 
 typedef struct menuitem
 {
 	char label[60];
 	int flags;
 	menucallback_f callback;
+	void * userdata;
 	int length;
 	struct menuitem *items;
 } menuitem_t;

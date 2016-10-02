@@ -1,6 +1,7 @@
 #include "interpreter.h"
 #include "io.h"
 #include "standard.h"
+#include "shell.h"
 #include <stddef.h>
 
 

@@ -287,7 +287,7 @@ menuitem_t *menu_open(menu_t const * menu)
 	console_refresh();
 	
 	if(result != NULL && result->callback != NULL) {
-		result->callback(result);
+		result->callback(result->userdata);
 	}
 	
 	// Rerender menu

@@ -9,6 +9,8 @@
 
 typedef struct
 {
+	char name[64];
+	char prompt[64];
 	console_t *console;
 	char input[128];
 	int cursor;
@@ -24,3 +26,5 @@ void shell_init(int shells);
  * Starts the shell interface with mainmenu and command line.
  */
 void shell_main();
+
+extern shell_t *currentShell;
