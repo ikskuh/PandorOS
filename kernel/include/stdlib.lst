@@ -51,6 +51,7 @@ ORDER(Refresh, "[state]", "If *state* is not given, this order refreshes the scr
 	} else {
 		if(NUM(0)) {
 			stdcon->flags |= CON_AUTOREFRESH;
+			console_refresh(stdcon);
 		} else {
 			stdcon->flags &= ~CON_AUTOREFRESH;
 		}
