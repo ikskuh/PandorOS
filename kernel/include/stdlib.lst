@@ -41,6 +41,22 @@ ORDER(Echo, "state", "Sets the echo state of the console. When the state is *On*
 	}
 })
 
+ORDER(Refresh, "[state]", "If *state* is not given, this order refreshes the screen and renders the text.\nIf *state* is *On*, the console auto-refresh is enabled. Disabling the auto-refresh is done by passing *Off* to *Refresh*",
+{
+	if(argc > 1) {
+		basic_error(ERR_ARG_COUNT);
+	}
+	if(argc == 0) {
+		console_refresh(stdcon);
+	} else {
+		if(NUM(0)) {
+			stdcon->flags |= CON_AUTOREFRESH;
+		} else {
+			stdcon->flags &= ~CON_AUTOREFRESH;
+		}
+	}
+})
+
 FUNCTION(Abs, "x", "Returns *x* as a positive value.",
 {
 	assert_argc(argc, 1);

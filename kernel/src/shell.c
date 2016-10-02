@@ -55,7 +55,6 @@ void shell_init(int shellCount)
 		shell->input[0] = 0;
 		shell->cursor = 0;
 		shell->flags = SHELL_ECHO;
-		
 
 		str_copy(mainmenu.items[1].items[i].label, shell->name);
 		mainmenu.items[1].items[i].callback = (menucallback_f)select_shell;
