@@ -281,6 +281,7 @@ menuitem_t *menu_open(menu_t const * menu)
 	
 	menu_select(menu->items, menu->length, -1);
 	
+	// Render menu
 	render_menu(&ri);
 	
 	console_refresh();
@@ -288,6 +289,9 @@ menuitem_t *menu_open(menu_t const * menu)
 	if(result != NULL && result->callback != NULL) {
 		result->callback(result);
 	}
+	
+	// Rerender menu
+	render_menu(&ri);
 					
 	return result;
 }

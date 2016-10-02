@@ -1,5 +1,9 @@
 #pragma once
 
+#include "console.h"
+
+#include <stdbool.h>
+
 #define SHELL_DEFAULT 0
 #define SHELL_ECHO    (1<<0)
 
@@ -8,5 +12,15 @@ typedef struct
 	console_t *console;
 	char input[128];
 	int cursor;
-	bool flags;
+	int flags;
 } shell_t;
+
+/**
+ * Initializes the shell system.
+ **/
+void shell_init(int shells);
+
+/**
+ * Starts the shell interface with mainmenu and command line.
+ */
+void shell_main();

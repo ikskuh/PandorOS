@@ -93,35 +93,33 @@ FUNCTION(Length, "str", "Returns the length of the string.",
 	return basic_mknum(str_len(src));
 })
 
-FUNCTION(Malloc, "len", "Allocates *len* bytes of memory and returns a handle to it.",
+FUNCTION(Malloc, "len", "Allocates *len* bytes of memory and returns a pointer to it.",
 {
 	if(argc != 1) basic_error(ERR_ARG_COUNT);
 	int len = NUM(0);
 	return basic_mknum((int)malloc(len));
 })
 
-FUNCTION(Free, "h", "Frees the handle *h* previously allocated by *Malloc()*.",
+FUNCTION(Free, "pointer", "Frees the *pointer* previously allocated by *Malloc()*.",
 {
 	if(argc != 1) basic_error(ERR_ARG_COUNT);
 	void *ptr = (void*)(int)NUM(0);
 	free(ptr);
 })
 
-FUNCTION(Peek, "h, off", "Reads the byte from the memory handle *h* with the given offset *off*",
+FUNCTION(Peek, "pointer", "Reads the byte from memory address given with *pointer*.",
 {
-	if(argc != 2) basic_error(ERR_ARG_COUNT);
-	char * ptr = (char*)(int)NUM(0);
-	int off = NUM(1);
-	return basic_mknum(ptr[off]);
+	if(argc != 1) basic_error(ERR_ARG_COUNT);
+	uint8_t * ptr = (uint8_t*)(int)NUM(0);
+	return basic_mknum(*ptr);
 })
 
-FUNCTION(Poke, "h, off, val", "Writes the byte *val* to the memory handle *h* with the given offset *off*",
+FUNCTION(Poke, "pointer, byte", "Writes *byte* to the memory address given with *pointer*.",
 {
-	if(argc != 3) basic_error(ERR_ARG_COUNT);
-	char * ptr = (char*)(int)NUM(0);
-	int off = NUM(1);
-	int val = NUM(2);
-	ptr[off] = val;
+	if(argc != 2) basic_error(ERR_ARG_COUNT);
+	uint8_t * ptr = (uint8_t*)(int)NUM(0);
+	int val = NUM(1);
+	*ptr = val;
 	return basic_mknum(val);
 })
 

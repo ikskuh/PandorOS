@@ -97,11 +97,11 @@ void var_get(variable_t * var, value_t * target)
 void var_set(variable_t * var, value_t source)
 {
 	if(var == NULL || var->type == TYPE_NULL) {
-		hal_debug("Trying to write '%v' to invalid variable.\n", source);
+		basic_error(ERR_INVALID_VAR);
 		return;
 	}
 	if(var->ro) {
-		hal_debug("Trying to write '%v' to read-only variable.\n", source);
+		basic_error(ERR_INVALID_VAR);
 		return;
 	}
 	if(var->type != source.type)

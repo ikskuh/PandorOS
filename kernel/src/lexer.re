@@ -38,7 +38,7 @@ struct token lex(const char *input)
 		fun = [A-Za-z][A-Za-z0-9]* "(";
 		com = ",";
 		str = "\"" [^"]* "\"";
-		ord = [A-Za-z][A-Za-z0-9]* " "*;
+		ord = [A-Za-z][A-Za-z0-9]*;
 		bool = "On" | "Off" | "True" | "False";
 
 		*        { return (struct token){ 0, 0 }; }
