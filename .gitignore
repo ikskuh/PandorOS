@@ -34,4 +34,4 @@
 
 kernel/build
 *.o
-basic/basic-demo
+basic/basic-demokernel/harddisk

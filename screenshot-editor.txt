@@ -1,0 +1,25 @@
+| Screen 0 | Screen 1 | Screen 2 |                          | Catalog | System |
+└──────────┴──────────┴──────────┴──────────────────────────┴─────────┴────────┘
+:Blabla                                                                         
+:                                                                               
+:For(A, 1, 10)                                                                  
+:Output(1, A, "Hallo Zeile " + A)                                               
+:If A = 2                                                                       
+:Debug "A is 2"                                                                 
+:End                                                                            
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
