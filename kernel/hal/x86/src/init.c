@@ -7,6 +7,8 @@
 #include "pmm.h"
 #include "printf.h"
 #include "options.h"
+#include "hal.h"
+#include "string.h"
 #include <stdint.h>
 #include <stddef.h>
 
@@ -29,7 +31,6 @@ void hal_debug(char const *fmt, ...)
 	gprintf(serial_putc, fmt, list);
 	va_end(list);
 }
-
 
 struct multiboot_header __attribute__((section ("multiboot"))) multibootHeader __attribute__ ((aligned (4))) = {
 	MULTIBOOT_HEADER_MAGIC, 
@@ -95,6 +96,16 @@ option_t halOptKeyboardLog = {
 	OPT_BOOL, "Log Keyboard", &kbddrvLogKeys, NULL, NULL
 };
 
+rootfs_t rootfs;
+
+rootfs_t const * hal_rootfs() {
+	if(rootfs.size == 0) {
+		return NULL;
+	} else {
+		return &rootfs;
+	}
+}
+
 void x86_init(uint32_t bootmagic, struct multiboot_info const * info)
 {
 	// Checks for a correct multiboot magic
@@ -124,6 +135,17 @@ void x86_init(uint32_t bootmagic, struct multiboot_info const * info)
 	option_add(&halOptions, &halOptConsoleBoldtext);
 	
 	option_add(&halOptions, &halOptKeyboardLog);
+	
+	rootfs.data = NULL;
+	rootfs.size = 0;
+	
+	struct multiboot_mod_list const * mods = (void const *)info->mods_addr;
+	if(info->mods_count > 0)
+	{
+		rootfs.data = (void const *)mods[0].mod_start;
+		rootfs.size = mods[0].mod_end - mods[0].mod_start;
+		str_copy(rootfs.cmdline, (char const*)mods[0].cmdline);
+	}
 }
 
 static void init_gdt()
@@ -257,7 +279,7 @@ static void init_pmm(struct multiboot_info const * info)
 	
 	uint32_t ptr = info->mmap_addr;
 	for(uint32_t i = 0; i < info->mmap_length; i++) {
-		struct multiboot_mmap_entry *mmap = (void*)ptr;
+		struct multiboot_mmap_entry const * mmap = (void const *)ptr;
 		
 		/*
 		hal_debug(
@@ -280,7 +302,7 @@ static void init_pmm(struct multiboot_info const * info)
 				uint64_t addr = mmap->addr + offset;
 				if(addr >= PMM_MEMSIZE) continue;
 				
-				page_t page = pmm_getpage((void*)addr);
+				page_t page = pmm_getpage((void const*)addr);
 				
 				pmm_mark(page, marking);
 			}
@@ -288,6 +310,22 @@ static void init_pmm(struct multiboot_info const * info)
 		ptr += mmap->size + 0x04;
 	}
 	// hal_debug("End of mmap.\n");
+	
+	struct multiboot_mod_list const * mods = (void const *)info->mods_addr;
+	for(uint32_t i = 0; i < info->mods_count; i++)
+	{
+		hal_debug(
+			"Mark module %d as used between (%d, %d): %s\n",
+			i,
+			mods[i].mod_start,
+			mods[i].mod_end,
+			mods[i].cmdline);
+		for(uint32_t addr = mods[i].mod_start; addr < mods[i].mod_end; addr += PMM_PAGESIZE)
+		{
+			page_t page = pmm_getpage((void*)addr);
+			pmm_mark(page, PMM_USED);
+		}
+	}
 	
 	for(char const *ptr = &kernel_start; ptr <= (char const*)&kernel_end; ptr += 0x1000)
 	{

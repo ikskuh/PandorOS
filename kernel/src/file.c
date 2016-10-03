@@ -1,8 +1,11 @@
 #include "file.h"
 #include "malloc.h"
 #include "string.h"
-
+#include "hal.h"
+#include "memory.h"
 #include "debug.h"
+
+#include <stdint.h>
 
 struct file
 {
@@ -20,6 +23,40 @@ file_t * first = NULL;
 void file_init()
 {
 	first = NULL;
+	
+	// Load Root-FS:
+	rootfs_t const * rootfs = hal_rootfs();
+	if(rootfs != NULL)
+	{
+		char const * ptr = rootfs->data;
+		
+		uint32_t magic = *((uint32_t * const)ptr);
+		if(magic != 0xD05E4ABC) {
+			debug("Invalid rootfs magic: %x\n", magic);
+		} else {
+			ptr += 0x04;
+			uint32_t size = 0;
+			do
+			{
+				size = *((uint32_t * const)ptr);
+				ptr += 0x04;
+				if(size > 0)
+				{
+					char name[16];
+					mem_copy(name, ptr, 0x10);
+					ptr += 0x10;
+					
+					debug("Load file %s...\n", name);
+					
+					file_t *f = file_get(name, FILE_NEW);
+					file_resize(f, size);
+					mem_copy(file_data(f), ptr, size);
+					
+					ptr += size;
+				}
+			} while(size != 0);
+		}
+	}
 }
 
 static file_t * file_new(char const * fileName, int type)

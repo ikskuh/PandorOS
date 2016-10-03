@@ -1,8 +1,6 @@
 
 ifndef PLATFORM
-
 PLATFORM=x86
-
 endif
 
 HAL_ROOT=./hal/$(PLATFORM)/
@@ -10,8 +8,12 @@ HAL_INIT=$(HAL_ROOT)init.lua
 HAL_CONFIG=$(HAL_ROOT)config.h
 
 LEX=flex
+MONO=mono
 
-all: kernel rmbuild
+all: kernel root.pfs rmbuild
+
+root.pfs:
+	$(MONO) ../fstools/fstools.exe ../root.pfs/*
 
 harddisk:
 	fallocate -l 32M $@

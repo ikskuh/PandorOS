@@ -1,6 +1,15 @@
 #pragma once
 
+#include <stddef.h>
+
 typedef struct console console_t;
+
+typedef struct rootfs
+{
+	void const * data;
+	size_t size;
+	char cmdline[64];
+} rootfs_t;
 
 void hal_console_init(int *w, int *h);
 
@@ -12,6 +21,10 @@ void hal_render_console(console_t const * con, int x, int y, int w, int h);
 
 void hal_debug(char const *fmt, ...);
 
+/**
+ * Gets the hals rootfs. If NULL, no RootFS is given.
+ */
+rootfs_t const * hal_rootfs();
 
 /**
  * Returns the number of block devices.

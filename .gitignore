@@ -35,3 +35,4 @@
 kernel/build
 *.o
 basic/basic-demokernel/harddisk
+kernel/root.pfs
