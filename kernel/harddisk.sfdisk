@@ -1,0 +1,7 @@
+label: dos
+label-id: 0x0d336b6c
+device: hard-disk
+unit: sectors
+
+hard-disk1 : start=        2048, size=       20480, type=7f
+hard-disk2 : start=       22528, size=       43008, type=b, bootable

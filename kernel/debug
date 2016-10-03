@@ -1,1 +1,1 @@
-qemu-system-i386 -kernel kernel -serial stdio -d guest_errors
+qemu-system-i386 -kernel kernel -serial stdio -d guest_errors -drive file=harddisk,if=ide,media=disk,format=raw

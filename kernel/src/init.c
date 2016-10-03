@@ -12,6 +12,7 @@
 #include "malloc.h"
 #include "shell.h"
 #include "file.h"
+#include "blockdev.h"
 
 int ticks = 0;
 
@@ -38,6 +39,8 @@ void os_init()
 	malloc_init();
 	
 	{ // Initialize malloc-dependent
+		blockdev_init();
+		
 		file_init();
 	
 		shell_init(4);

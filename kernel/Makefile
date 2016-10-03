@@ -13,6 +13,10 @@ LEX=flex
 
 all: kernel rmbuild
 
+harddisk:
+	fallocate -l 32M $@
+	sfdisk $@ < harddisk.sfdisk
+
 kernel: initfiles basicfiles makefile 
 	$(MAKE) -B -C build
 	mv build/kernel kernel
@@ -26,7 +30,8 @@ makefile:
 	mkdir -p build
 	mcs build.cs
 	mono build.exe $(PLATFORM)
-
+	
+	
 initfiles: config.h init.lua
 	lua init.lua $(PLATFORM)
 ifneq ("$(wildcard $(HAL_INIT))","")
@@ -54,4 +59,4 @@ clean: rmbuild
 rmbuild: build.exe
 	rm build.exe
 	
-.PHONY: kernel cleanup
+.PHONY: kernel cleanup harddisk
