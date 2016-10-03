@@ -38,8 +38,19 @@ void editor_open(char const * fileName)
 	
 	while(true)
 	{
-		cls();
+		cy = clamp(cy, 0, lineCount - 1);
+		cx = clamp(cx, 0, lines[cy].length);
+					
+		while(cy < lineOffset) {
+			lineOffset--;
+		}
 		
+		// TODO: Improve scrolling down
+		while(cy >= lineOffset + edcon->height) {
+			lineOffset ++;
+		}
+		
+		cls();
 		int top = lineOffset;
 		int bottom = 0;
 
@@ -151,17 +162,29 @@ void editor_open(char const * fileName)
 					cy++;
 					cx = 0;
 					continue;
+				case VK_K:
+					if(kbd_is_pressed(VK_CONTROL) == false)
+						break;
+					if(lineCount <= 1)
+					{
+						lines[0].length = 0;
+						continue;
+					}
+					for(int i = cy + 1; i < lineCount; i++)
+					{
+						lines[i - 1] = lines[i];
+					}
+					lineCount--;
+					continue;
 				case VK_UP:
 					if(cy == 0)
 						continue;
 					cy -= 1;
-					cx = min(cx, lines[cy].length);
 					continue;
 				case VK_DOWN:
 					if(cy >= lineCount - 1)
 						continue;
 					cy += 1;
-					cx = min(cx, lines[cy].length);
 					continue;
 				case VK_RIGHT:
 					if(cx >= lines[cy].length)
@@ -187,8 +210,6 @@ void editor_open(char const * fileName)
 		{
 			if(lines[cy].length >= LINE_LENGTH || cx >= LINE_LENGTH)
 				continue;
-			
-			debug("key input: %c, (%d -> %d)\n", hit.codepoint, cx, lines[cy].length);
 			
 			for(int i = lines[cy].length; i > cx; i--) {
 				lines[cy].text[i] = lines[cy].text[i - 1];

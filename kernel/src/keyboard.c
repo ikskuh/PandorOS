@@ -21,6 +21,15 @@ void kbd_enqueue_event(keyhit_t event)
 bool kbd_is_pressed(int vk)
 {
 	if(vk < 0 || vk >= VK__LIMIT) {
+		switch(vk)
+		{
+			case VK_CONTROL:
+				return kbd_is_pressed(VK_CONTROL_LEFT) || kbd_is_pressed(VK_CONTROL_RIGHT);
+			case VK_SHIFT:
+				return kbd_is_pressed(VK_SHIFT_LEFT) || kbd_is_pressed(VK_SHIFT_RIGHT);
+			case VK_ALT:
+				return kbd_is_pressed(VK_ALT_LEFT) || kbd_is_pressed(VK_ALT_RIGHT);
+		}
 		return false;
 	}
 	return kbdState[vk];

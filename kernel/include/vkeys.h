@@ -89,3 +89,6 @@
 #define VK_NUM_8 87
 #define VK_NUM_9 88
 #define VK__LIMIT 89
+#define VK_CONTROL 90
+#define VK_SHIFT 91
+#define VK_ALT 92
