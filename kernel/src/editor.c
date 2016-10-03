@@ -135,7 +135,6 @@ void editor_open(char const * fileName)
 					lines[cy].length -= 1;
 				
 					continue;
-					continue;
 				case VK_RETURN:
 					// Append Line in any case:
 					lines = realloc(lines, (++lineCount) * sizeof(line_t));
@@ -175,6 +174,12 @@ void editor_open(char const * fileName)
 					if(cx <= 0)
 						continue;
 					cx -= 1;
+					continue;
+				case VK_END:
+					cx = lines[cy].length;
+					continue;
+				case VK_HOME:
+					cx = 0;
 					continue;
 			}
 		}

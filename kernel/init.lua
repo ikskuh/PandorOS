@@ -28,6 +28,7 @@ virtual_keys = {
 	"DOT",
 	"HYPHEN",
 	"NUMBER", -- #
+	"HOME", "END",
 	"NUM_PLUS",
 	"NUM_MINUS",
 	"NUM_MULT",
