@@ -10,7 +10,7 @@ DEFKEY( "7", 7, '7', '/', '{' ),
 DEFKEY( "8", 8, '8', '(', '[' ),
 DEFKEY( "9", 9, '9', ')', ']' ),
 DEFKEY( "0", 0, '0', '=', '}' ),
-DEFKEY( "\\", INVALID, 0, '?', '\\' ), // TODO: Add virtual key code
+DEFKEY( "\\", INVALID, '\xE1', '?', '\\' ), // TODO: Add virtual key code
 DEFKEY( "`", INVALID, '\'', '`', 0 ), // TODO: Add virtual key code
 DEFKEY( "BACKSPACE", BACKSPACE, '\b', '\b', '\b' ),
 DEFKEY( "TAB", TAB, '\t', '\t', '\t' ),
@@ -24,7 +24,7 @@ DEFKEY( "u", U, 'u', 'U', 0 ),
 DEFKEY( "i", I, 'i', 'I', 0 ),
 DEFKEY( "o", O, 'o', 'O', 0 ),
 DEFKEY( "p", P, 'p', 'P', 0 ),
-DEFKEY( "ü", INVALID, 'u', 'U', 0 ), // TODO: Add virtual key code
+DEFKEY( "ü", INVALID, '\x81', '\x9A', 0 ), // TODO: Add virtual key code
 DEFKEY( "+", PLUS, '+', '*', '~' ),
 DEFKEY( "Enter", RETURN, '\n', '\n', '\r' ),
 DEFKEY( "CTRL-LEFT", CONTROL_LEFT, 0, 0, 0 ),
@@ -37,8 +37,8 @@ DEFKEY( "CTRL-LEFT", CONTROL_LEFT, 0, 0, 0 ),
 /* 36 */ DEFKEY( "j", J, 'j', 'J', 0 ),
 /* 37 */ DEFKEY( "k", K, 'k', 'K', 0 ),
 /* 38 */ DEFKEY( "l", L, 'l', 'L', 0 ),
-/* 39 */ DEFKEY( "ö", INVALID, 0, 0, 0 ),
-/* 40 */ DEFKEY( "ä", INVALID, 0, 0, 0 ),
+/* 39 */ DEFKEY( "ö", INVALID, '\x94', '\x99', 0 ),
+/* 40 */ DEFKEY( "ä", INVALID, '\x84', '\x8E', 0 ),
 /* 41 */ DEFKEY( "^", INVALID, '^', 0, 0 ),
 /* 42 */ DEFKEY( "SHIFT-LEFT", SHIFT_LEFT, 0, 0, 0 ),
 /* 43 */ DEFKEY( "#", NUMBER, '#', '\'', 0 ),

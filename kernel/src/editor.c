@@ -130,6 +130,20 @@ void editor_open(char const * fileName)
 				
 					continue;
 				case VK_RETURN:
+					// Append Line in any case:
+					lines = realloc(lines, (++lineCount) * sizeof(line_t));
+					for(int i = lineCount - 1; i > cy; i--)
+					{
+						lines[i] = lines[i - 1];
+					}
+					lines[cy + 1].length = 0;
+					for(int i = cx; i < lines[cy].length; i++) {
+						lines[cy + 1].text[i - cx] = lines[cy].text[i];
+						lines[cy + 1].length++;
+					}
+					lines[cy].length = cx;
+					cy++;
+					cx = 0;
 					continue;
 				case VK_UP:
 					if(cy == 0)
