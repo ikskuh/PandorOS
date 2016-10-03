@@ -3,6 +3,7 @@
 #include "standard.h"
 #include "shell.h"
 #include "editor.h"
+#include "file.h"
 #include <stddef.h>
 
 

@@ -167,6 +167,44 @@ FUNCTION(Poke, "pointer, byte", "Writes *byte* to the memory address given with 
 	return basic_mknum(val);
 })
 
+FUNCTION(Open, "name, [flags]", "",
+{
+	if(argc < 1 || argc > 3)
+		basic_error(ERR_ARG_COUNT);
+	string_t name = STR(0);
+	int flags = (argc > 1) ? NUM(1) : FILE_DEFAULT;
+	
+	return basic_mknum((int)file_get(name, flags));
+})
+
+FUNCTION(GetSize, "file", "",
+{
+	assert_argc(argc, 1);
+	file_t * file = (void*)(int)NUM(0);
+	return basic_mknum(file_size(file));
+})
+
+FUNCTION(GetType, "file", "",
+{
+	assert_argc(argc, 1);
+	file_t * file = (void*)(int)NUM(0);
+	return basic_mknum(file_type(file));
+})
+
+FUNCTION(GetData, "file", "",
+{
+	assert_argc(argc, 1);
+	file_t * file = (void*)(int)NUM(0);
+	return basic_mknum((int)file_data(file));
+})
+
+FUNCTION(Resize, "file, size", "",
+{
+	assert_argc(argc, 2);
+	file_t * file = (void*)(int)NUM(0);
+	int size = NUM(1);
+	file_resize(file, size);
+})
 
 
 #ifdef _IMPORT_GENERATED_

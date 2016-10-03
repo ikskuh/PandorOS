@@ -11,6 +11,7 @@
 #include "catalog.h"
 #include "malloc.h"
 #include "shell.h"
+#include "file.h"
 
 int ticks = 0;
 
@@ -37,6 +38,8 @@ void os_init()
 	malloc_init();
 	
 	{ // Initialize malloc-dependent
+		file_init();
+	
 		shell_init(4);
 	}
 	
