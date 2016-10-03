@@ -6,7 +6,7 @@
 IMPORT(extern bool shell_has_echo;)
 IMPORT(char printsep[64] = "";)
 
-ORDER(Print, "...", "Prints its arguments and adds a newline.",
+ORDER(DEFAULT, Print, "...", "Prints its arguments and adds a newline.",
 {
 	for(int i = 0; i < argc; i++)
 	{
@@ -18,26 +18,26 @@ ORDER(Print, "...", "Prints its arguments and adds a newline.",
 	return basic_mknull();
 })
 
-ORDER(PrintSep, "separator", "Sets the separator that will be printed inbetween the arguments to *Print*.",
+ORDER(DEFAULT, PrintSep, "separator", "Sets the separator that will be printed inbetween the arguments to *Print*.",
 {
 	assert_argc(argc, 1);
 	str_copy(printsep, STR(0));
 })
 
-ORDER(Prompt, "str", "Sets the shell prompt for the current shell.",
+ORDER(DEFAULT, Prompt, "str", "Sets the shell prompt for the current shell.",
 {
 	assert_argc(argc, 1);
 	str_copy(currentShell->prompt, STR(0));
 })
 
-ORDER(Edit, "file", "Opens the editor for the given file name.",
+ORDER(NOPRG, Edit, "file", "Opens the editor for the given file name.",
 {
 	assert_argc(argc, 1);
 	
 	editor_open(STR(0));
 })
 
-ORDER(Echo, "state", "Sets the echo state of the console. When the state is *On*, the console will echo the results of expressions, when state is *Off* nothing will be printed.",
+ORDER(NOPRG, Echo, "state", "Sets the echo state of the console. When the state is *On*, the console will echo the results of expressions, when state is *Off* nothing will be printed.",
 {
 	assert_argc(argc, 1);
 	if(NUM(0)) {
@@ -47,7 +47,7 @@ ORDER(Echo, "state", "Sets the echo state of the console. When the state is *On*
 	}
 })
 
-ORDER(Refresh, "[state]", "If *state* is not given, this order refreshes the screen and renders the text.\nIf *state* is *On*, the console auto-refresh is enabled. Disabling the auto-refresh is done by passing *Off* to *Refresh*",
+ORDER(DEFAULT, Refresh, "[state]", "If *state* is not given, this order refreshes the screen and renders the text.\nIf *state* is *On*, the console auto-refresh is enabled. Disabling the auto-refresh is done by passing *Off* to *Refresh*",
 {
 	if(argc > 1) {
 		basic_error(ERR_ARG_COUNT);

@@ -3,7 +3,9 @@
 #include "standard.h"
 #include "debug.h"
 
-#define LINE_LENGTH 80
+#include <stdbool.h>
+
+#define LINE_LENGTH 250
 
 typedef struct line
 {
@@ -19,10 +21,17 @@ void editor_open(char const * fileName)
 	edcon->flags &= ~CON_AUTOREFRESH;
 	
 	int lineOffset = 0;
-	int lineCount = 1;
+	int lineCount = 3;
 	line_t *lines = malloc(lineCount * sizeof(line_t));
 	lines[0].length = 0;
+	lines[1].length = 0;
+	lines[2].length = 0;
 	
+	#define LINEINIT(n, t) str_copy(lines[n].text, t); lines[n].length = str_len(t)
+	
+	LINEINIT(0, "Hallo Editor!");
+	LINEINIT(1, "Dies ist ein Editor mit Zeilenumbruch. Die Implementierung des Zeilenumbruch ist aber im Moment noch ziemlich schlecht. Trotzdem kann man super tippen, vorallem weil der Zeilenumbruch funktionieren sollte.");
+	LINEINIT(2, "Von daher sollte man sich überlegen, ein Word-Wrapping einzubauen.");
 	
 	int cx = 0;
 	int cy = 0;
@@ -32,19 +41,68 @@ void editor_open(char const * fileName)
 		cls();
 		
 		int top = lineOffset;
-		int bottom = min(lineCount, lineOffset + edcon->height);
+		int bottom = 0;
 
-		for(int l = top; l < bottom; l++)
+		edcon->cursor.x = 0;
+		edcon->cursor.y = edcon->height;
+		
+		int y = 0;
+		for(int l = top; l < lineCount; l++)
 		{
 			line_t *line = &lines[l];
+			bottom = l;
 	
+			setc(0, y, ':');
+
+			int x = 1;
+			bool inWord = false;
 			for(int i = 0; i < line->length; i++) {
-				setc(i, l - lineOffset, line->text[i]);
+				
+				char c = line->text[i];
+				
+				if(c == ' ') {
+					inWord = false;
+				} else {
+					if(inWord == false) {
+						int peek = 0;
+						for(int j = 0; i+j < line->length && (line->text[i + j] != ' '); j++) {
+							peek++;
+						}
+						if(x + peek > edcon->width) {
+							x = 1;
+							y ++;
+							if(y >= edcon->height) {
+								break;
+							}
+						}
+					}
+					inWord = true;
+				}
+				
+				if(cy == l && cx == i) {
+					edcon->cursor.x = x;
+					edcon->cursor.y = y;
+				}
+				
+				setc(x++, y, c);
+				if(x >= edcon->width) {
+					x = 1;
+					y++;
+					if(y >= edcon->height) {
+						break;
+					}
+				}
+			}
+			if(cy == l && cx == line->length) {
+				edcon->cursor.x = x;
+				edcon->cursor.y = y;
+			}
+			
+			y++;
+			if(y >= edcon->height) {
+				break;
 			}
 		}
-		
-		edcon->cursor.x = cx;
-		edcon->cursor.y = cy - lineOffset;
 		
 		console_refresh();
 		
@@ -56,8 +114,10 @@ void editor_open(char const * fileName)
 			switch(hit.key)
 			{
 				case VK_BACKSPACE:
-					if(cx <= 0)
+					if(cx <= 0) {
+						// TODO: User wants to delete 
 						continue;
+					}
 					
 					debug("key unput: (%d -> %d)\n", cx, lines[cy].length);
 					
