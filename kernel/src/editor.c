@@ -176,27 +176,29 @@ void editor_open(char const * fileName)
 					}
 					lineCount--;
 					continue;
+				case VK_LEFT:
+					if(cx > 0) {
+						cx -= 1;
+						continue;
+					}
+					cx = LINE_LENGTH; // This will be clamped at the start of the loop.
+					// Intelligent fallthrough
 				case VK_UP:
 					if(cy == 0)
 						continue;
 					cy -= 1;
 					continue;
+				case VK_RIGHT:
+					if(cx < lines[cy].length && cx < LINE_LENGTH) {
+						cx += 1;
+						continue;
+					}
+					cx = 0;
+					// Intelligent fallthrough
 				case VK_DOWN:
 					if(cy >= lineCount - 1)
 						continue;
 					cy += 1;
-					continue;
-				case VK_RIGHT:
-					if(cx >= lines[cy].length)
-						continue;
-					if(cx >= LINE_LENGTH)
-						continue;
-					cx += 1;
-					continue;
-				case VK_LEFT:
-					if(cx <= 0)
-						continue;
-					cx -= 1;
 					continue;
 				case VK_END:
 					cx = lines[cy].length;

@@ -30,7 +30,17 @@ ORDER(DEFAULT, Prompt, "str", "Sets the shell prompt for the current shell.",
 	str_copy(currentShell->prompt, STR(0));
 })
 
-ORDER(NOPRG, Edit, "file", "Opens the editor for the given file name.",
+ORDER(NOPRG, Edit, "file",
+	"Opens the editor for the given file name.\n"
+	"\n"
+	"Editor Controls:\n"
+	"Up/Down/Left/Right  Move Cursor\n"
+	"Delete              Delete current char\n"
+	"Backspace           Delete previous char\n"
+	"Return              Splits the current line\n"
+	"Ctrl+K              Deletes the current line\n"
+	"Home                Moves the cursor to the start\n"
+	"End                 Moves the cursor to the end of the line\n",
 {
 	assert_argc(argc, 1);
 	
