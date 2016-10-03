@@ -2,6 +2,8 @@
 #include "io.h"
 #include "standard.h"
 #include "debug.h"
+#include "file.h"
+#include "interpreter.h"
 
 #include <stdbool.h>
 
@@ -15,23 +17,54 @@ typedef struct line
 
 void editor_open(char const * fileName)
 {
+	switch(file_type_by_extension(fileName))
+	{
+		case FILE_INVALID:
+		case FILE_TEXT:
+		case FILE_PROGRAM:
+			break;
+		default:
+			basic_error(ERR_INVALID_FILE);
+			return;
+	}
+	
 	console_t *prevcon = stdcon;
 	console_t *edcon = console_new();
 	console_set(edcon);
 	edcon->flags &= ~CON_AUTOREFRESH;
 	
 	int lineOffset = 0;
-	int lineCount = 3;
-	line_t *lines = malloc(lineCount * sizeof(line_t));
-	lines[0].length = 0;
-	lines[1].length = 0;
-	lines[2].length = 0;
+	int lineCount = 1;
 	
-	#define LINEINIT(n, t) str_copy(lines[n].text, t); lines[n].length = str_len(t)
-	
-	LINEINIT(0, "Hallo Editor!");
-	LINEINIT(1, "Dies ist ein Editor mit Zeilenumbruch. Die Implementierung des Zeilenumbruch ist aber im Moment noch ziemlich schlecht. Trotzdem kann man super tippen, vorallem weil der Zeilenumbruch funktionieren sollte.");
-	LINEINIT(2, "Von daher sollte man sich überlegen, ein Word-Wrapping einzubauen.");
+	file_t *file = file_get(fileName, FILE_DEFAULT);
+	if(file_type(file) != FILE_INVALID)
+	{
+		char * data = file_data(file);
+		for(int i = 0; i < file_size(file); i++)
+		{
+			if(data[i] == '\n')
+				lineCount++;
+		}
+	}
+	line_t *lines = zalloc(lineCount * sizeof(line_t));
+	if(file_type(file) != FILE_INVALID)
+	{
+		char * data = file_data(file);
+		
+		int line = 0;
+		for(int i = 0; i < file_size(file); i++)
+		{
+			char c = data[i];
+			if(c == '\n')
+			{
+				line++;
+			}
+			else
+			{
+				lines[line].text[lines[line].length++] = c;
+			}
+		}
+	}
 	
 	int cx = 0;
 	int cy = 0;
@@ -206,6 +239,42 @@ void editor_open(char const * fileName)
 				case VK_HOME:
 					cx = 0;
 					continue;
+				case VK_S:
+				{
+					if(kbd_is_pressed(VK_CONTROL) == false)
+						break;
+					
+					int total = 0;
+					for(int i = 0; i < lineCount; i++)
+					{
+						total += lines[i].length;
+						total += 1; // '\n'
+					}
+					
+					file = file_get(fileName, FILE_NEW);
+					if(file_type(file) == FILE_INVALID) {
+						debug("Invalid file: %s\n", fileName);
+						continue;
+					}
+					
+					file_resize(file, total);
+					
+					char * ptr = file_data(file);
+					
+					for(int i = 0; i < lineCount; i++)
+					{
+						mem_copy(ptr, lines[i].text, lines[i].length);
+						ptr += lines[i].length;
+						*ptr = '\n';
+						ptr += 1;
+					}
+				
+					continue;
+				}
+				case VK_ESCAPE:
+					console_delete(edcon);
+					console_set(prevcon);
+					return;
 			}
 		}
 		if(hit.flags & khfCharInput)

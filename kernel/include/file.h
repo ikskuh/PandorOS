@@ -28,6 +28,11 @@ void file_init();
 file_t * file_get(char const * fileName, int flags);
 
 /**
+ * Returns the file type determined by the given file name.
+ */
+int file_type_by_extension(char const * fileName);
+
+/**
  * Returns the type of the given file.
  */
 int file_type(file_t * file);

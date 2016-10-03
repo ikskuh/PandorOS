@@ -1,7 +1,8 @@
 #include "malloc.h"
 #include "tlsf.h"
 #include "pmm.h"
-#include "io.h"
+#include "debug.h"
+#include "memory.h"
 
 tlsf_t tlsf;
 
@@ -25,7 +26,8 @@ void malloc_init()
 		}
 	}
 	if(upper <= lower) {
-		printf("Out of memory!\n");
+		debug("Out of memory!\n");
+		while(1);
 	}
 	
 	for(page_t p = lower; p <= upper; p++) {
@@ -34,7 +36,7 @@ void malloc_init()
 	
 	size_t len = (size_t)(upper - lower + 1) * (size_t)PMM_PAGESIZE;
 	
-	printf("Heap is [%d, %d]\n", lower, upper);
+	debug("Heap is [%d, %d]\n", lower, upper);
 	
 	tlsf = tlsf_create_with_pool(pmm_getptr(lower), len);
 }
@@ -44,6 +46,13 @@ void * malloc(size_t bytes)
 	return tlsf_malloc(tlsf, bytes);
 }
 
+void * zalloc(size_t bytes)
+{
+	char * ptr = malloc(bytes);
+	if(ptr != NULL)
+		mem_set(ptr, 0, bytes);
+	return ptr;
+}
 
 void free(void *ptr)
 {

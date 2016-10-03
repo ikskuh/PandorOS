@@ -2,6 +2,8 @@
 #include "malloc.h"
 #include "string.h"
 
+#include "debug.h"
+
 struct file
 {
 	char name[128];
@@ -22,10 +24,12 @@ void file_init()
 
 static file_t * file_new(char const * fileName, int type)
 {
+	debug("Create file '%s' of type %d\n", fileName, type);
+
 	file_t *file = malloc(sizeof(file_t));
 	str_copy(file->name, fileName);
 	file->type = type;
-	file->data = NULL;
+	file->data = malloc(1);
 	file->size = 0;
 	file->next = NULL;
 	
@@ -40,7 +44,7 @@ static file_t * file_new(char const * fileName, int type)
 	return file;
 }
 
-static int gettype(char const * name)
+int file_type_by_extension(char const * name)
 {
 	while(*name)
 	{
@@ -57,7 +61,7 @@ static int gettype(char const * name)
 
 file_t * file_get(char const * fileName, int flags)
 {
-	int type = gettype(fileName);
+	int type = file_type_by_extension(fileName);
 	if(type == FILE_INVALID)
 		return NULL;
 
@@ -111,5 +115,12 @@ void file_resize(file_t * file, int size)
 {
 	if(file == NULL)
 		return;
-	file->data = realloc(file->data, file->size);
+	void * new = realloc(file->data, size);
+	
+	debug("file_resize(%d,%d): (%d, %d)\n", file, size, file->data, new);
+	
+	if(new == NULL)
+		return;
+	file->data = new;
+	file->size = size;
 }
