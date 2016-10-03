@@ -1,8 +1,11 @@
 #include "keyboard-drv.h"
 #include "input.h"
 #include "io.h"
+#include "hal.h"
 
 #include <stddef.h>
+
+bool kbddrvLogKeys = false;
 
 #define DEFKEY(name, vkey, lower, upper, variant) { VK_##vkey, lower, upper, variant }
 
@@ -71,6 +74,11 @@ struct cpu *keyboard_isr(struct cpu *cpu)
 		scancode = (struct scancode){ kbpInput, 0 };
 	}
 	if(scancode.set >= 0) {
+	
+		if(kbddrvLogKeys) {
+			hal_debug("Key %s: (%d @ %d)\n", break_code ? "Release" : "Press", scancode.code, scancode.set);
+		}
+	
 		key_t const * map = NULL;
 		
 		if(scancode.set == 0 && scancode.code < sizeof(keymap_set0) / sizeof(keymap_set0[0])) {

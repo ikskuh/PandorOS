@@ -118,9 +118,6 @@ void editor_open(char const * fileName)
 						// TODO: User wants to delete 
 						continue;
 					}
-					
-					debug("key unput: (%d -> %d)\n", cx, lines[cy].length);
-					
 					for(int i = cx - 1; i < lines[cy].length; i++) {
 						lines[cy].text[i] = lines[cy].text[i + 1];
 					}
@@ -128,6 +125,16 @@ void editor_open(char const * fileName)
 					
 					cx -= 1;
 				
+					continue;
+				case VK_DELETE:
+					if(cx >= lines->length)
+						continue;
+					for(int i = cx; i < lines[cy].length; i++) {
+						lines[cy].text[i] = lines[cy].text[i + 1];
+					}
+					lines[cy].length -= 1;
+				
+					continue;
 					continue;
 				case VK_RETURN:
 					// Append Line in any case:

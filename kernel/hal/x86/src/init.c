@@ -88,6 +88,13 @@ extern option_t halOptConsoleBackground;
 extern option_t halOptConsoleHighlight;
 extern option_t halOptConsoleBoldtext;
 
+
+extern bool kbddrvLogKeys;
+
+option_t halOptKeyboardLog = {
+	OPT_BOOL, "Log Keyboard", &kbddrvLogKeys, NULL, NULL
+};
+
 void x86_init(uint32_t bootmagic, struct multiboot_info const * info)
 {
 	// Checks for a correct multiboot magic
@@ -115,6 +122,8 @@ void x86_init(uint32_t bootmagic, struct multiboot_info const * info)
 	option_add(&halOptions, &halOptConsoleBackground);
 	option_add(&halOptions, &halOptConsoleHighlight);
 	option_add(&halOptions, &halOptConsoleBoldtext);
+	
+	option_add(&halOptions, &halOptKeyboardLog);
 }
 
 static void init_gdt()
