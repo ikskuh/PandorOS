@@ -2,6 +2,7 @@
 #include "io.h"
 #include "standard.h"
 #include "shell.h"
+#include "editor.h"
 #include <stddef.h>
 
 

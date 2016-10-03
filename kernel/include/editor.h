@@ -3,4 +3,4 @@
 /**
  * Opens an editor
  */
-void editor_open();
+void editor_open(char const * fileName);

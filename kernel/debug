@@ -1,1 +1,1 @@
-qemu-system-i386 -kernel kernel -serial stdio
+qemu-system-i386 -kernel kernel -serial stdio -d guest_errors

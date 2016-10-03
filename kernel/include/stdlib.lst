@@ -30,6 +30,12 @@ ORDER(Prompt, "str", "Sets the shell prompt for the current shell.",
 	str_copy(currentShell->prompt, STR(0));
 })
 
+ORDER(Edit, "file", "Opens the editor for the given file name.",
+{
+	assert_argc(argc, 1);
+	
+	editor_open(STR(0));
+})
 
 ORDER(Echo, "state", "Sets the echo state of the console. When the state is *On*, the console will echo the results of expressions, when state is *Off* nothing will be printed.",
 {
