@@ -5,6 +5,7 @@
 #include "options.h"
 #include "shell.h"
 #include "standard.h"
+#include "debug.h"
 #include <stddef.h>
 
 menu_t mainmenu = {
@@ -51,10 +52,13 @@ void mainmenu_initshell(shell_t * shells, int count)
 {
 	mainmenu.items[MAINMENU_SHELL].length = count;
 	mainmenu.items[MAINMENU_SHELL].items = malloc(count * sizeof(menuitem_t));
-	
+	mem_set(
+		mainmenu.items[MAINMENU_SHELL].items, 
+		0, 
+		count * sizeof(menuitem_t));
 	for(int i = 0; i < count; i++)
 	{
-		str_copy(mainmenu.items[1].items[i].label, shells[i].name);
+		str_copy(mainmenu.items[MAINMENU_SHELL].items[i].label, shells[i].name);
 		mainmenu.items[MAINMENU_SHELL].items[i].callback = (menucallback_f)select_shell;
 		mainmenu.items[MAINMENU_SHELL].items[i].userdata = &shells[i];
 	}

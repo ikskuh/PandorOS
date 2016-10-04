@@ -5,6 +5,7 @@
 #include "catalog.h"
 #include "charmap.h"
 #include "mainmenu.h"
+#include "debug.h"
 
 shell_t *currentShell = NULL;
 
@@ -22,10 +23,10 @@ void select_shell(shell_t * shell)
 
 void shell_init(int shellCount)
 {
-	shell_t shells[shellCount];
+	shell_t * shells = malloc(shellCount * sizeof(shell_t));
 	for(int i = 0; i  < shellCount; i++)
 	{
-		shell_t *shell = malloc(sizeof(shell_t));
+		shell_t *shell = &shells[i];
 		
 		str_printf(shell->name, "Shell %d", i);
 		str_copy(shell->prompt, "#> ");

@@ -1,6 +1,7 @@
 #include "menu.h"
 #include "hal.h"
 #include "input.h"
+#include "debug.h"
 #include <stddef.h>
 
 // Export from console.c
@@ -112,7 +113,7 @@ static void render_menu(renderinfo_t *ri)
 
 static void render_dropdown(renderinfo_t *ri)
 {
-// #define CHA_BORDER (CHA_RED | CHA_HIGHLIGHT)
+// #define CHA_BORDER (CHA_BOLD | CHA_HIGHLIGHT)
 #define CHA_BORDER CHA_DEFAULT
 	int width = submenuwidth(ri->items, ri->count);
 	
