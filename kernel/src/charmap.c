@@ -77,6 +77,8 @@ void charmap_open()
 					cy = 0;
 				break;
 			case VK_RETURN:
+				if(cx == 0 && cy == 0) // Disallow \0
+					break;
 				last = (cy << 4) | cx;
 			case VK_ESCAPE:
 				console_delete(chcon);

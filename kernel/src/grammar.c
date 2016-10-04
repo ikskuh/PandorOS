@@ -1262,6 +1262,10 @@ void Parse(
 					if(token.type == 0)
 						break;
 				}
+				else if(token.type == -2)
+				{
+					basic_error(ERR_INVALID_TOKEN);
+				}
 				input += token.length;
 			}
 		
@@ -1320,4 +1324,4 @@ void Parse(
 		}
 		return NULL;
 	}
-#line 1324 "src/grammar.c"
+#line 1328 "src/grammar.c"

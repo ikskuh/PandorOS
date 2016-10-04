@@ -22,13 +22,12 @@ struct token lex(const char *input)
 #define YYBACKUPCTX()  ctxmarker = index
 #define YYRESTORE()    index = marker
 #define YYRESTORECTX() index = ctxmarker
-#define YYLESSTHAN(n)  len - index < n
+#define YYLESSTHAN(n)  ((len - index) < (n))
 #define YYFILL(n)      {}
 	/*!re2c
 		re2c:define:YYCTYPE = char;
 		re2c:yyfill:enable = 0;
 
-		end = "\x00";
 		bin = '0b' [01]+;
 		dec = [0-9]+;
 		hex = '0x' [0-9a-fA-F]+;
@@ -41,7 +40,8 @@ struct token lex(const char *input)
 		ord = [A-Za-z][A-Za-z0-9]*;
 		bool = "On" | "Off" | "True" | "False";
 
-		*        { return (struct token){ 0, 0 }; }
+		*        { return (struct token){ -2, 0 }; }
+		"0x00"   { return (struct token){ 0, 0 }; }
 		dec      { return (struct token){ TOK_INTEGER, index }; }
 		hex      { return (struct token){ 2, index }; }
 		"+"      { return (struct token){ TOK_PLUS, index }; }
@@ -55,7 +55,7 @@ struct token lex(const char *input)
 		fun      { return (struct token){ TOK_FUN, index }; }
 		com      { return (struct token){ TOK_COMMA, index }; }
 		ws+      { return (struct token){ -1, index }; }
-		str      { return (struct token){ TOK_STRING, index }; }
+		"\"" ([^"] \ "\x00")* "\""      { return (struct token){ TOK_STRING, index }; }
 		bool     { return (struct token){ TOK_BOOL, index }; }
 		ord      { return (struct token){ TOK_ORDER, index }; }
 		
