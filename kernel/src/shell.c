@@ -71,7 +71,6 @@ void shell_main()
 					currshell.input[currshell.cursor++] = cmap;
 					putc(cmap);
 				}
-				
 				mainmenu_shellenable(true);
 				break;
 			}
@@ -95,7 +94,12 @@ void shell_main()
 				currshell.input[currshell.cursor] = 0;
 				currshell.cursor = 0;
 				
+				
+				mainmenu_shellenable(false);
+				
 				value_t result = basic_execute(currshell.input);
+				
+				mainmenu_shellenable(true);
 				
 				if(basic_lasterror() != ERR_SUCCESS)
 				{

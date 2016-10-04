@@ -32,6 +32,7 @@ void mainmenu_open(bool fromShell)
 {
 	mainmenu_shellenable(fromShell);
 	menu_open(&mainmenu);
+	mainmenu_shellenable(fromShell);
 }
 
 void mainmenu_render()

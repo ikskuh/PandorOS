@@ -4,6 +4,9 @@
 #include "debug.h"
 #include "file.h"
 #include "interpreter.h"
+#include "mainmenu.h"
+#include "catalog.h"
+#include "charmap.h"
 
 #include <stdbool.h>
 
@@ -68,6 +71,20 @@ void editor_open(char const * fileName)
 	
 	int cx = 0;
 	int cy = 0;
+
+#define PUTC(c) do { \
+	if(lines[cy].length >= LINE_LENGTH || cx >= LINE_LENGTH) \
+		break; \
+	for(int i = lines[cy].length; i > cx; i--) { \
+		lines[cy].text[i] = lines[cy].text[i - 1]; \
+	} \
+	lines[cy].text[cx] = c; \
+	lines[cy].length += 1; \
+	cx += 1; \
+} while(false)
+
+	mainmenu_shellenable(false);
+	mainmenu_render();
 	
 	while(true)
 	{
@@ -239,6 +256,25 @@ void editor_open(char const * fileName)
 				case VK_HOME:
 					cx = 0;
 					continue;
+				case VK_TAB:
+				{
+					mainmenu_open(false);
+				
+					char const * insertion = catalog_get();
+					if(insertion != NULL)
+					{
+						while(*insertion) {
+							PUTC(*insertion);
+							insertion++;
+						}
+					}
+					int cmap = charmap_last();
+					if(cmap >= 0) {
+						PUTC(cmap);
+					}
+					
+					continue;
+				}
 				case VK_S:
 				{
 					if(kbd_is_pressed(VK_CONTROL) == false)
@@ -279,16 +315,7 @@ void editor_open(char const * fileName)
 		}
 		if(hit.flags & khfCharInput)
 		{
-			if(lines[cy].length >= LINE_LENGTH || cx >= LINE_LENGTH)
-				continue;
-			
-			for(int i = lines[cy].length; i > cx; i--) {
-				lines[cy].text[i] = lines[cy].text[i - 1];
-			}
-			lines[cy].text[cx] = hit.codepoint;
-			lines[cy].length += 1;
-			
-			cx += 1;
+			PUTC(hit.codepoint);
 		}
 	}
 }
