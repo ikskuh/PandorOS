@@ -6,7 +6,7 @@
 #define MENU_DEFAULT    0
 #define MENU_SELECTED   CHA_HIGHLIGHT
 #define MENU_RIGHTALIGN (1<<2)
-#define MENU_OPENED     (1<<3)
+#define MENU_DISABLED   (1<<3)
 
 struct menuitem;
 

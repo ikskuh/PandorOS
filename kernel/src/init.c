@@ -48,9 +48,7 @@ void os_init()
 	
 	while(true)
 	{
-	
 		shell_main();
-	
 	}
 	
 	while(true);

@@ -8,7 +8,7 @@
 #define WIDTH 80
 #define HEIGHT 25
 
-int foreground = 0xF, background = 0x0, highlight = 0x2, boldcolor = 0xC;
+int foreground = 0xF, background = 0x0, highlight = 0x2, boldcolor = 0xC, discolor = 0x7;
 
 optioncfg_int_t halOptColorLimit = {
 	0,  // min
@@ -33,20 +33,18 @@ option_t halOptConsoleBoldtext = {
 
 static uint8_t getcolor(int attribs)
 {
+	int fg = foreground;
+	int bg = background;
+
 	if(attribs & CHA_BOLD)
-	{
-		if(attribs & CHA_HIGHLIGHT)
-			return ((highlight&0xF) << 4) | (boldcolor&0xF);
-		else
-			return ((background&0xF) << 4) | (boldcolor&0xF);
-	}
-	else
-	{
-		if(attribs & CHA_HIGHLIGHT)
-			return ((highlight&0xF) << 4) | (foreground&0xF);
-		else
-			return ((background&0xF) << 4) | (foreground&0xF);
-	}
+		fg = boldcolor;
+	if(attribs & CHA_DISABLED)
+		fg = discolor;
+	
+	if(attribs & CHA_HIGHLIGHT)
+		bg = highlight;
+	
+	return (fg&0xF) | ((bg&0xF) << 4);
 }
 
 struct _vchar

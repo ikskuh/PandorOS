@@ -5,6 +5,7 @@
 #define CHA_DEFAULT   0
 #define CHA_HIGHLIGHT (1<<0)
 #define CHA_BOLD      (1<<1)
+#define CHA_DISABLED  (1<<2)
 
 #define CON_DEFAULT      0
 #define CON_AUTOREFRESH (1<<0)

@@ -46,8 +46,6 @@ void file_init()
 					mem_copy(name, ptr, 0x10);
 					ptr += 0x10;
 					
-					debug("Load file %s...\n", name);
-					
 					file_t *f = file_get(name, FILE_NEW);
 					file_resize(f, size);
 					mem_copy(file_data(f), ptr, size);
@@ -61,8 +59,6 @@ void file_init()
 
 static file_t * file_new(char const * fileName, int type)
 {
-	debug("Create file '%s' of type %d\n", fileName, type);
-
 	file_t *file = malloc(sizeof(file_t));
 	str_copy(file->name, fileName);
 	file->type = type;
@@ -153,8 +149,6 @@ void file_resize(file_t * file, int size)
 	if(file == NULL)
 		return;
 	void * new = realloc(file->data, size);
-	
-	debug("file_resize(%d,%d): (%d, %d)\n", file, size, file->data, new);
 	
 	if(new == NULL)
 		return;

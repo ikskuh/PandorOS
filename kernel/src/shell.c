@@ -1,57 +1,28 @@
 #include "shell.h"
-#include "catalog.h"
-#include "options.h"
-#include "menu.h"
 #include "interpreter.h"
 #include "standard.h"
 #include "io.h"
+#include "catalog.h"
 #include "charmap.h"
-
-static void select_shell(shell_t * shell);
+#include "mainmenu.h"
 
 shell_t *currentShell = NULL;
 
 #define currshell (*currentShell)
 
-#define MAINMENU_CATALOG 0
-#define MAINMENU_CHARMAP 1
-#define MAINMENU_SHELL   2
-#define MAINMENU_SYSTEM  3
-
-menu_t mainmenu = {
-	4,
-	(menuitem_t[]) {
-		{ "Catalog",  MENU_DEFAULT, &catalog_open, NULL, 0, NULL },
-		{ "Char Map", MENU_DEFAULT, &charmap_open, NULL, 0, NULL },
-		{ "Screen ?", MENU_DEFAULT, NULL, NULL, 0, NULL },
-		{ "System",   MENU_DEFAULT | MENU_RIGHTALIGN, NULL, NULL,
-			6, 
-			(menuitem_t[]) {
-				{ "Memory Management", MENU_DEFAULT, NULL, NULL, 0, NULL },
-				{ "OS Debugger",       MENU_DEFAULT, NULL, NULL, 0, NULL },
-				{ "Settings",          MENU_DEFAULT, options_showmenu, NULL, 0, NULL },
-				{ "About",             MENU_DEFAULT, NULL, NULL, 0, NULL },
-				{ "Reboot",            MENU_DEFAULT, NULL, NULL, 0, NULL },
-				{ "Poweroff",          MENU_DEFAULT, NULL, NULL, 0, NULL },
-			}
-		},
-	},
-};
-
-static void select_shell(shell_t * shell)
+void select_shell(shell_t * shell)
 {
 	if(shell == NULL) return;
 	currentShell = shell;
 	
-	str_copy(mainmenu.items[MAINMENU_SHELL].label, shell->name);
+	mainmenu_setshell(shell->name);
 	
 	console_set(currshell.console);
 }
 
 void shell_init(int shellCount)
 {
-	mainmenu.items[MAINMENU_SHELL].length = shellCount;
-	mainmenu.items[MAINMENU_SHELL].items = malloc(shellCount * sizeof(menuitem_t));
+	shell_t shells[shellCount];
 	for(int i = 0; i  < shellCount; i++)
 	{
 		shell_t *shell = malloc(sizeof(shell_t));
@@ -63,10 +34,6 @@ void shell_init(int shellCount)
 		shell->cursor = 0;
 		shell->flags = SHELL_ECHO;
 
-		str_copy(mainmenu.items[1].items[i].label, shell->name);
-		mainmenu.items[MAINMENU_SHELL].items[i].callback = (menucallback_f)select_shell;
-		mainmenu.items[MAINMENU_SHELL].items[i].userdata = shell;
-		
 		if(i == 0) {
 			select_shell(shell);
 		}
@@ -74,9 +41,10 @@ void shell_init(int shellCount)
 		console_printf(shell->console, "%s", shell->prompt);
 	}
 	
-	menu_render(&mainmenu);
+	mainmenu_initshell(shells, shellCount);
+	
+	mainmenu_render();
 }
-
 
 void shell_main()
 {
@@ -88,8 +56,7 @@ void shell_main()
 		{
 			case '\t':
 			{
-				// menuitem_t *selection = menu_open(&mainmenu);
-				menu_open(&mainmenu);
+				mainmenu_open(true);
 				char const * insertion = catalog_get();
 				if(insertion != NULL)
 				{
@@ -103,6 +70,8 @@ void shell_main()
 					currshell.input[currshell.cursor++] = cmap;
 					putc(cmap);
 				}
+				
+				mainmenu_shellenable(true);
 				break;
 			}
 			case 0x1B: // Escape

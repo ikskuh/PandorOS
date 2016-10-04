@@ -7,7 +7,7 @@
 #define SHELL_DEFAULT 0
 #define SHELL_ECHO    (1<<0)
 
-typedef struct
+typedef struct shell
 {
 	char name[64];
 	char prompt[64];
@@ -26,5 +26,10 @@ void shell_init(int shells);
  * Starts the shell interface with mainmenu and command line.
  */
 void shell_main();
+
+/**
+ * Selects another shell.
+ */
+void select_shell(shell_t * shell);
 
 extern shell_t *currentShell;

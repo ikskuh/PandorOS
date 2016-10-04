@@ -8,10 +8,12 @@ extern int screenwidth, screenheight;
 
 static int menucolor(menuitem_t * const item)
 {
+	int flags = CHA_DEFAULT;
 	if(item->flags & MENU_SELECTED)
-		return CHA_HIGHLIGHT;
-	else
-		return CHA_DEFAULT;
+		flags |= CHA_HIGHLIGHT;
+	if(item->flags & MENU_DISABLED)
+		flags |= CHA_DISABLED;
+	return flags;
 }
 
 static void menu_select(menuitem_t *items, int count, int index)
@@ -210,6 +212,8 @@ static menuitem_t *menu_subopen(
 			case VK_RETURN:
 			{
 				menuitem_t *sel = &ri->items[cursor];
+				if((sel->flags & MENU_DISABLED) != 0)
+					break;
 				if(sel->length == 0)
 					return sel;
 				
@@ -223,16 +227,13 @@ static menuitem_t *menu_subopen(
 				if(sel->flags & MENU_RIGHTALIGN)
 				{
 					subri.spacex = screenwidth - 1;
-					hal_debug("Start: %d\n", subri.spacex);
 					for(int i = ri->count-1; i >= cursor; i--) {
 						if((ri->items[i].flags & MENU_RIGHTALIGN) == 0)
 							continue;
 						int w = strlen(ri->items[i].label);
-						hal_debug("Segment: %d, %d, '%s'\n", subri.spacex, w, ri->items[i].label);
 						subri.spacex -= w;
 						subri.spacex -= 1;
 					}
-					hal_debug("End: %d\n", subri.spacex);
 				}
 				else
 				{
