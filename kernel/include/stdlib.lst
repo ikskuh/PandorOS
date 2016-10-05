@@ -47,6 +47,19 @@ ORDER(NOPRG, Edit, "file",
 	editor_open(STR(0));
 })
 
+ORDER(DEFAULT, Run, "fileName", "Runs the given script file.",
+{
+	assert_argc(argc, 1);
+	string_t fileName = STR(0);
+	
+	file_t * file = file_get(fileName, FILE_DEFAULT);
+
+	if(file_type(file) != FILE_PROGRAM)
+		basic_error(ERR_INVALID_FILE);
+	
+	return basic_run(file);
+})
+
 ORDER(NOPRG, Echo, "state", "Sets the echo state of the console. When the state is *On*, the console will echo the results of expressions, when state is *Off* nothing will be printed.",
 {
 	assert_argc(argc, 1);

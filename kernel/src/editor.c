@@ -310,6 +310,7 @@ void editor_open(char const * fileName)
 				case VK_ESCAPE:
 					console_delete(edcon);
 					console_set(prevcon);
+					free(lines);
 					return;
 			}
 		}

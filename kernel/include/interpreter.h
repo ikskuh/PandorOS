@@ -2,6 +2,7 @@
 
 #include "basic/types.h"
 #include "basic/var.h"
+#include "file.h"
 
 #include <stddef.h>
 #include <stdbool.h>
@@ -34,6 +35,13 @@ typedef value_t (*basfunc_f)(int argc, value_t *argv);
  * @return      The evaluation result.
  */
 value_t basic_execute(char const *input);
+
+/**
+ * Runs a given basic file.
+ * @param file The the file to be run.
+ * @returns    The file evaluation result.
+ */
+value_t basic_run(file_t * file);
 
 /**
  * Registers a basic function.
