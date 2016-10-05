@@ -37,13 +37,6 @@ typedef value_t (*basfunc_f)(int argc, value_t *argv);
 value_t basic_execute(char const *input);
 
 /**
- * Runs a given basic file.
- * @param file The the file to be run.
- * @returns    The file evaluation result.
- */
-value_t basic_run(file_t * file);
-
-/**
  * Registers a basic function.
  * @param name     The case sensitive name of the function
  * @param function The function itself.

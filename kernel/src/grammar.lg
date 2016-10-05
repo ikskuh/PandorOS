@@ -145,14 +145,6 @@ arglist(A) ::= expr(B) COMMA arglist(C). {
 
 % code {
 
-#define LINE_LENGTH 250
-
-typedef struct line
-{
-	char text[LINE_LENGTH];
-	int length;
-} line_t;
-
 	static char prealloc[1024];
 
 	static void *mwrap(size_t size)
@@ -175,58 +167,6 @@ typedef struct line
 	error_t basic_lasterror()
 	{
 		return lastError;
-	}
-	
-	value_t basic_run(file_t * file)
-	{
-		if(file_type(file) != FILE_PROGRAM)
-		{
-			lastError = ERR_INVALID_FILE;
-			return basic_mknull();
-		}
-		
-		int lineCount = 1;
-		
-		char * data = file_data(file);
-		for(int i = 0; i < file_size(file); i++)
-		{
-			if(data[i] == '\n')
-				lineCount++;
-		}
-		
-		line_t *lines = zalloc(lineCount * sizeof(line_t));
-		
-		int line = 0;
-		for(int i = 0; i < file_size(file); i++)
-		{
-			char c = data[i];
-			if(c == '\n')
-			{
-				lines[line].text[lines[line].length] = 0;
-				line++;
-			}
-			else
-			{
-				lines[line].text[lines[line].length++] = c;
-			}
-		}
-		
-		lastError = ERR_SUCCESS;
-		
-		value_t result = basic_mknull();
-		for(int i = 0; i < lineCount; i++)
-		{
-			// printf("[%d] = '%s'\n", i, lines[i].text);
-			result = basic_execute(lines[i].text);
-			if(basic_lasterror() != ERR_SUCCESS) {
-				result = basic_mknull();
-				break;
-			}
-		}
-		
-		
-		free(lines);
-		return result;
 	}
 	
 	value_t basic_execute(char const *input)
