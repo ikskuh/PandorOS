@@ -1,5 +1,6 @@
 qemu-system-i386 \
 	-kernel kernel \
+	-initrd root.pfs \
 	-serial stdio \
 	-d guest_errors \
 	-drive file=harddisk,if=ide,media=disk,format=raw,index=0

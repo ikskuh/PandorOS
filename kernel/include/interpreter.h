@@ -44,6 +44,10 @@ value_t basic_execute(char const *input);
  */
 void basic_register(char const *name, basfunc_f function, int type);
 
+/**
+ *
+ */
+void basic_compile(file_t * in, file_t * outfile);
 
 /**
  * Returns true if a value is null.

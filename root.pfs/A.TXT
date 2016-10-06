@@ -1,0 +1,9 @@
+Print "This is a demo program!"
+10 -> A
+20 -> B
+A + B -> C
+Sum(A, B) -> D
+
+Print "Sum(A,B)'1 = ", C
+Print "Sum(A,B)'2 = ", D
+Print "Sum(A,B)'3 = ", Sum(10, 20)

@@ -24,6 +24,26 @@ ORDER(DEFAULT, PrintSep, "separator", "Sets the separator that will be printed i
 	str_copy(printsep, STR(0));
 })
 
+ORDER(DEFAULT, Compile, "input, output", "Compiles the *TXT input* file into the *PRG output* file.",
+{
+	assert_argc(argc, 2);
+	string_t infile = STR(0);
+	string_t outfile = STR(1);
+	
+	if(file_type_by_extension(infile) != FILE_TEXT)
+		basic_error(ERR_INVALID_FILE);
+	if(file_type_by_extension(outfile) != FILE_PROGRAM)
+		basic_error(ERR_INVALID_FILE);
+	
+	file_t *in = file_get(infile, FILE_DEFAULT);
+	file_t *out = file_get(infile, FILE_NEW);
+	
+	if(in == NULL)
+		basic_error(ERR_INVALID_FILE);
+	
+	basic_compile(in, out);
+})
+
 ORDER(DEFAULT, Prompt, "str", "Sets the shell prompt for the current shell.",
 {
 	assert_argc(argc, 1);

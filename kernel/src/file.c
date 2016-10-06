@@ -70,8 +70,10 @@ static file_t * file_new(char const * fileName, int type)
 	str_copy(file->name, fileName);
 	file->type = type;
 	file->data = malloc(1);
+	mem_set(file->data, 0, 1);
 	file->size = 0;
 	file->next = NULL;
+	
 	
 	if(first == NULL) {
 		first = file;
@@ -155,10 +157,12 @@ void file_resize(file_t * file, int size)
 {
 	if(file == NULL)
 		return;
-	void * new = realloc(file->data, size);
+	char * new = realloc(file->data, size + 1);
 	
 	if(new == NULL)
 		return;
+	
+	new [size] = 0;
 	file->data = new;
 	file->size = size;
 }
