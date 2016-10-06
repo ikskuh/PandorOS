@@ -18,7 +18,11 @@ struct file
 	struct file * next;
 };
 
-file_t * first = NULL;
+static file_t * first = NULL;
+
+file_t * file_first() { return first; }
+
+file_t * file_next(file_t * it) { return it->next; }
 
 void file_init()
 {
@@ -155,3 +159,63 @@ void file_resize(file_t * file, int size)
 	file->data = new;
 	file->size = size;
 }
+
+
+
+
+
+void file_clearfs()
+{
+	while(first != NULL)
+	{
+		file_t *k = first;
+		first = first->next;
+		
+		if(k->data)
+			free(k->data);
+		free(k);
+	}
+}
+
+/**
+ * Appends the given file system from a storage device.
+ */
+void file_loadfs(storage_t * storage)
+{
+	/*
+	if(rootfs != NULL)
+	{
+		char const * ptr = rootfs->data;
+		
+		uint32_t magic = *((uint32_t * const)ptr);
+		if(magic != 0xD05E4ABC) {
+			debug("Invalid rootfs magic: %x\n", magic);
+		} else {
+			ptr += 0x04;
+			uint32_t size = 0;
+			do
+			{
+				size = *((uint32_t * const)ptr);
+				ptr += 0x04;
+				if(size > 0)
+				{
+					char name[16];
+					mem_copy(name, ptr, 0x10);
+					ptr += 0x10;
+					
+					file_t *f = file_get(name, FILE_NEW);
+					file_resize(f, size);
+					mem_copy(file_data(f), ptr, size);
+					
+					ptr += size;
+				}
+			} while(size != 0);
+		}
+	}
+	*/
+}
+
+/**
+ * Stores the current inram FS to a storage device.
+ */
+void file_savefs(storage_t * storage);

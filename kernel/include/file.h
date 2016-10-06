@@ -1,5 +1,7 @@
 #pragma once
 
+#include "storage.h"
+
 #define FILE_INVALID 0
 #define FILE_PROGRAM 1
 #define FILE_DATA    2
@@ -18,6 +20,21 @@ typedef struct file file_t;
  * Initializes the inram file system.
  */
 void file_init();
+
+/**
+ * Deletes all files from the inram FS.
+ */
+void file_clearfs();
+
+/**
+ * Appends the given file system from a storage device.
+ */
+void file_loadfs(storage_t * storage);
+
+/**
+ * Stores the current inram FS to a storage device.
+ */
+void file_savefs(storage_t * storage);
 
 /** 
  * Gets or creates a new file.
@@ -54,3 +71,8 @@ void * file_data(file_t * file);
  * @param size The new size of the file.
  */
 void file_resize(file_t * file, int size);
+
+
+file_t * file_first();
+
+file_t * file_next(file_t * it);

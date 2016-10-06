@@ -74,6 +74,12 @@ ORDER(DEFAULT, Refresh, "[state]", "If *state* is not given, this order refreshe
 	}
 })
 
+ORDER(DEFAULT, ClearFS, "", "Deletes all files from the inram file system.",
+{
+	assert_argc(argc, 0);
+	file_clearfs();
+})
+
 FUNCTION(Abs, "x", "Returns *x* as a positive value.",
 {
 	assert_argc(argc, 1);

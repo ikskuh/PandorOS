@@ -41,3 +41,16 @@ static inline int str_len(char const *str)
 	while(*str++) len++;
 	return len;
 }
+
+static inline int str_comp(char const * lhs, char const * rhs)
+{
+	int s1;
+	int s2;
+	do {
+		s1 = *lhs++;
+		s2 = *rhs++;
+		if (s1 == 0)
+			break;
+	} while (s1 == s2);
+	return (s1 < s2) ? -1 : (s1 > s2);
+}
