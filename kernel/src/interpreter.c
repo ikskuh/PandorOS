@@ -3,6 +3,7 @@
 #include "pmm.h"
 #include "longjmp.h"
 #include "standard.h"
+#include "debug.h"
 #include "basic/lexer.h"
 
 // declared in grammar.lg
@@ -107,112 +108,147 @@ char const * basic_err_to_string(error_t err)
 	}
 }
 
-
-
 basfunc_f basic_getfunc(int type, char const *name);
 
-void basic_compile(file_t * in, file_t * outfile)
+typedef struct dynmem
 {
-	char * input = file_data(in);
-	int size = file_size(in);
+	char *ptr;
+	int cursor;
+	int size;
+} dynmem_t;
 
-	for(int cursor = 0; cursor < size; )
+static dynmem_t dm_new()
+{
+	return (dynmem_t) {
+		NULL, 0, 0
+	};
+}
+
+static void dm_write(dynmem_t * dm, void *ptr, int size)
+{
+	if(dm->cursor + size > dm->size)
+	{
+		debug("Resize %d to %d\n", dm->size, dm->size + 0x100);
+		dm->size += 0x100;
+		void *nx = realloc(dm->ptr, dm->size);
+		if(nx == NULL)
+			; // TODO: Handle error
+		dm->ptr = nx;
+		
+	}
+	
+	mem_copy(&dm->ptr[dm->cursor], ptr, size);
+	
+	dm->cursor += size;
+}
+
+static void dm_kill(dynmem_t * dm)
+{
+	free(dm->ptr);
+}
+
+void basic_compile(file_t * infile, file_t * outfile)
+{
+	char zero = 0;
+	char * input = file_data(infile);
+	int insize = file_size(infile);
+
+	dynmem_t bytecode = dm_new();
+	
+	for(int rcursor = 0; rcursor < insize; )
 	{
 		// Skip all empty newlines
-		while(input[cursor] == '\n')
+		while(input[rcursor] == '\n')
 		{
-			cursor++;
-			if(cursor >= size)
+			rcursor++;
+			if(rcursor >= insize)
 				break;
 		}
-		if(cursor >= size)
+		if(rcursor >= insize)
 			break; // Double break!
 		
-		struct token token = lex(&input[cursor]);
-			
-		static char buffer[64];
-		mem_set(buffer, 0, sizeof(buffer));
-		mem_copy(buffer, input + cursor, token.length);
-		
-		printf("'%s'(%d)*%d = %d\n", buffer, input[cursor], token.length, token.type);
-			
+		struct token token = lex(&input[rcursor]);
 		if(token.type >= 0)
 		{
-			// token_t currtok;
+			char buffer[512];
+			mem_set(buffer, 0, sizeof(buffer));
+			mem_copy(buffer, input + rcursor, token.length);
+			
+			{
+				char tok = token.type;
+				dm_write(&bytecode, &tok, 1); 
+			}
 			
 			switch(token.type)
 			{
 				case TOK_INTEGER:
 				{
-					// currtok.val = basic_mknum(str_to_int(buffer, 10));
+					int ival = str_to_int(buffer, 10);
+					dm_write(&bytecode, &ival, sizeof(ival));
 					break;
 				}
 				case TOK_BOOL:
 				{
-					// currtok.val = basic_mknum(str_eq(buffer, "True") || str_eq(buffer, "On"));
+					bool bval = str_eq(buffer, "True") || str_eq(buffer, "On");
+					dm_write(&bytecode, &bval, sizeof(bval));
 					break;
 				}
+				// Both strings are stored with each length+ptr and zero termination.
 				case TOK_STRING:
 				{
-					// Initialize with uninitialized pointer
-					
-					// char *str = basic_alloc(token.length - 1);
-					// mem_copy(str, buffer + 1, token.length - 2);
-					// str[token.length - 2] = 0;
-					
-					// currtok.val = basic_mkstr(str);
-					
+					int len = token.length - 2;
+					dm_write(&bytecode, &len, sizeof(len));
+					dm_write(&bytecode, buffer + 1, len);
+					dm_write(&bytecode, &zero, sizeof(zero));
 					break;
 				}
-				case TOK_VAR:
-				{
-					// currtok.var = var_byname(buffer);
-					break;
-				}
+				// Both strings are stored with each length+ptr and zero termination.
 				case TOK_FUN:
-				{
-					// currtok.fun = basic_getfunc(BASIC_FUNCTION, buffer);
-					// if(currtok.fun == NULL) {
-					// 	basic_error(ERR_FUNC_NOT_FOUND);
-					// }
-					break;
-				}
+				case TOK_VAR:
 				case TOK_ORDER:
 				{
-					// for(int i = 0; buffer[i]; i++)
-					// {
-					// 	if(buffer[i] == ' ')
-					// 		buffer[i] = 0;
-					// }
-					// currtok.fun = basic_getfunc(BASIC_ORDER, buffer);
-					// if(currtok.fun == NULL) {
-					// 	basic_error(ERR_FUNC_NOT_FOUND);
-					// }
+					int len = token.length;
+					dm_write(&bytecode, &len, sizeof(len));
+					dm_write(&bytecode, buffer, len);
+					dm_write(&bytecode, &zero, sizeof(zero));
 					break;
 				}
 			}
-		
-			if(token.type == 0)
+			if(token.type == TOKEN_EMPTY)
 				break;
 		}
-		else if(token.type == -2)
+		else if(token.type == TOKEN_INVALID)
 		{
 			basic_error(ERR_INVALID_TOKEN);
 		}
-		cursor += token.length;
+		rcursor += token.length;
 		
-		if (input[cursor] == '\n' || cursor >= size)
+		if (input[rcursor] == '\n' || rcursor >= insize)
 		{
 			// End of line/file:
 		
+			char end;
 			// Write End-Of-Line-Token:
-			printf("END OF LINE\n");
+			if(rcursor >= insize) {
+				end = TOKEN_EOF;
+			} else {
+				end = TOKEN_EOL;
+			}
+			dm_write(&bytecode, &end, 1);
 			
-			cursor++;
+			rcursor++;
 			
-			if(cursor >= size)
+			if(rcursor >= insize)
 				break;
 		}
 	}
 	
+	// Finally, put the stuff in our target file.
+	file_resize(outfile, bytecode.cursor);
+	mem_copy(
+		file_data(outfile),
+		bytecode.ptr,
+		bytecode.cursor);
+	
+	dm_kill(&bytecode);
 }

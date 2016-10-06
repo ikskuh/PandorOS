@@ -1265,7 +1265,7 @@ void Parse(
 					if(token.type == 0)
 						break;
 				}
-				else if(token.type == -2)
+				else if(token.type == TOKEN_INVALID)
 				{
 					basic_error(ERR_INVALID_TOKEN);
 				}

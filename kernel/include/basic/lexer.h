@@ -1,5 +1,11 @@
 #pragma once
 
+#define TOKEN_EOF        -4
+#define TOKEN_EOL        -3
+#define TOKEN_INVALID    -2
+#define TOKEN_WHITESPACE -1
+#define TOKEN_EMPTY       0
+
 #include "grammar.h"
 
 struct token

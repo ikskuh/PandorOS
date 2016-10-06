@@ -4,6 +4,7 @@
 #include "shell.h"
 #include "editor.h"
 #include "file.h"
+#include "debug.h"
 #include <stddef.h>
 
 

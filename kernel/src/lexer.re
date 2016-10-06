@@ -40,10 +40,9 @@ struct token lex(const char *input)
 		ord = [A-Za-z][A-Za-z0-9]*;
 		bool = "On" | "Off" | "True" | "False";
 
-		*        { return (struct token){ -2, 0 }; }
-		"0x00"   { return (struct token){ 0, 0 }; }
+		*        { return (struct token){ TOKEN_INVALID, 0 }; }
+		"0x00"   { return (struct token){ TOKEN_EMPTY, 0 }; }
 		dec      { return (struct token){ TOK_INTEGER, index }; }
-		hex      { return (struct token){ 2, index }; }
 		"+"      { return (struct token){ TOK_PLUS, index }; }
 		"-"      { return (struct token){ TOK_MINUS, index }; }
 		"*"      { return (struct token){ TOK_TIMES, index }; }
@@ -54,7 +53,7 @@ struct token lex(const char *input)
 		var      { return (struct token){ TOK_VAR, index }; }
 		fun      { return (struct token){ TOK_FUN, index }; }
 		com      { return (struct token){ TOK_COMMA, index }; }
-		ws+      { return (struct token){ -1, index }; }
+		ws+      { return (struct token){ TOKEN_WHITESPACE, index }; }
 		"\"" ([^"] \ "\x00")* "\""      { return (struct token){ TOK_STRING, index }; }
 		bool     { return (struct token){ TOK_BOOL, index }; }
 		ord      { return (struct token){ TOK_ORDER, index }; }
