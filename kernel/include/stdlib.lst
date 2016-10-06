@@ -84,7 +84,7 @@ ORDER(DEFAULT, ListFS, "", "Lists all files of the inram file system.",
 		char const *name = file_getname(f);
 		int len = str_len(name);
 		if(stdcon->cursor.x + len + 1 >= stdcon->width) {
-			printf("\n", stdcon->cursor.x);
+			printf("\n");
 		}
 		printf("%s ", name);
 		stdcon->cursor.x = (stdcon->cursor.x + (columnWidth - 1)) & ~(columnWidth - 1);
@@ -96,6 +96,49 @@ ORDER(DEFAULT, ClearFS, "", "Deletes all files from the inram file system.",
 {
 	assert_argc(argc, 0);
 	file_clearfs();
+})
+
+ORDER(DEFAULT, LoadFS, "storage", "Loads all files from the *storage* media into the inram file system.",
+{
+	assert_argc(argc, 1);
+	string_t storname = STR(0);
+	
+	storage_t const * storage = storage_get(storname);
+	if(storage == NULL) {
+		basic_error(ERR_INVALID_STORAGE);
+	}
+	
+	file_loadfs(storage);
+})
+
+ORDER(DEFAULT, SaveFS, "storage", "Saves all files from the inram file system to the *storage* media.",
+{
+	assert_argc(argc, 1);
+	string_t storname = STR(0);
+	
+	storage_t const * storage = storage_get(storname);
+	if(storage == NULL) {
+		basic_error(ERR_INVALID_STORAGE);
+	}
+	
+	file_savefs(storage);
+})
+
+ORDER(DEFAULT, ListStor, "", "Lists all possible storage medias.",
+{
+	assert_argc(argc, 0);
+	
+	int columnWidth = 8;
+	for(storage_t const * it = storage_first(); it != NULL; it = it->next)
+	{
+		int len = str_len(it->name);
+		if(stdcon->cursor.x + len + 1 >= stdcon->width) {
+			printf("\n");
+		}
+		printf("%s ", it->name);
+		stdcon->cursor.x = (stdcon->cursor.x + (columnWidth - 1)) & ~(columnWidth - 1);
+	}
+	printf("\n");
 })
 
 FUNCTION(Abs, "x", "Returns *x* as a positive value.",

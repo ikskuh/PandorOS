@@ -74,6 +74,17 @@ void storage_init()
 	}
 }
 
+storage_t const * storage_get(char const * name)
+{
+	for(storage_t const * it = storage_first(); it != NULL; it = it->next)
+	{
+		if(str_eq(it->name, name)) {
+			return it;
+		}
+	}
+	return NULL;
+}
+
 storage_t const * storage_first()
 {
 	return storages;

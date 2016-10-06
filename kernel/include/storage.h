@@ -38,3 +38,5 @@ typedef struct storage
 void storage_init();
 
 storage_t const * storage_first();
+
+storage_t const * storage_get(char const * name);

@@ -29,12 +29,12 @@ void file_clearfs();
 /**
  * Appends the given file system from a storage device.
  */
-void file_loadfs(storage_t * storage);
+void file_loadfs(storage_t const * storage);
 
 /**
  * Stores the current inram FS to a storage device.
  */
-void file_savefs(storage_t * storage);
+void file_savefs(storage_t const * storage);
 
 /** 
  * Gets or creates a new file.
