@@ -237,8 +237,55 @@ bool hal_read_block(int devid, int lba, void * buffer)
 	return true;
 }
 
-bool hal_write_block(int devid, int block, void const * data)
+bool hal_write_block(int devid, int lba, void const * buffer)
 {
-	hal_debug("hal_write_block not implemented yet.\n");
-	return false;
+	int num = 1; // TODO: Maybe replace with parameter some time
+	struct dev * dev = &devs[devid];
+	if(dev->present == false) {
+		hal_debug("Invalid read from blockid %d: Device not preset!\n", devid);
+		return false;
+	}
+	
+#define ports (dev->ports)
+	
+	if(dev->sectorcount <= 0) {
+		return false;
+	}
+	if(num <= 0) {
+		return false;
+	}
+	uint16_t * ptr = (uint16_t*)buffer;
+	
+	if(dev->master)
+		outb(ports.devSelect, 0xE0);
+	else
+		outb(ports.devSelect, 0xF0);
+	outb(ports.sectors, num);
+	outb(ports.lbaLow, lba);
+	outb(ports.lbaMid, lba >> 8);
+	outb(ports.lbaHigh, lba >> 16);
+	outb(ports.cmd, 0x30);
+	
+	uint32_t off = 0;
+	while(num-- > 0) {
+		uint8_t stat;
+		while(((stat = status(dev)) & 0x9) == 0);
+		if(stat & 0x01) {
+			hal_debug("Failed to read from %s.\n", dev->name);
+			return false;
+		}
+		
+		for(uint32_t i = 0; i < 256; i++) {
+			outw(ports.data, ptr[off++]);
+			asm volatile ("nop");
+			asm volatile ("nop");
+			asm volatile ("nop");
+			asm volatile ("nop");
+		}
+		
+		outb(ports.cmd, 0xE7); // Flush
+	}
+
+#undef ports
+	return true;
 }

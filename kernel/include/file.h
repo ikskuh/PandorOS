@@ -27,6 +27,11 @@ void file_init();
 void file_clearfs();
 
 /**
+ * Initializes a new file system.
+ */
+void file_initfs(storage_t const * storage);
+
+/**
  * Appends the given file system from a storage device.
  */
 void file_loadfs(storage_t const * storage);

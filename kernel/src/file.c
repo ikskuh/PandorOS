@@ -180,25 +180,27 @@ void file_clearfs()
 	}
 }
 
-typedef struct storeread
+typedef struct storeio
 {
 	storage_t const * storage;
 	uint8_t * buffer;
 	int cursor;
 	uint32_t lba;
-} storeread_t;
+} storeio_t;
 
-static storeread_t sr_init(storage_t const * storage, void * buffer)
+static storeio_t sio_init(storage_t const * storage, void * buffer)
 {
-	storeread_t sr;
+	storeio_t sr;
 	sr.storage = storage;
 	sr.buffer= buffer;
 	sr.lba = sr.storage->partition.lba;
-	sr.cursor = sr.lba;
+	sr.cursor = 0;
+	// When initializing, read the whole block in, so sio_flush won't override shit.
+	hal_read_block(sr.storage->device, sr.lba, sr.buffer);
 	return sr;
 }
 
-static void sr_read(storeread_t * sr, void * buffer, int len)
+static void sio_read(storeio_t * sr, void * buffer, int len)
 {
 	uint8_t * buf = buffer;
 	while(len > 0)
@@ -219,6 +221,38 @@ static void sr_read(storeread_t * sr, void * buffer, int len)
 	}
 }
 
+static void sio_write(storeio_t * sr, void * buffer, int len)
+{
+	if(sr->lba > (sr->storage->partition.lba + sr->storage->partition.size)) {
+		// TODO: Do some error handling here!
+		return;
+	}
+	
+	uint8_t * buf = buffer;
+	while(len > 0)
+	{
+		sr->buffer[sr->cursor++] = *buf++;
+		len--;
+		
+		if(sr->cursor >= hal_blocksize(sr->storage->device))
+		{
+			hal_write_block(sr->storage->device, sr->lba, sr->buffer);
+			
+			sr->cursor = 0;
+			sr->lba++;
+			if(sr->lba > (sr->storage->partition.lba + sr->storage->partition.size)) {
+				// TODO: Do some error handling here!
+				return;
+			}
+		}
+	}
+}
+
+static void sio_flush(storeio_t * sr)
+{
+	hal_write_block(sr->storage->device, sr->lba, sr->buffer);
+}
+
 /**
  * Appends the given file system from a storage device.
  */
@@ -230,10 +264,10 @@ void file_loadfs(storage_t const * storage)
 	
 	char buffer[blocksize];
 	
-	storeread_t read = sr_init(storage, buffer);
+	storeio_t read = sio_init(storage, buffer);
 	
 	uint32_t magic;
-	sr_read(&read, &magic, sizeof(magic));
+	sio_read(&read, &magic, sizeof(magic));
 	if(magic != 0xD05E4ABC) {
 		debug("Invalid rootfs magic: %x\n", magic);
 		basic_error(ERR_INVALID_STORAGE);
@@ -242,15 +276,15 @@ void file_loadfs(storage_t const * storage)
 	uint32_t size = 0;
 	do
 	{
-		sr_read(&read, &size, sizeof(size));
+		sio_read(&read, &size, sizeof(size));
 		if(size > 0)
 		{
 			char name[16];
-			sr_read(&read, name, 0x10);
+			sio_read(&read, name, 0x10);
 			
 			file_t *f = file_get(name, FILE_NEW);
 			file_resize(f, size);
-			sr_read(&read, file_data(f), size);
+			sio_read(&read, file_data(f), size);
 		}
 	} while(size != 0);
 }
@@ -260,5 +294,56 @@ void file_loadfs(storage_t const * storage)
  */
 void file_savefs(storage_t const * storage)
 {
+	if(storage == NULL)
+		return;
+	int blocksize = hal_blocksize(storage->device);
 	
+	char buffer[blocksize];
+	
+	storeio_t write = sio_init(storage, buffer);
+	
+	uint32_t magic;
+	sio_read(&write, &magic, sizeof(magic));
+	if(magic != 0xD05E4ABC) {
+		debug("Invalid rootfs magic: %x\n", magic);
+		basic_error(ERR_INVALID_STORAGE);
+	}
+	
+	uint32_t size = 0;
+	for(file_t *it = first; it != NULL; it = it->next)
+	{
+		if(it->size == 0) 
+			continue;
+		char name[16];
+		str_copy(name, it->name);
+		size = it->size;
+		
+		sio_write(&write, &size, sizeof(size));
+		sio_write(&write, name, 0x10);
+		sio_write(&write, file_data(it), size);
+			
+	} 
+	
+	// Write end marker
+	size = 0;
+	sio_write(&write, &size, sizeof(size));
+	sio_flush(&write);
+}
+
+void file_initfs(storage_t const * storage)
+{
+
+	if(storage == NULL)
+		return;
+	int blocksize = hal_blocksize(storage->device);
+	
+	char buffer[blocksize];
+	
+	storeio_t write = sio_init(storage, buffer);
+	
+	uint32_t magic = 0xD05E4ABC;
+	uint32_t size = 0;
+	sio_write(&write, &magic, sizeof(magic));
+	sio_write(&write, &size, sizeof(size));
+	sio_flush(&write);
 }

@@ -98,6 +98,19 @@ ORDER(DEFAULT, ClearFS, "", "Deletes all files from the inram file system.",
 	file_clearfs();
 })
 
+ORDER(DEFAULT, InitFS, "storage", "Initializes a new file system on the *storage* media.",
+{
+	assert_argc(argc, 1);
+	string_t storname = STR(0);
+	
+	storage_t const * storage = storage_get(storname);
+	if(storage == NULL) {
+		basic_error(ERR_INVALID_STORAGE);
+	}
+	
+	file_initfs(storage);
+})
+
 ORDER(DEFAULT, LoadFS, "storage", "Loads all files from the *storage* media into the inram file system.",
 {
 	assert_argc(argc, 1);

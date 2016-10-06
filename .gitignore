@@ -34,6 +34,8 @@
 
 kernel/build
 *.o
-basic/basic-demokernel/harddisk
+basic/basic-demo
+kernel/harddisk
 kernel/root.pfs
 kernel/boot.img
+kernel/harddisk
