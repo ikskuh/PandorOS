@@ -49,8 +49,8 @@ void catalog_init()
 	selection = -1;
 	
 	{
-		int n = CATALOG_SIZE;
 		// Sort catalog
+		int n = CATALOG_SIZE;
 		do
 		{
 			int newn = 1;

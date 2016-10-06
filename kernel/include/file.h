@@ -76,3 +76,5 @@ void file_resize(file_t * file, int size);
 file_t * file_first();
 
 file_t * file_next(file_t * it);
+
+char const * file_getname(file_t *f);

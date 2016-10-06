@@ -24,6 +24,8 @@ file_t * file_first() { return first; }
 
 file_t * file_next(file_t * it) { return it->next; }
 
+char const * file_getname(file_t *it) { return it->name; }
+
 void file_init()
 {
 	first = NULL;
