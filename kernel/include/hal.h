@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stddef.h>
+#include <stdbool.h>
 
 typedef struct console console_t;
 
@@ -43,10 +44,12 @@ int hal_blocksize(int devid);
  
 /**
  * Reads a block from the block device.
+ * @returns true on success.
  */
-void hal_read_block(int devid, int block, void * data);
+bool hal_read_block(int devid, int block, void * data);
 
 /**
  * Writes a block to the block device.
+ * @returns true on success.
  */
-void hal_write_block(int devid, int block, void const * data);
+bool hal_write_block(int devid, int block, void const * data);
