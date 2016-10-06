@@ -2,6 +2,7 @@
 #include "io.h"
 #include "standard.h"
 #include "console/utils.h"
+#include "debug.h"
 
 #include <stddef.h>
 
@@ -46,6 +47,27 @@ void catalog_init()
 	console->flags &= ~CON_AUTOREFRESH;
 	console->flags |=  CON_NOCURSOR;
 	selection = -1;
+	
+	{
+		int n = CATALOG_SIZE;
+		// Sort catalog
+		do
+		{
+			int newn = 1;
+			for (int i = 0; i < n - 1; ++i)
+			{
+				if (str_comp(entries[i].paste, entries[i + 1].paste) > 0)
+				{
+					cataloginfo_t tmp = entries[i];
+					entries[i] = entries[i + 1];
+					entries[i + 1] = tmp;
+					newn = i + 1;
+				}
+			}
+			n = newn;
+		} while (n > 1);
+	}
+	
 	
 	for(int i = 0; i < CATALOG_SIZE; i++)
 	{
