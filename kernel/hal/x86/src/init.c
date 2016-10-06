@@ -74,6 +74,8 @@ static void init_gdt();
 static void init_idt();
 static void init_pmm(struct multiboot_info const * info);
 
+struct cpu *ata_isr(struct cpu *cpu);
+
 static struct cpu *timer_tick(struct cpu *cpu)
 {
 	os_tick();
@@ -106,6 +108,8 @@ rootfs_t const * hal_rootfs() {
 	}
 }
 
+void x86_init_ata();
+
 void x86_init(uint32_t bootmagic, struct multiboot_info const * info)
 {
 	// Checks for a correct multiboot magic
@@ -126,6 +130,7 @@ void x86_init(uint32_t bootmagic, struct multiboot_info const * info)
 	
 	interrupts[0x20] = &timer_tick;
 	interrupts[0x21] = &keyboard_isr;
+	interrupts[0x2E] = &ata_isr;
 	
 	optiongroup_register(&halOptions);
 	
@@ -146,6 +151,8 @@ void x86_init(uint32_t bootmagic, struct multiboot_info const * info)
 		rootfs.size = mods[0].mod_end - mods[0].mod_start;
 		str_copy(rootfs.cmdline, (char const*)mods[0].cmdline);
 	}
+	
+	x86_init_ata();
 }
 
 static void init_gdt()
