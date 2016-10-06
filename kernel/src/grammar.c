@@ -1157,6 +1157,137 @@ void Parse(
 #line 146 "src/grammar.lg"
 
 
+	static token_t nulltoken = { };
+	
+	bool errorhandler_valid = false;
+	jmp_buf errorhandler;
+	static error_t lastError = ERR_SUCCESS;
+
+	error_t basic_lasterror()
+	{
+		return lastError;
+	}
+	
+	value_t basic_execute2(uint8_t const * tokens, int length)
+	{
+		basic_memreset();
+		
+		void* pParser = ParseAlloc (malloc);
+		
+		errorhandler_valid = true;
+		int errcode = setjmp(errorhandler);
+		if(errcode == 0)
+		{
+			result = basic_mknull();
+			for(int i = 0; i < length; )
+			{
+				int token_type = (char)tokens[i++];
+				if(token_type > 0)
+				{
+					token_t currtok;
+					switch(token_type)
+					{
+						case TOK_INTEGER:
+						{
+							currtok.val = basic_mknum(*((int*)&tokens[i]));
+							i += sizeof(int);
+							break;
+						}
+						case TOK_BOOL:
+						{
+							currtok.val = basic_mknum(*((bool*)&tokens[i]));
+							i += sizeof(bool);
+							break;
+						}
+						case TOK_STRING:
+						{
+							int len = *((int*)&tokens[i]);
+							i += sizeof(int);
+							
+							currtok.val = basic_mkstr((char const *)&tokens[i]);
+							i += len;
+							
+							break;
+						}
+						case TOK_VAR:
+						{
+							int len = *((int*)&tokens[i]);
+							i += sizeof(int);
+							
+							currtok.var = var_byname((char const *)&tokens[i]);
+							if(currtok.var == NULL) {
+								basic_error(ERR_INVALID_VAR);
+							}
+							i += len;
+							
+							break;
+						}
+						case TOK_FUN:
+						{
+							int len = *((int*)&tokens[i]);
+							i += sizeof(int);
+							
+							currtok.fun = basic_getfunc(BASIC_FUNCTION, (char const *)&tokens[i]);
+							if(currtok.fun == NULL) {
+								basic_error(ERR_FUNC_NOT_FOUND);
+							}
+							i += len;
+							
+							break;
+						}
+						case TOK_ORDER:
+						{
+							int len = *((int*)&tokens[i]);
+							i += sizeof(int);
+							
+							currtok.fun = basic_getfunc(BASIC_ORDER, (char const *)&tokens[i]);
+							if(currtok.fun == NULL) {
+								basic_error(ERR_FUNC_NOT_FOUND);
+							}
+							i += len;
+							
+							break;
+						}
+					}
+					
+					Parse(pParser, token_type, currtok);
+					
+				}
+				else if(token_type == TOKEN_INVALID)
+				{
+					basic_error(ERR_INVALID_TOKEN);
+				}
+				else if(token_type == TOKEN_EOF || token_type == TOKEN_EOL)
+				{
+					Parse(pParser, 0, nulltoken);
+					
+					if(basic_isnull(result) == false) {
+						var_setans(result);
+					}
+				
+					lastError = ERR_SUCCESS;
+				}
+				if(token_type == TOKEN_EOF)
+					break;
+			}
+		}
+		else
+		{
+			// We got an error!
+			result = basic_mknull();
+			lastError = (error_t)errcode;
+		}
+		errorhandler_valid = false;
+		
+		ParseFree(pParser, free );
+		
+		allocator_delete(argalloc);
+		
+		
+		
+		return result;
+	}
+	
 	static char prealloc[1024];
 
 	static void *mwrap(size_t size)
@@ -1168,17 +1299,6 @@ void Parse(
 	static void prefree(void * ptr)
 	{
 		(void)ptr;
-	}
-	
-	static token_t nulltoken = { };
-	
-	bool errorhandler_valid = false;
-	jmp_buf errorhandler;
-	static error_t lastError = ERR_SUCCESS;
-
-	error_t basic_lasterror()
-	{
-		return lastError;
 	}
 	
 	value_t basic_execute(char const *input)
@@ -1327,4 +1447,4 @@ void Parse(
 		}
 		return NULL;
 	}
-#line 1331 "src/grammar.c"
+#line 1451 "src/grammar.c"

@@ -5,6 +5,7 @@
 #include "file.h"
 
 #include <stddef.h>
+#include <stdint.h>
 #include <stdbool.h>
 
 #define BASIC_FUNCTION 1
@@ -35,6 +36,8 @@ typedef value_t (*basfunc_f)(int argc, value_t *argv);
  * @return      The evaluation result.
  */
 value_t basic_execute(char const *input);
+
+value_t basic_execute2(uint8_t const * tokens, int length);
 
 /**
  * Registers a basic function.

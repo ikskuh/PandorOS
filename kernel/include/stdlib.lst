@@ -46,6 +46,16 @@ ORDER(DEFAULT, Compile, "input, output", "Compiles the *TXT input* file into the
 	basic_compile(in, out);
 })
 
+ORDER(DEFAULT, Run, "file", "Runs the compiled script file.",
+{
+	assert_argc(argc, 1);
+	file_t *in = file_get(STR(0), FILE_DEFAULT);
+	if(file_type(in) != FILE_PROGRAM) {
+		basic_error(ERR_INVALID_FILE);
+	}
+	return basic_execute2(file_data(in), file_size(in));
+})
+
 ORDER(DEFAULT, DumpFile, "file", "Dumps a file in hexadecimal to the debug output.",
 {
 	assert_argc(argc, 1);

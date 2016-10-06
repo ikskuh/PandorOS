@@ -134,7 +134,6 @@ static void dm_write(dynmem_t * dm, void *ptr, int size)
 		if(nx == NULL)
 			; // TODO: Handle error
 		dm->ptr = nx;
-		
 	}
 	
 	mem_copy(&dm->ptr[dm->cursor], ptr, size);
