@@ -20,3 +20,8 @@ value_t val_or(value_t lhs, value_t rhs);
 value_t val_xor(value_t lhs, value_t rhs);
 
 value_t val_not(value_t lhs);
+
+value_t val_eq(value_t lhs, value_t rhs);
+value_t val_neq(value_t lhs, value_t rhs);
+value_t val_lt(value_t lhs, value_t rhs);
+value_t val_le(value_t lhs, value_t rhs);

@@ -10,6 +10,12 @@ State 0:
           expr ::= * expr AND expr
           expr ::= * expr OR expr
           expr ::= * expr XOR expr
+          expr ::= * expr LESS expr
+          expr ::= * expr LESSEQ expr
+          expr ::= * expr GREATER expr
+          expr ::= * expr GREATEREQ expr
+          expr ::= * expr EQ expr
+          expr ::= * expr NEQ expr
           expr ::= * BRO expr BRC
           expr ::= * MINUS expr
           expr ::= * NOT expr
@@ -23,14 +29,14 @@ State 0:
                          MINUS shift  5
                            NOT shift  4
                          ORDER shift  1
-                           VAR shift  28
+                           VAR shift  38
                            BRO shift  6
-                       INTEGER shift  31
-                          BOOL shift  30
-                        STRING shift  29
+                       INTEGER shift  41
+                          BOOL shift  40
+                        STRING shift  39
                            FUN shift  3
                        program accept
-                          expr shift  15
+                          expr shift  21
 
 State 1:
           program ::= ORDER * arglist
@@ -41,6 +47,12 @@ State 1:
           expr ::= * expr AND expr
           expr ::= * expr OR expr
           expr ::= * expr XOR expr
+          expr ::= * expr LESS expr
+          expr ::= * expr LESSEQ expr
+          expr ::= * expr GREATER expr
+          expr ::= * expr GREATEREQ expr
+          expr ::= * expr EQ expr
+          expr ::= * expr NEQ expr
           expr ::= * BRO expr BRC
           expr ::= * MINUS expr
           expr ::= * NOT expr
@@ -49,21 +61,21 @@ State 1:
           expr ::= * STRING
           expr ::= * VAR
           expr ::= * FUN arglist BRC
-     (20) arglist ::= *
+     (26) arglist ::= *
           arglist ::= * expr
           arglist ::= * expr COMMA arglist
 
                          MINUS shift  5
                            NOT shift  4
-                           VAR shift  28
+                           VAR shift  38
                            BRO shift  6
-                       INTEGER shift  31
-                          BOOL shift  30
-                        STRING shift  29
+                       INTEGER shift  41
+                          BOOL shift  40
+                        STRING shift  39
                            FUN shift  3
-                          expr shift  16
-                       arglist shift  23
-                     {default} reduce 20
+                          expr shift  22
+                       arglist shift  33
+                     {default} reduce 26
 
 State 2:
           expr ::= * expr MINUS expr
@@ -73,6 +85,12 @@ State 2:
           expr ::= * expr AND expr
           expr ::= * expr OR expr
           expr ::= * expr XOR expr
+          expr ::= * expr LESS expr
+          expr ::= * expr LESSEQ expr
+          expr ::= * expr GREATER expr
+          expr ::= * expr GREATEREQ expr
+          expr ::= * expr EQ expr
+          expr ::= * expr NEQ expr
           expr ::= * BRO expr BRC
           expr ::= * MINUS expr
           expr ::= * NOT expr
@@ -81,22 +99,22 @@ State 2:
           expr ::= * STRING
           expr ::= * VAR
           expr ::= * FUN arglist BRC
-     (20) arglist ::= *
+     (26) arglist ::= *
           arglist ::= * expr
           arglist ::= * expr COMMA arglist
           arglist ::= expr COMMA * arglist
 
                          MINUS shift  5
                            NOT shift  4
-                           VAR shift  28
+                           VAR shift  38
                            BRO shift  6
-                       INTEGER shift  31
-                          BOOL shift  30
-                        STRING shift  29
+                       INTEGER shift  41
+                          BOOL shift  40
+                        STRING shift  39
                            FUN shift  3
-                          expr shift  16
-                       arglist shift  27
-                     {default} reduce 20
+                          expr shift  22
+                       arglist shift  37
+                     {default} reduce 26
 
 State 3:
           expr ::= * expr MINUS expr
@@ -106,6 +124,12 @@ State 3:
           expr ::= * expr AND expr
           expr ::= * expr OR expr
           expr ::= * expr XOR expr
+          expr ::= * expr LESS expr
+          expr ::= * expr LESSEQ expr
+          expr ::= * expr GREATER expr
+          expr ::= * expr GREATEREQ expr
+          expr ::= * expr EQ expr
+          expr ::= * expr NEQ expr
           expr ::= * BRO expr BRC
           expr ::= * MINUS expr
           expr ::= * NOT expr
@@ -115,21 +139,21 @@ State 3:
           expr ::= * VAR
           expr ::= * FUN arglist BRC
           expr ::= FUN * arglist BRC
-     (20) arglist ::= *
+     (26) arglist ::= *
           arglist ::= * expr
           arglist ::= * expr COMMA arglist
 
                          MINUS shift  5
                            NOT shift  4
-                           VAR shift  28
+                           VAR shift  38
                            BRO shift  6
-                       INTEGER shift  31
-                          BOOL shift  30
-                        STRING shift  29
+                       INTEGER shift  41
+                          BOOL shift  40
+                        STRING shift  39
                            FUN shift  3
-                          expr shift  16
-                       arglist shift  24
-                     {default} reduce 20
+                          expr shift  22
+                       arglist shift  34
+                     {default} reduce 26
 
 State 4:
           expr ::= * expr MINUS expr
@@ -139,6 +163,12 @@ State 4:
           expr ::= * expr AND expr
           expr ::= * expr OR expr
           expr ::= * expr XOR expr
+          expr ::= * expr LESS expr
+          expr ::= * expr LESSEQ expr
+          expr ::= * expr GREATER expr
+          expr ::= * expr GREATEREQ expr
+          expr ::= * expr EQ expr
+          expr ::= * expr NEQ expr
           expr ::= * BRO expr BRC
           expr ::= * MINUS expr
           expr ::= * NOT expr
@@ -151,13 +181,13 @@ State 4:
 
                          MINUS shift  5
                            NOT shift  4
-                           VAR shift  28
+                           VAR shift  38
                            BRO shift  6
-                       INTEGER shift  31
-                          BOOL shift  30
-                        STRING shift  29
+                       INTEGER shift  41
+                          BOOL shift  40
+                        STRING shift  39
                            FUN shift  3
-                          expr shift  32
+                          expr shift  29
 
 State 5:
           expr ::= * expr MINUS expr
@@ -167,6 +197,12 @@ State 5:
           expr ::= * expr AND expr
           expr ::= * expr OR expr
           expr ::= * expr XOR expr
+          expr ::= * expr LESS expr
+          expr ::= * expr LESSEQ expr
+          expr ::= * expr GREATER expr
+          expr ::= * expr GREATEREQ expr
+          expr ::= * expr EQ expr
+          expr ::= * expr NEQ expr
           expr ::= * BRO expr BRC
           expr ::= * MINUS expr
           expr ::= MINUS * expr
@@ -179,13 +215,13 @@ State 5:
 
                          MINUS shift  5
                            NOT shift  4
-                           VAR shift  28
+                           VAR shift  38
                            BRO shift  6
-                       INTEGER shift  31
-                          BOOL shift  30
-                        STRING shift  29
+                       INTEGER shift  41
+                          BOOL shift  40
+                        STRING shift  39
                            FUN shift  3
-                          expr shift  18
+                          expr shift  24
 
 State 6:
           expr ::= * expr MINUS expr
@@ -195,6 +231,12 @@ State 6:
           expr ::= * expr AND expr
           expr ::= * expr OR expr
           expr ::= * expr XOR expr
+          expr ::= * expr LESS expr
+          expr ::= * expr LESSEQ expr
+          expr ::= * expr GREATER expr
+          expr ::= * expr GREATEREQ expr
+          expr ::= * expr EQ expr
+          expr ::= * expr NEQ expr
           expr ::= * BRO expr BRC
           expr ::= BRO * expr BRC
           expr ::= * MINUS expr
@@ -207,13 +249,13 @@ State 6:
 
                          MINUS shift  5
                            NOT shift  4
-                           VAR shift  28
+                           VAR shift  38
                            BRO shift  6
-                       INTEGER shift  31
-                          BOOL shift  30
-                        STRING shift  29
+                       INTEGER shift  41
+                          BOOL shift  40
+                        STRING shift  39
                            FUN shift  3
-                          expr shift  17
+                          expr shift  23
 
 State 7:
           expr ::= * expr MINUS expr
@@ -223,7 +265,13 @@ State 7:
           expr ::= * expr AND expr
           expr ::= * expr OR expr
           expr ::= * expr XOR expr
-          expr ::= expr XOR * expr
+          expr ::= * expr LESS expr
+          expr ::= * expr LESSEQ expr
+          expr ::= * expr GREATER expr
+          expr ::= * expr GREATEREQ expr
+          expr ::= * expr EQ expr
+          expr ::= * expr NEQ expr
+          expr ::= expr NEQ * expr
           expr ::= * BRO expr BRC
           expr ::= * MINUS expr
           expr ::= * NOT expr
@@ -235,13 +283,13 @@ State 7:
 
                          MINUS shift  5
                            NOT shift  4
-                           VAR shift  28
+                           VAR shift  38
                            BRO shift  6
-                       INTEGER shift  31
-                          BOOL shift  30
-                        STRING shift  29
+                       INTEGER shift  41
+                          BOOL shift  40
+                        STRING shift  39
                            FUN shift  3
-                          expr shift  34
+                          expr shift  43
 
 State 8:
           expr ::= * expr MINUS expr
@@ -250,8 +298,14 @@ State 8:
           expr ::= * expr DIVIDE expr
           expr ::= * expr AND expr
           expr ::= * expr OR expr
-          expr ::= expr OR * expr
           expr ::= * expr XOR expr
+          expr ::= * expr LESS expr
+          expr ::= * expr LESSEQ expr
+          expr ::= * expr GREATER expr
+          expr ::= * expr GREATEREQ expr
+          expr ::= * expr EQ expr
+          expr ::= expr EQ * expr
+          expr ::= * expr NEQ expr
           expr ::= * BRO expr BRC
           expr ::= * MINUS expr
           expr ::= * NOT expr
@@ -263,15 +317,219 @@ State 8:
 
                          MINUS shift  5
                            NOT shift  4
-                           VAR shift  28
+                           VAR shift  38
                            BRO shift  6
-                       INTEGER shift  31
-                          BOOL shift  30
-                        STRING shift  29
+                       INTEGER shift  41
+                          BOOL shift  40
+                        STRING shift  39
                            FUN shift  3
-                          expr shift  35
+                          expr shift  44
 
 State 9:
+          expr ::= * expr MINUS expr
+          expr ::= * expr PLUS expr
+          expr ::= * expr TIMES expr
+          expr ::= * expr DIVIDE expr
+          expr ::= * expr AND expr
+          expr ::= * expr OR expr
+          expr ::= * expr XOR expr
+          expr ::= * expr LESS expr
+          expr ::= * expr LESSEQ expr
+          expr ::= * expr GREATER expr
+          expr ::= * expr GREATEREQ expr
+          expr ::= expr GREATEREQ * expr
+          expr ::= * expr EQ expr
+          expr ::= * expr NEQ expr
+          expr ::= * BRO expr BRC
+          expr ::= * MINUS expr
+          expr ::= * NOT expr
+          expr ::= * INTEGER
+          expr ::= * BOOL
+          expr ::= * STRING
+          expr ::= * VAR
+          expr ::= * FUN arglist BRC
+
+                         MINUS shift  5
+                           NOT shift  4
+                           VAR shift  38
+                           BRO shift  6
+                       INTEGER shift  41
+                          BOOL shift  40
+                        STRING shift  39
+                           FUN shift  3
+                          expr shift  45
+
+State 10:
+          expr ::= * expr MINUS expr
+          expr ::= * expr PLUS expr
+          expr ::= * expr TIMES expr
+          expr ::= * expr DIVIDE expr
+          expr ::= * expr AND expr
+          expr ::= * expr OR expr
+          expr ::= * expr XOR expr
+          expr ::= * expr LESS expr
+          expr ::= * expr LESSEQ expr
+          expr ::= * expr GREATER expr
+          expr ::= expr GREATER * expr
+          expr ::= * expr GREATEREQ expr
+          expr ::= * expr EQ expr
+          expr ::= * expr NEQ expr
+          expr ::= * BRO expr BRC
+          expr ::= * MINUS expr
+          expr ::= * NOT expr
+          expr ::= * INTEGER
+          expr ::= * BOOL
+          expr ::= * STRING
+          expr ::= * VAR
+          expr ::= * FUN arglist BRC
+
+                         MINUS shift  5
+                           NOT shift  4
+                           VAR shift  38
+                           BRO shift  6
+                       INTEGER shift  41
+                          BOOL shift  40
+                        STRING shift  39
+                           FUN shift  3
+                          expr shift  46
+
+State 11:
+          expr ::= * expr MINUS expr
+          expr ::= * expr PLUS expr
+          expr ::= * expr TIMES expr
+          expr ::= * expr DIVIDE expr
+          expr ::= * expr AND expr
+          expr ::= * expr OR expr
+          expr ::= * expr XOR expr
+          expr ::= * expr LESS expr
+          expr ::= * expr LESSEQ expr
+          expr ::= expr LESSEQ * expr
+          expr ::= * expr GREATER expr
+          expr ::= * expr GREATEREQ expr
+          expr ::= * expr EQ expr
+          expr ::= * expr NEQ expr
+          expr ::= * BRO expr BRC
+          expr ::= * MINUS expr
+          expr ::= * NOT expr
+          expr ::= * INTEGER
+          expr ::= * BOOL
+          expr ::= * STRING
+          expr ::= * VAR
+          expr ::= * FUN arglist BRC
+
+                         MINUS shift  5
+                           NOT shift  4
+                           VAR shift  38
+                           BRO shift  6
+                       INTEGER shift  41
+                          BOOL shift  40
+                        STRING shift  39
+                           FUN shift  3
+                          expr shift  47
+
+State 12:
+          expr ::= * expr MINUS expr
+          expr ::= * expr PLUS expr
+          expr ::= * expr TIMES expr
+          expr ::= * expr DIVIDE expr
+          expr ::= * expr AND expr
+          expr ::= * expr OR expr
+          expr ::= * expr XOR expr
+          expr ::= * expr LESS expr
+          expr ::= expr LESS * expr
+          expr ::= * expr LESSEQ expr
+          expr ::= * expr GREATER expr
+          expr ::= * expr GREATEREQ expr
+          expr ::= * expr EQ expr
+          expr ::= * expr NEQ expr
+          expr ::= * BRO expr BRC
+          expr ::= * MINUS expr
+          expr ::= * NOT expr
+          expr ::= * INTEGER
+          expr ::= * BOOL
+          expr ::= * STRING
+          expr ::= * VAR
+          expr ::= * FUN arglist BRC
+
+                         MINUS shift  5
+                           NOT shift  4
+                           VAR shift  38
+                           BRO shift  6
+                       INTEGER shift  41
+                          BOOL shift  40
+                        STRING shift  39
+                           FUN shift  3
+                          expr shift  48
+
+State 13:
+          expr ::= * expr MINUS expr
+          expr ::= * expr PLUS expr
+          expr ::= * expr TIMES expr
+          expr ::= * expr DIVIDE expr
+          expr ::= * expr AND expr
+          expr ::= * expr OR expr
+          expr ::= * expr XOR expr
+          expr ::= expr XOR * expr
+          expr ::= * expr LESS expr
+          expr ::= * expr LESSEQ expr
+          expr ::= * expr GREATER expr
+          expr ::= * expr GREATEREQ expr
+          expr ::= * expr EQ expr
+          expr ::= * expr NEQ expr
+          expr ::= * BRO expr BRC
+          expr ::= * MINUS expr
+          expr ::= * NOT expr
+          expr ::= * INTEGER
+          expr ::= * BOOL
+          expr ::= * STRING
+          expr ::= * VAR
+          expr ::= * FUN arglist BRC
+
+                         MINUS shift  5
+                           NOT shift  4
+                           VAR shift  38
+                           BRO shift  6
+                       INTEGER shift  41
+                          BOOL shift  40
+                        STRING shift  39
+                           FUN shift  3
+                          expr shift  30
+
+State 14:
+          expr ::= * expr MINUS expr
+          expr ::= * expr PLUS expr
+          expr ::= * expr TIMES expr
+          expr ::= * expr DIVIDE expr
+          expr ::= * expr AND expr
+          expr ::= * expr OR expr
+          expr ::= expr OR * expr
+          expr ::= * expr XOR expr
+          expr ::= * expr LESS expr
+          expr ::= * expr LESSEQ expr
+          expr ::= * expr GREATER expr
+          expr ::= * expr GREATEREQ expr
+          expr ::= * expr EQ expr
+          expr ::= * expr NEQ expr
+          expr ::= * BRO expr BRC
+          expr ::= * MINUS expr
+          expr ::= * NOT expr
+          expr ::= * INTEGER
+          expr ::= * BOOL
+          expr ::= * STRING
+          expr ::= * VAR
+          expr ::= * FUN arglist BRC
+
+                         MINUS shift  5
+                           NOT shift  4
+                           VAR shift  38
+                           BRO shift  6
+                       INTEGER shift  41
+                          BOOL shift  40
+                        STRING shift  39
+                           FUN shift  3
+                          expr shift  31
+
+State 15:
           expr ::= * expr MINUS expr
           expr ::= * expr PLUS expr
           expr ::= * expr TIMES expr
@@ -280,6 +538,12 @@ State 9:
           expr ::= expr AND * expr
           expr ::= * expr OR expr
           expr ::= * expr XOR expr
+          expr ::= * expr LESS expr
+          expr ::= * expr LESSEQ expr
+          expr ::= * expr GREATER expr
+          expr ::= * expr GREATEREQ expr
+          expr ::= * expr EQ expr
+          expr ::= * expr NEQ expr
           expr ::= * BRO expr BRC
           expr ::= * MINUS expr
           expr ::= * NOT expr
@@ -291,15 +555,15 @@ State 9:
 
                          MINUS shift  5
                            NOT shift  4
-                           VAR shift  28
+                           VAR shift  38
                            BRO shift  6
-                       INTEGER shift  31
-                          BOOL shift  30
-                        STRING shift  29
+                       INTEGER shift  41
+                          BOOL shift  40
+                        STRING shift  39
                            FUN shift  3
-                          expr shift  36
+                          expr shift  32
 
-State 10:
+State 16:
           expr ::= * expr MINUS expr
           expr ::= * expr PLUS expr
           expr ::= * expr TIMES expr
@@ -308,6 +572,12 @@ State 10:
           expr ::= * expr AND expr
           expr ::= * expr OR expr
           expr ::= * expr XOR expr
+          expr ::= * expr LESS expr
+          expr ::= * expr LESSEQ expr
+          expr ::= * expr GREATER expr
+          expr ::= * expr GREATEREQ expr
+          expr ::= * expr EQ expr
+          expr ::= * expr NEQ expr
           expr ::= * BRO expr BRC
           expr ::= * MINUS expr
           expr ::= * NOT expr
@@ -319,15 +589,15 @@ State 10:
 
                          MINUS shift  5
                            NOT shift  4
-                           VAR shift  28
+                           VAR shift  38
                            BRO shift  6
-                       INTEGER shift  31
-                          BOOL shift  30
-                        STRING shift  29
+                       INTEGER shift  41
+                          BOOL shift  40
+                        STRING shift  39
                            FUN shift  3
-                          expr shift  21
+                          expr shift  27
 
-State 11:
+State 17:
           expr ::= * expr MINUS expr
           expr ::= * expr PLUS expr
           expr ::= * expr TIMES expr
@@ -336,6 +606,12 @@ State 11:
           expr ::= * expr AND expr
           expr ::= * expr OR expr
           expr ::= * expr XOR expr
+          expr ::= * expr LESS expr
+          expr ::= * expr LESSEQ expr
+          expr ::= * expr GREATER expr
+          expr ::= * expr GREATEREQ expr
+          expr ::= * expr EQ expr
+          expr ::= * expr NEQ expr
           expr ::= * BRO expr BRC
           expr ::= * MINUS expr
           expr ::= * NOT expr
@@ -347,15 +623,15 @@ State 11:
 
                          MINUS shift  5
                            NOT shift  4
-                           VAR shift  28
+                           VAR shift  38
                            BRO shift  6
-                       INTEGER shift  31
-                          BOOL shift  30
-                        STRING shift  29
+                       INTEGER shift  41
+                          BOOL shift  40
+                        STRING shift  39
                            FUN shift  3
-                          expr shift  22
+                          expr shift  28
 
-State 12:
+State 18:
           expr ::= * expr MINUS expr
           expr ::= * expr PLUS expr
           expr ::= expr PLUS * expr
@@ -364,6 +640,12 @@ State 12:
           expr ::= * expr AND expr
           expr ::= * expr OR expr
           expr ::= * expr XOR expr
+          expr ::= * expr LESS expr
+          expr ::= * expr LESSEQ expr
+          expr ::= * expr GREATER expr
+          expr ::= * expr GREATEREQ expr
+          expr ::= * expr EQ expr
+          expr ::= * expr NEQ expr
           expr ::= * BRO expr BRC
           expr ::= * MINUS expr
           expr ::= * NOT expr
@@ -375,15 +657,15 @@ State 12:
 
                          MINUS shift  5
                            NOT shift  4
-                           VAR shift  28
+                           VAR shift  38
                            BRO shift  6
-                       INTEGER shift  31
-                          BOOL shift  30
-                        STRING shift  29
+                       INTEGER shift  41
+                          BOOL shift  40
+                        STRING shift  39
                            FUN shift  3
-                          expr shift  19
+                          expr shift  25
 
-State 13:
+State 19:
           expr ::= * expr MINUS expr
           expr ::= expr MINUS * expr
           expr ::= * expr PLUS expr
@@ -392,6 +674,12 @@ State 13:
           expr ::= * expr AND expr
           expr ::= * expr OR expr
           expr ::= * expr XOR expr
+          expr ::= * expr LESS expr
+          expr ::= * expr LESSEQ expr
+          expr ::= * expr GREATER expr
+          expr ::= * expr GREATEREQ expr
+          expr ::= * expr EQ expr
+          expr ::= * expr NEQ expr
           expr ::= * BRO expr BRC
           expr ::= * MINUS expr
           expr ::= * NOT expr
@@ -403,22 +691,22 @@ State 13:
 
                          MINUS shift  5
                            NOT shift  4
-                           VAR shift  28
+                           VAR shift  38
                            BRO shift  6
-                       INTEGER shift  31
-                          BOOL shift  30
-                        STRING shift  29
+                       INTEGER shift  41
+                          BOOL shift  40
+                        STRING shift  39
                            FUN shift  3
-                          expr shift  20
+                          expr shift  26
 
-State 14:
+State 20:
           program ::= expr ASS * variable
           variable ::= * VAR
 
-                           VAR shift  37
-                      variable shift  25
+                           VAR shift  49
+                      variable shift  35
 
-State 15:
+State 21:
       (1) program ::= expr *
           program ::= expr * ASS variable
           expr ::= expr * MINUS expr
@@ -428,18 +716,30 @@ State 15:
           expr ::= expr * AND expr
           expr ::= expr * OR expr
           expr ::= expr * XOR expr
+          expr ::= expr * LESS expr
+          expr ::= expr * LESSEQ expr
+          expr ::= expr * GREATER expr
+          expr ::= expr * GREATEREQ expr
+          expr ::= expr * EQ expr
+          expr ::= expr * NEQ expr
 
                              $ reduce 1
-                          PLUS shift  12
-                         MINUS shift  13
-                        DIVIDE shift  10
-                         TIMES shift  11
-                           AND shift  9
-                            OR shift  8
-                           XOR shift  7
-                           ASS shift  14
+                          PLUS shift  18
+                         MINUS shift  19
+                        DIVIDE shift  16
+                         TIMES shift  17
+                           AND shift  15
+                            OR shift  14
+                           XOR shift  13
+                          LESS shift  12
+                        LESSEQ shift  11
+                       GREATER shift  10
+                     GREATEREQ shift  9
+                            EQ shift  8
+                           NEQ shift  7
+                           ASS shift  20
 
-State 16:
+State 22:
           expr ::= expr * MINUS expr
           expr ::= expr * PLUS expr
           expr ::= expr * TIMES expr
@@ -447,20 +747,32 @@ State 16:
           expr ::= expr * AND expr
           expr ::= expr * OR expr
           expr ::= expr * XOR expr
-     (21) arglist ::= expr *
+          expr ::= expr * LESS expr
+          expr ::= expr * LESSEQ expr
+          expr ::= expr * GREATER expr
+          expr ::= expr * GREATEREQ expr
+          expr ::= expr * EQ expr
+          expr ::= expr * NEQ expr
+     (27) arglist ::= expr *
           arglist ::= expr * COMMA arglist
 
-                          PLUS shift  12
-                         MINUS shift  13
-                        DIVIDE shift  10
-                         TIMES shift  11
-                           AND shift  9
-                            OR shift  8
-                           XOR shift  7
+                          PLUS shift  18
+                         MINUS shift  19
+                        DIVIDE shift  16
+                         TIMES shift  17
+                           AND shift  15
+                            OR shift  14
+                           XOR shift  13
+                          LESS shift  12
+                        LESSEQ shift  11
+                       GREATER shift  10
+                     GREATEREQ shift  9
+                            EQ shift  8
+                           NEQ shift  7
                          COMMA shift  2
-                     {default} reduce 21
+                     {default} reduce 27
 
-State 17:
+State 23:
           expr ::= expr * MINUS expr
           expr ::= expr * PLUS expr
           expr ::= expr * TIMES expr
@@ -468,18 +780,30 @@ State 17:
           expr ::= expr * AND expr
           expr ::= expr * OR expr
           expr ::= expr * XOR expr
+          expr ::= expr * LESS expr
+          expr ::= expr * LESSEQ expr
+          expr ::= expr * GREATER expr
+          expr ::= expr * GREATEREQ expr
+          expr ::= expr * EQ expr
+          expr ::= expr * NEQ expr
           expr ::= BRO expr * BRC
 
-                          PLUS shift  12
-                         MINUS shift  13
-                        DIVIDE shift  10
-                         TIMES shift  11
-                           AND shift  9
-                            OR shift  8
-                           XOR shift  7
-                           BRC shift  33
+                          PLUS shift  18
+                         MINUS shift  19
+                        DIVIDE shift  16
+                         TIMES shift  17
+                           AND shift  15
+                            OR shift  14
+                           XOR shift  13
+                          LESS shift  12
+                        LESSEQ shift  11
+                       GREATER shift  10
+                     GREATEREQ shift  9
+                            EQ shift  8
+                           NEQ shift  7
+                           BRC shift  42
 
-State 18:
+State 24:
           expr ::= expr * MINUS expr
           expr ::= expr * PLUS expr
           expr ::= expr * TIMES expr
@@ -487,16 +811,28 @@ State 18:
           expr ::= expr * AND expr
           expr ::= expr * OR expr
           expr ::= expr * XOR expr
-     (13) expr ::= MINUS expr *
+          expr ::= expr * LESS expr
+          expr ::= expr * LESSEQ expr
+          expr ::= expr * GREATER expr
+          expr ::= expr * GREATEREQ expr
+          expr ::= expr * EQ expr
+          expr ::= expr * NEQ expr
+     (19) expr ::= MINUS expr *
 
-                        DIVIDE shift  10
-                         TIMES shift  11
-                           AND shift  9
-                            OR shift  8
-                           XOR shift  7
-                     {default} reduce 13
+                        DIVIDE shift  16
+                         TIMES shift  17
+                           AND shift  15
+                            OR shift  14
+                           XOR shift  13
+                          LESS shift  12
+                        LESSEQ shift  11
+                       GREATER shift  10
+                     GREATEREQ shift  9
+                            EQ shift  8
+                           NEQ shift  7
+                     {default} reduce 19
 
-State 19:
+State 25:
           expr ::= expr * MINUS expr
           expr ::= expr * PLUS expr
       (6) expr ::= expr PLUS expr *
@@ -505,15 +841,27 @@ State 19:
           expr ::= expr * AND expr
           expr ::= expr * OR expr
           expr ::= expr * XOR expr
+          expr ::= expr * LESS expr
+          expr ::= expr * LESSEQ expr
+          expr ::= expr * GREATER expr
+          expr ::= expr * GREATEREQ expr
+          expr ::= expr * EQ expr
+          expr ::= expr * NEQ expr
 
-                        DIVIDE shift  10
-                         TIMES shift  11
-                           AND shift  9
-                            OR shift  8
-                           XOR shift  7
+                        DIVIDE shift  16
+                         TIMES shift  17
+                           AND shift  15
+                            OR shift  14
+                           XOR shift  13
+                          LESS shift  12
+                        LESSEQ shift  11
+                       GREATER shift  10
+                     GREATEREQ shift  9
+                            EQ shift  8
+                           NEQ shift  7
                      {default} reduce 6
 
-State 20:
+State 26:
           expr ::= expr * MINUS expr
       (5) expr ::= expr MINUS expr *
           expr ::= expr * PLUS expr
@@ -522,15 +870,27 @@ State 20:
           expr ::= expr * AND expr
           expr ::= expr * OR expr
           expr ::= expr * XOR expr
+          expr ::= expr * LESS expr
+          expr ::= expr * LESSEQ expr
+          expr ::= expr * GREATER expr
+          expr ::= expr * GREATEREQ expr
+          expr ::= expr * EQ expr
+          expr ::= expr * NEQ expr
 
-                        DIVIDE shift  10
-                         TIMES shift  11
-                           AND shift  9
-                            OR shift  8
-                           XOR shift  7
+                        DIVIDE shift  16
+                         TIMES shift  17
+                           AND shift  15
+                            OR shift  14
+                           XOR shift  13
+                          LESS shift  12
+                        LESSEQ shift  11
+                       GREATER shift  10
+                     GREATEREQ shift  9
+                            EQ shift  8
+                           NEQ shift  7
                      {default} reduce 5
 
-State 21:
+State 27:
           expr ::= expr * MINUS expr
           expr ::= expr * PLUS expr
           expr ::= expr * TIMES expr
@@ -539,13 +899,25 @@ State 21:
           expr ::= expr * AND expr
           expr ::= expr * OR expr
           expr ::= expr * XOR expr
+          expr ::= expr * LESS expr
+          expr ::= expr * LESSEQ expr
+          expr ::= expr * GREATER expr
+          expr ::= expr * GREATEREQ expr
+          expr ::= expr * EQ expr
+          expr ::= expr * NEQ expr
 
-                           AND shift  9
-                            OR shift  8
-                           XOR shift  7
+                           AND shift  15
+                            OR shift  14
+                           XOR shift  13
+                          LESS shift  12
+                        LESSEQ shift  11
+                       GREATER shift  10
+                     GREATEREQ shift  9
+                            EQ shift  8
+                           NEQ shift  7
                      {default} reduce 8
 
-State 22:
+State 28:
           expr ::= expr * MINUS expr
           expr ::= expr * PLUS expr
           expr ::= expr * TIMES expr
@@ -554,58 +926,25 @@ State 22:
           expr ::= expr * AND expr
           expr ::= expr * OR expr
           expr ::= expr * XOR expr
+          expr ::= expr * LESS expr
+          expr ::= expr * LESSEQ expr
+          expr ::= expr * GREATER expr
+          expr ::= expr * GREATEREQ expr
+          expr ::= expr * EQ expr
+          expr ::= expr * NEQ expr
 
-                           AND shift  9
-                            OR shift  8
-                           XOR shift  7
+                           AND shift  15
+                            OR shift  14
+                           XOR shift  13
+                          LESS shift  12
+                        LESSEQ shift  11
+                       GREATER shift  10
+                     GREATEREQ shift  9
+                            EQ shift  8
+                           NEQ shift  7
                      {default} reduce 7
 
-State 23:
-      (3) program ::= ORDER arglist *
-
-                             $ reduce 3
-
-State 24:
-          expr ::= FUN arglist * BRC
-
-                           BRC shift  26
-
-State 25:
-      (2) program ::= expr ASS variable *
-
-                             $ reduce 2
-
-State 26:
-     (19) expr ::= FUN arglist BRC *
-
-                     {default} reduce 19
-
-State 27:
-     (22) arglist ::= expr COMMA arglist *
-
-                     {default} reduce 22
-
-State 28:
-     (18) expr ::= VAR *
-
-                     {default} reduce 18
-
 State 29:
-     (17) expr ::= STRING *
-
-                     {default} reduce 17
-
-State 30:
-     (16) expr ::= BOOL *
-
-                     {default} reduce 16
-
-State 31:
-     (15) expr ::= INTEGER *
-
-                     {default} reduce 15
-
-State 32:
           expr ::= expr * MINUS expr
           expr ::= expr * PLUS expr
           expr ::= expr * TIMES expr
@@ -613,16 +952,23 @@ State 32:
           expr ::= expr * AND expr
           expr ::= expr * OR expr
           expr ::= expr * XOR expr
-     (14) expr ::= NOT expr *
+          expr ::= expr * LESS expr
+          expr ::= expr * LESSEQ expr
+          expr ::= expr * GREATER expr
+          expr ::= expr * GREATEREQ expr
+          expr ::= expr * EQ expr
+          expr ::= expr * NEQ expr
+     (20) expr ::= NOT expr *
 
-                     {default} reduce 14
+                          LESS shift  12
+                        LESSEQ shift  11
+                       GREATER shift  10
+                     GREATEREQ shift  9
+                            EQ shift  8
+                           NEQ shift  7
+                     {default} reduce 20
 
-State 33:
-     (12) expr ::= BRO expr BRC *
-
-                     {default} reduce 12
-
-State 34:
+State 30:
           expr ::= expr * MINUS expr
           expr ::= expr * PLUS expr
           expr ::= expr * TIMES expr
@@ -631,10 +977,22 @@ State 34:
           expr ::= expr * OR expr
           expr ::= expr * XOR expr
      (11) expr ::= expr XOR expr *
+          expr ::= expr * LESS expr
+          expr ::= expr * LESSEQ expr
+          expr ::= expr * GREATER expr
+          expr ::= expr * GREATEREQ expr
+          expr ::= expr * EQ expr
+          expr ::= expr * NEQ expr
 
+                          LESS shift  12
+                        LESSEQ shift  11
+                       GREATER shift  10
+                     GREATEREQ shift  9
+                            EQ shift  8
+                           NEQ shift  7
                      {default} reduce 11
 
-State 35:
+State 31:
           expr ::= expr * MINUS expr
           expr ::= expr * PLUS expr
           expr ::= expr * TIMES expr
@@ -643,10 +1001,22 @@ State 35:
           expr ::= expr * OR expr
      (10) expr ::= expr OR expr *
           expr ::= expr * XOR expr
+          expr ::= expr * LESS expr
+          expr ::= expr * LESSEQ expr
+          expr ::= expr * GREATER expr
+          expr ::= expr * GREATEREQ expr
+          expr ::= expr * EQ expr
+          expr ::= expr * NEQ expr
 
+                          LESS shift  12
+                        LESSEQ shift  11
+                       GREATER shift  10
+                     GREATEREQ shift  9
+                            EQ shift  8
+                           NEQ shift  7
                      {default} reduce 10
 
-State 36:
+State 32:
           expr ::= expr * MINUS expr
           expr ::= expr * PLUS expr
           expr ::= expr * TIMES expr
@@ -655,10 +1025,180 @@ State 36:
       (9) expr ::= expr AND expr *
           expr ::= expr * OR expr
           expr ::= expr * XOR expr
+          expr ::= expr * LESS expr
+          expr ::= expr * LESSEQ expr
+          expr ::= expr * GREATER expr
+          expr ::= expr * GREATEREQ expr
+          expr ::= expr * EQ expr
+          expr ::= expr * NEQ expr
 
+                          LESS shift  12
+                        LESSEQ shift  11
+                       GREATER shift  10
+                     GREATEREQ shift  9
+                            EQ shift  8
+                           NEQ shift  7
                      {default} reduce 9
 
+State 33:
+      (3) program ::= ORDER arglist *
+
+                             $ reduce 3
+
+State 34:
+          expr ::= FUN arglist * BRC
+
+                           BRC shift  36
+
+State 35:
+      (2) program ::= expr ASS variable *
+
+                             $ reduce 2
+
+State 36:
+     (25) expr ::= FUN arglist BRC *
+
+                     {default} reduce 25
+
 State 37:
+     (28) arglist ::= expr COMMA arglist *
+
+                     {default} reduce 28
+
+State 38:
+     (24) expr ::= VAR *
+
+                     {default} reduce 24
+
+State 39:
+     (23) expr ::= STRING *
+
+                     {default} reduce 23
+
+State 40:
+     (22) expr ::= BOOL *
+
+                     {default} reduce 22
+
+State 41:
+     (21) expr ::= INTEGER *
+
+                     {default} reduce 21
+
+State 42:
+     (18) expr ::= BRO expr BRC *
+
+                     {default} reduce 18
+
+State 43:
+          expr ::= expr * MINUS expr
+          expr ::= expr * PLUS expr
+          expr ::= expr * TIMES expr
+          expr ::= expr * DIVIDE expr
+          expr ::= expr * AND expr
+          expr ::= expr * OR expr
+          expr ::= expr * XOR expr
+          expr ::= expr * LESS expr
+          expr ::= expr * LESSEQ expr
+          expr ::= expr * GREATER expr
+          expr ::= expr * GREATEREQ expr
+          expr ::= expr * EQ expr
+          expr ::= expr * NEQ expr
+     (17) expr ::= expr NEQ expr *
+
+                     {default} reduce 17
+
+State 44:
+          expr ::= expr * MINUS expr
+          expr ::= expr * PLUS expr
+          expr ::= expr * TIMES expr
+          expr ::= expr * DIVIDE expr
+          expr ::= expr * AND expr
+          expr ::= expr * OR expr
+          expr ::= expr * XOR expr
+          expr ::= expr * LESS expr
+          expr ::= expr * LESSEQ expr
+          expr ::= expr * GREATER expr
+          expr ::= expr * GREATEREQ expr
+          expr ::= expr * EQ expr
+     (16) expr ::= expr EQ expr *
+          expr ::= expr * NEQ expr
+
+                     {default} reduce 16
+
+State 45:
+          expr ::= expr * MINUS expr
+          expr ::= expr * PLUS expr
+          expr ::= expr * TIMES expr
+          expr ::= expr * DIVIDE expr
+          expr ::= expr * AND expr
+          expr ::= expr * OR expr
+          expr ::= expr * XOR expr
+          expr ::= expr * LESS expr
+          expr ::= expr * LESSEQ expr
+          expr ::= expr * GREATER expr
+          expr ::= expr * GREATEREQ expr
+     (15) expr ::= expr GREATEREQ expr *
+          expr ::= expr * EQ expr
+          expr ::= expr * NEQ expr
+
+                     {default} reduce 15
+
+State 46:
+          expr ::= expr * MINUS expr
+          expr ::= expr * PLUS expr
+          expr ::= expr * TIMES expr
+          expr ::= expr * DIVIDE expr
+          expr ::= expr * AND expr
+          expr ::= expr * OR expr
+          expr ::= expr * XOR expr
+          expr ::= expr * LESS expr
+          expr ::= expr * LESSEQ expr
+          expr ::= expr * GREATER expr
+     (14) expr ::= expr GREATER expr *
+          expr ::= expr * GREATEREQ expr
+          expr ::= expr * EQ expr
+          expr ::= expr * NEQ expr
+
+                     {default} reduce 14
+
+State 47:
+          expr ::= expr * MINUS expr
+          expr ::= expr * PLUS expr
+          expr ::= expr * TIMES expr
+          expr ::= expr * DIVIDE expr
+          expr ::= expr * AND expr
+          expr ::= expr * OR expr
+          expr ::= expr * XOR expr
+          expr ::= expr * LESS expr
+          expr ::= expr * LESSEQ expr
+     (13) expr ::= expr LESSEQ expr *
+          expr ::= expr * GREATER expr
+          expr ::= expr * GREATEREQ expr
+          expr ::= expr * EQ expr
+          expr ::= expr * NEQ expr
+
+                     {default} reduce 13
+
+State 48:
+          expr ::= expr * MINUS expr
+          expr ::= expr * PLUS expr
+          expr ::= expr * TIMES expr
+          expr ::= expr * DIVIDE expr
+          expr ::= expr * AND expr
+          expr ::= expr * OR expr
+          expr ::= expr * XOR expr
+          expr ::= expr * LESS expr
+     (12) expr ::= expr LESS expr *
+          expr ::= expr * LESSEQ expr
+          expr ::= expr * GREATER expr
+          expr ::= expr * GREATEREQ expr
+          expr ::= expr * EQ expr
+          expr ::= expr * NEQ expr
+
+                     {default} reduce 12
+
+State 49:
       (4) variable ::= VAR *
 
                      {default} reduce 4
@@ -674,18 +1214,24 @@ Symbols:
     6: OR
     7: XOR
     8: NOT
-    9: ASS
-   10: ORDER
-   11: VAR
-   12: BRO
-   13: BRC
-   14: INTEGER
-   15: BOOL
-   16: STRING
-   17: FUN
-   18: COMMA
-   19: error:
-   20: program: <lambda> MINUS NOT ORDER VAR BRO INTEGER BOOL STRING FUN
-   21: expr: MINUS NOT VAR BRO INTEGER BOOL STRING FUN
-   22: variable: VAR
-   23: arglist: <lambda> MINUS NOT VAR BRO INTEGER BOOL STRING FUN
+    9: LESS
+   10: LESSEQ
+   11: GREATER
+   12: GREATEREQ
+   13: EQ
+   14: NEQ
+   15: ASS
+   16: ORDER
+   17: VAR
+   18: BRO
+   19: BRC
+   20: INTEGER
+   21: BOOL
+   22: STRING
+   23: FUN
+   24: COMMA
+   25: error:
+   26: program: <lambda> MINUS NOT ORDER VAR BRO INTEGER BOOL STRING FUN
+   27: expr: MINUS NOT VAR BRO INTEGER BOOL STRING FUN
+   28: variable: VAR
+   29: arglist: <lambda> MINUS NOT VAR BRO INTEGER BOOL STRING FUN

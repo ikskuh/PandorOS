@@ -103,7 +103,7 @@ static allocator_t * argalloc;
 **                       defined, then do no error processing.
 */
 #define YYCODETYPE unsigned char
-#define YYNOCODE 25
+#define YYNOCODE 31
 #define YYACTIONTYPE unsigned char
 #define ParseTOKENTYPE token_t
 typedef union {
@@ -117,8 +117,8 @@ typedef union {
 #define ParseARG_PDECL
 #define ParseARG_FETCH
 #define ParseARG_STORE
-#define YYNSTATE 38
-#define YYNRULE 23
+#define YYNSTATE 50
+#define YYNRULE 29
 #define YY_NO_ACTION      (YYNSTATE+YYNRULE+2)
 #define YY_ACCEPT_ACTION  (YYNSTATE+YYNRULE+1)
 #define YY_ERROR_ACTION   (YYNSTATE+YYNRULE)
@@ -187,49 +187,64 @@ static const YYMINORTYPE yyzerominor = { 0 };
 **                     shifting non-terminals after a reduce.
 **  yy_default[]       Default action for each state.
 */
-#define YY_ACTTAB_COUNT (76)
+#define YY_ACTTAB_COUNT (131)
 static const YYACTIONTYPE yy_action[] = {
- /*     0 */    38,   40,    5,    9,    8,    7,   26,   16,    4,   24,
- /*    10 */     1,   28,    6,   41,   31,   30,   29,    3,   39,   12,
- /*    20 */    13,   10,   11,    9,    8,    7,   16,   14,   27,   12,
- /*    30 */    13,   10,   11,    9,    8,    7,   10,   11,    9,    8,
- /*    40 */     7,   33,   25,   12,   13,   10,   11,    9,    8,    7,
- /*    50 */    37,   16,    5,   23,   62,   15,   20,   19,    4,   22,
- /*    60 */     2,   28,    6,   63,   31,   30,   29,    3,   21,   36,
- /*    70 */    35,   63,   34,   17,   18,   32,
+ /*     0 */    51,   18,   19,   16,   17,   15,   14,   13,   52,   12,
+ /*    10 */    11,   10,    9,    8,    7,   20,   18,   19,   16,   17,
+ /*    20 */    15,   14,   13,   53,   12,   11,   10,    9,    8,    7,
+ /*    30 */    22,   22,   34,   37,   42,   36,   18,   19,   16,   17,
+ /*    40 */    15,   14,   13,   49,   12,   11,   10,    9,    8,    7,
+ /*    50 */    12,   11,   10,    9,    8,    7,   22,   26,   33,    2,
+ /*    60 */    80,   21,   81,   16,   17,   15,   14,   13,   35,   12,
+ /*    70 */    11,   10,    9,    8,    7,   50,   25,    5,   28,   27,
+ /*    80 */    32,   31,   30,    4,   48,   47,   46,   81,   45,   44,
+ /*    90 */    81,    1,   38,    6,   43,   41,   40,   39,    3,   15,
+ /*   100 */    14,   13,   81,   12,   11,   10,    9,    8,    7,    5,
+ /*   110 */    23,   24,   29,   81,   81,    4,   81,   81,   81,   81,
+ /*   120 */    81,   81,   81,   81,   38,    6,   81,   41,   40,   39,
+ /*   130 */     3,
 };
 static const YYCODETYPE yy_lookahead[] = {
- /*     0 */     0,    0,    2,    5,    6,    7,   13,   21,    8,   23,
- /*    10 */    10,   11,   12,    0,   14,   15,   16,   17,    0,    1,
- /*    20 */     2,    3,    4,    5,    6,    7,   21,    9,   23,    1,
- /*    30 */     2,    3,    4,    5,    6,    7,    3,    4,    5,    6,
- /*    40 */     7,   13,   22,    1,    2,    3,    4,    5,    6,    7,
- /*    50 */    11,   21,    2,   23,   20,   21,   21,   21,    8,   21,
- /*    60 */    18,   11,   12,   24,   14,   15,   16,   17,   21,   21,
- /*    70 */    21,   24,   21,   21,   21,   21,
+ /*     0 */     0,    1,    2,    3,    4,    5,    6,    7,    0,    9,
+ /*    10 */    10,   11,   12,   13,   14,   15,    1,    2,    3,    4,
+ /*    20 */     5,    6,    7,    0,    9,   10,   11,   12,   13,   14,
+ /*    30 */    27,   27,   29,   29,   19,   19,    1,    2,    3,    4,
+ /*    40 */     5,    6,    7,   17,    9,   10,   11,   12,   13,   14,
+ /*    50 */     9,   10,   11,   12,   13,   14,   27,   27,   29,   24,
+ /*    60 */    26,   27,   30,    3,    4,    5,    6,    7,   28,    9,
+ /*    70 */    10,   11,   12,   13,   14,    0,   27,    2,   27,   27,
+ /*    80 */    27,   27,   27,    8,   27,   27,   27,   30,   27,   27,
+ /*    90 */    30,   16,   17,   18,   27,   20,   21,   22,   23,    5,
+ /*   100 */     6,    7,   30,    9,   10,   11,   12,   13,   14,    2,
+ /*   110 */    27,   27,   27,   30,   30,    8,   30,   30,   30,   30,
+ /*   120 */    30,   30,   30,   30,   17,   18,   30,   20,   21,   22,
+ /*   130 */    23,
 };
-#define YY_SHIFT_USE_DFLT (-8)
-#define YY_SHIFT_COUNT (25)
-#define YY_SHIFT_MIN   (-7)
-#define YY_SHIFT_MAX   (50)
+#define YY_SHIFT_USE_DFLT (-1)
+#define YY_SHIFT_COUNT (35)
+#define YY_SHIFT_MIN   (0)
+#define YY_SHIFT_MAX   (107)
 static const signed char yy_shift_ofst[] = {
- /*     0 */     0,   50,   50,   50,   50,   50,   50,   50,   50,   50,
- /*    10 */    50,   50,   50,   50,   39,   18,   42,   28,   33,   33,
- /*    20 */    33,   -2,   -2,   13,   -7,    1,
+ /*     0 */    75,  107,  107,  107,  107,  107,  107,  107,  107,  107,
+ /*    10 */   107,  107,  107,  107,  107,  107,  107,  107,  107,  107,
+ /*    20 */    26,    0,   35,   15,   60,   60,   60,   94,   94,   41,
+ /*    30 */    41,   41,   41,   23,   16,    8,
 };
-#define YY_REDUCE_USE_DFLT (-15)
-#define YY_REDUCE_COUNT (14)
-#define YY_REDUCE_MIN   (-14)
-#define YY_REDUCE_MAX   (54)
+#define YY_REDUCE_USE_DFLT (-1)
+#define YY_REDUCE_COUNT (20)
+#define YY_REDUCE_MIN   (0)
+#define YY_REDUCE_MAX   (85)
 static const signed char yy_reduce_ofst[] = {
- /*     0 */    34,   30,    5,  -14,   54,   53,   52,   51,   49,   48,
- /*    10 */    47,   38,   36,   35,   20,
+ /*     0 */    34,   29,    4,    3,   85,   84,   83,   67,   62,   61,
+ /*    10 */    59,   58,   57,   55,   54,   53,   52,   51,   49,   30,
+ /*    20 */    40,
 };
 static const YYACTIONTYPE yy_default[] = {
- /*     0 */    61,   58,   58,   58,   61,   61,   61,   61,   61,   61,
- /*    10 */    61,   61,   61,   61,   61,   61,   59,   61,   51,   44,
- /*    20 */    43,   46,   45,   61,   61,   61,   57,   60,   56,   55,
- /*    30 */    54,   53,   52,   50,   49,   48,   47,   42,
+ /*     0 */    79,   76,   76,   76,   79,   79,   79,   79,   79,   79,
+ /*    10 */    79,   79,   79,   79,   79,   79,   79,   79,   79,   79,
+ /*    20 */    79,   79,   77,   79,   69,   56,   55,   58,   57,   70,
+ /*    30 */    61,   60,   59,   79,   79,   79,   75,   78,   74,   73,
+ /*    40 */    72,   71,   68,   67,   66,   65,   64,   63,   62,   54,
 };
 
 /* The next table maps tokens into fallback tokens.  If a construct
@@ -324,10 +339,12 @@ void ParseTrace(FILE *TraceFILE, char *zTracePrompt){
 static const char *const yyTokenName[] = { 
   "$",             "PLUS",          "MINUS",         "DIVIDE",      
   "TIMES",         "AND",           "OR",            "XOR",         
-  "NOT",           "ASS",           "ORDER",         "VAR",         
-  "BRO",           "BRC",           "INTEGER",       "BOOL",        
-  "STRING",        "FUN",           "COMMA",         "error",       
-  "program",       "expr",          "variable",      "arglist",     
+  "NOT",           "LESS",          "LESSEQ",        "GREATER",     
+  "GREATEREQ",     "EQ",            "NEQ",           "ASS",         
+  "ORDER",         "VAR",           "BRO",           "BRC",         
+  "INTEGER",       "BOOL",          "STRING",        "FUN",         
+  "COMMA",         "error",         "program",       "expr",        
+  "variable",      "arglist",     
 };
 #endif /* NDEBUG */
 
@@ -347,17 +364,23 @@ static const char *const yyRuleName[] = {
  /*   9 */ "expr ::= expr AND expr",
  /*  10 */ "expr ::= expr OR expr",
  /*  11 */ "expr ::= expr XOR expr",
- /*  12 */ "expr ::= BRO expr BRC",
- /*  13 */ "expr ::= MINUS expr",
- /*  14 */ "expr ::= NOT expr",
- /*  15 */ "expr ::= INTEGER",
- /*  16 */ "expr ::= BOOL",
- /*  17 */ "expr ::= STRING",
- /*  18 */ "expr ::= VAR",
- /*  19 */ "expr ::= FUN arglist BRC",
- /*  20 */ "arglist ::=",
- /*  21 */ "arglist ::= expr",
- /*  22 */ "arglist ::= expr COMMA arglist",
+ /*  12 */ "expr ::= expr LESS expr",
+ /*  13 */ "expr ::= expr LESSEQ expr",
+ /*  14 */ "expr ::= expr GREATER expr",
+ /*  15 */ "expr ::= expr GREATEREQ expr",
+ /*  16 */ "expr ::= expr EQ expr",
+ /*  17 */ "expr ::= expr NEQ expr",
+ /*  18 */ "expr ::= BRO expr BRC",
+ /*  19 */ "expr ::= MINUS expr",
+ /*  20 */ "expr ::= NOT expr",
+ /*  21 */ "expr ::= INTEGER",
+ /*  22 */ "expr ::= BOOL",
+ /*  23 */ "expr ::= STRING",
+ /*  24 */ "expr ::= VAR",
+ /*  25 */ "expr ::= FUN arglist BRC",
+ /*  26 */ "arglist ::=",
+ /*  27 */ "arglist ::= expr",
+ /*  28 */ "arglist ::= expr COMMA arglist",
 };
 #endif /* NDEBUG */
 
@@ -671,29 +694,35 @@ static const struct {
   YYCODETYPE lhs;         /* Symbol on the left-hand side of the rule */
   unsigned char nrhs;     /* Number of right-hand side symbols in the rule */
 } yyRuleInfo[] = {
-  { 20, 0 },
-  { 20, 1 },
-  { 20, 3 },
-  { 20, 2 },
-  { 22, 1 },
-  { 21, 3 },
-  { 21, 3 },
-  { 21, 3 },
-  { 21, 3 },
-  { 21, 3 },
-  { 21, 3 },
-  { 21, 3 },
-  { 21, 3 },
-  { 21, 2 },
-  { 21, 2 },
-  { 21, 1 },
-  { 21, 1 },
-  { 21, 1 },
-  { 21, 1 },
-  { 21, 3 },
-  { 23, 0 },
-  { 23, 1 },
-  { 23, 3 },
+  { 26, 0 },
+  { 26, 1 },
+  { 26, 3 },
+  { 26, 2 },
+  { 28, 1 },
+  { 27, 3 },
+  { 27, 3 },
+  { 27, 3 },
+  { 27, 3 },
+  { 27, 3 },
+  { 27, 3 },
+  { 27, 3 },
+  { 27, 3 },
+  { 27, 3 },
+  { 27, 3 },
+  { 27, 3 },
+  { 27, 3 },
+  { 27, 3 },
+  { 27, 3 },
+  { 27, 2 },
+  { 27, 2 },
+  { 27, 1 },
+  { 27, 1 },
+  { 27, 1 },
+  { 27, 1 },
+  { 27, 3 },
+  { 29, 0 },
+  { 29, 1 },
+  { 29, 3 },
 };
 
 static void yy_accept(yyParser*);  /* Forward Declaration */
@@ -749,25 +778,25 @@ static void yy_reduce(
   **     break;
   */
       case 0: /* program ::= */
-#line 62 "src/grammar.lg"
+#line 63 "src/grammar.lg"
 { result = basic_mknull(); }
-#line 755 "src/grammar.c"
+#line 784 "src/grammar.c"
         break;
       case 1: /* program ::= expr */
-#line 63 "src/grammar.lg"
+#line 64 "src/grammar.lg"
 { result = yymsp[0].minor.yy0.val; }
-#line 760 "src/grammar.c"
+#line 789 "src/grammar.c"
         break;
       case 2: /* program ::= expr ASS variable */
-#line 64 "src/grammar.lg"
+#line 65 "src/grammar.lg"
 {
 	var_set(yymsp[0].minor.yy0.var, yymsp[-2].minor.yy0.val);
 	result = yymsp[-2].minor.yy0.val;
 }
-#line 768 "src/grammar.c"
+#line 797 "src/grammar.c"
         break;
       case 3: /* program ::= ORDER arglist */
-#line 68 "src/grammar.lg"
+#line 69 "src/grammar.lg"
 {
 	
 	arg_t *a;
@@ -788,75 +817,105 @@ static void yy_reduce(
 
 	result = yymsp[-1].minor.yy0.fun(cnt, args);
 }
-#line 792 "src/grammar.c"
+#line 821 "src/grammar.c"
         break;
       case 4: /* variable ::= VAR */
-      case 15: /* expr ::= INTEGER */ yytestcase(yyruleno==15);
-      case 16: /* expr ::= BOOL */ yytestcase(yyruleno==16);
-      case 17: /* expr ::= STRING */ yytestcase(yyruleno==17);
-#line 89 "src/grammar.lg"
+      case 21: /* expr ::= INTEGER */ yytestcase(yyruleno==21);
+      case 22: /* expr ::= BOOL */ yytestcase(yyruleno==22);
+      case 23: /* expr ::= STRING */ yytestcase(yyruleno==23);
+#line 90 "src/grammar.lg"
 { yygotominor.yy0 = yymsp[0].minor.yy0; }
-#line 800 "src/grammar.c"
+#line 829 "src/grammar.c"
         break;
       case 5: /* expr ::= expr MINUS expr */
-#line 91 "src/grammar.lg"
+#line 92 "src/grammar.lg"
 { yygotominor.yy0.val = val_sub(yymsp[-2].minor.yy0.val, yymsp[0].minor.yy0.val); }
-#line 805 "src/grammar.c"
+#line 834 "src/grammar.c"
         break;
       case 6: /* expr ::= expr PLUS expr */
-#line 92 "src/grammar.lg"
+#line 93 "src/grammar.lg"
 { yygotominor.yy0.val = val_add(yymsp[-2].minor.yy0.val, yymsp[0].minor.yy0.val); }
-#line 810 "src/grammar.c"
+#line 839 "src/grammar.c"
         break;
       case 7: /* expr ::= expr TIMES expr */
-#line 93 "src/grammar.lg"
+#line 94 "src/grammar.lg"
 { yygotominor.yy0.val = val_mul(yymsp[-2].minor.yy0.val, yymsp[0].minor.yy0.val); }
-#line 815 "src/grammar.c"
+#line 844 "src/grammar.c"
         break;
       case 8: /* expr ::= expr DIVIDE expr */
-#line 94 "src/grammar.lg"
+#line 95 "src/grammar.lg"
 { yygotominor.yy0.val = val_div(yymsp[-2].minor.yy0.val, yymsp[0].minor.yy0.val); }
-#line 820 "src/grammar.c"
+#line 849 "src/grammar.c"
         break;
       case 9: /* expr ::= expr AND expr */
-#line 96 "src/grammar.lg"
+#line 97 "src/grammar.lg"
 { yygotominor.yy0.val = val_and(yymsp[-2].minor.yy0.val, yymsp[0].minor.yy0.val); }
-#line 825 "src/grammar.c"
+#line 854 "src/grammar.c"
         break;
       case 10: /* expr ::= expr OR expr */
-#line 97 "src/grammar.lg"
+#line 98 "src/grammar.lg"
 { yygotominor.yy0.val = val_or(yymsp[-2].minor.yy0.val, yymsp[0].minor.yy0.val); }
-#line 830 "src/grammar.c"
+#line 859 "src/grammar.c"
         break;
       case 11: /* expr ::= expr XOR expr */
-#line 98 "src/grammar.lg"
+#line 99 "src/grammar.lg"
 { yygotominor.yy0.val = val_xor(yymsp[-2].minor.yy0.val, yymsp[0].minor.yy0.val); }
-#line 835 "src/grammar.c"
+#line 864 "src/grammar.c"
         break;
-      case 12: /* expr ::= BRO expr BRC */
-#line 100 "src/grammar.lg"
-{ yygotominor.yy0 = yymsp[-1].minor.yy0; }
-#line 840 "src/grammar.c"
+      case 12: /* expr ::= expr LESS expr */
+#line 101 "src/grammar.lg"
+{ yygotominor.yy0.val = val_lt(yymsp[-2].minor.yy0.val, yymsp[0].minor.yy0.val); }
+#line 869 "src/grammar.c"
         break;
-      case 13: /* expr ::= MINUS expr */
+      case 13: /* expr ::= expr LESSEQ expr */
 #line 102 "src/grammar.lg"
-{ yygotominor.yy0.val = val_neg(yymsp[0].minor.yy0.val); }
-#line 845 "src/grammar.c"
+{ yygotominor.yy0.val = val_le(yymsp[-2].minor.yy0.val, yymsp[0].minor.yy0.val); }
+#line 874 "src/grammar.c"
         break;
-      case 14: /* expr ::= NOT expr */
+      case 14: /* expr ::= expr GREATER expr */
 #line 103 "src/grammar.lg"
-{ yygotominor.yy0.val = val_not(yymsp[0].minor.yy0.val); }
-#line 850 "src/grammar.c"
+{ yygotominor.yy0.val = val_lt(yymsp[0].minor.yy0.val, yymsp[-2].minor.yy0.val); }
+#line 879 "src/grammar.c"
         break;
-      case 18: /* expr ::= VAR */
+      case 15: /* expr ::= expr GREATEREQ expr */
+#line 104 "src/grammar.lg"
+{ yygotominor.yy0.val = val_le(yymsp[0].minor.yy0.val, yymsp[-2].minor.yy0.val); }
+#line 884 "src/grammar.c"
+        break;
+      case 16: /* expr ::= expr EQ expr */
+#line 105 "src/grammar.lg"
+{ yygotominor.yy0.val = val_eq(yymsp[0].minor.yy0.val, yymsp[-2].minor.yy0.val); }
+#line 889 "src/grammar.c"
+        break;
+      case 17: /* expr ::= expr NEQ expr */
+#line 106 "src/grammar.lg"
+{ yygotominor.yy0.val = val_neq(yymsp[0].minor.yy0.val, yymsp[-2].minor.yy0.val); }
+#line 894 "src/grammar.c"
+        break;
+      case 18: /* expr ::= BRO expr BRC */
 #line 109 "src/grammar.lg"
+{ yygotominor.yy0 = yymsp[-1].minor.yy0; }
+#line 899 "src/grammar.c"
+        break;
+      case 19: /* expr ::= MINUS expr */
+#line 111 "src/grammar.lg"
+{ yygotominor.yy0.val = val_neg(yymsp[0].minor.yy0.val); }
+#line 904 "src/grammar.c"
+        break;
+      case 20: /* expr ::= NOT expr */
+#line 112 "src/grammar.lg"
+{ yygotominor.yy0.val = val_not(yymsp[0].minor.yy0.val); }
+#line 909 "src/grammar.c"
+        break;
+      case 24: /* expr ::= VAR */
+#line 118 "src/grammar.lg"
 { 
 	var_get(yymsp[0].minor.yy0.var, &yygotominor.yy0.val);
 }
-#line 857 "src/grammar.c"
+#line 916 "src/grammar.c"
         break;
-      case 19: /* expr ::= FUN arglist BRC */
-#line 113 "src/grammar.lg"
+      case 25: /* expr ::= FUN arglist BRC */
+#line 122 "src/grammar.lg"
 {
 	arg_t *a;
 
@@ -876,30 +935,30 @@ static void yy_reduce(
 
 	yygotominor.yy0.val = yymsp[-2].minor.yy0.fun(cnt, args);
 }
-#line 880 "src/grammar.c"
+#line 939 "src/grammar.c"
         break;
-      case 20: /* arglist ::= */
-#line 133 "src/grammar.lg"
+      case 26: /* arglist ::= */
+#line 142 "src/grammar.lg"
 { yygotominor.yy0.arg = NULL; }
-#line 885 "src/grammar.c"
+#line 944 "src/grammar.c"
         break;
-      case 21: /* arglist ::= expr */
-#line 135 "src/grammar.lg"
+      case 27: /* arglist ::= expr */
+#line 144 "src/grammar.lg"
 { 
 	yygotominor.yy0.arg = allocator_alloc(argalloc);
 	yygotominor.yy0.arg->value = yymsp[0].minor.yy0.val;
 	yygotominor.yy0.arg->next = NULL;
 }
-#line 894 "src/grammar.c"
+#line 953 "src/grammar.c"
         break;
-      case 22: /* arglist ::= expr COMMA arglist */
-#line 141 "src/grammar.lg"
+      case 28: /* arglist ::= expr COMMA arglist */
+#line 150 "src/grammar.lg"
 {
 	yygotominor.yy0.arg = allocator_alloc(argalloc);
 	yygotominor.yy0.arg->value = yymsp[-2].minor.yy0.val;
 	yygotominor.yy0.arg->next = yymsp[0].minor.yy0.arg;
 }
-#line 903 "src/grammar.c"
+#line 962 "src/grammar.c"
         break;
       default:
         break;
@@ -961,10 +1020,10 @@ static void yy_syntax_error(
 ){
   ParseARG_FETCH;
 #define TOKEN (yyminor.yy0)
-#line 58 "src/grammar.lg"
+#line 59 "src/grammar.lg"
   
   basic_error(ERR_SYNTAX_ERROR);
-#line 968 "src/grammar.c"
+#line 1027 "src/grammar.c"
   ParseARG_STORE; /* Suppress warning about unused %extra_argument variable */
 }
 
@@ -1155,7 +1214,7 @@ void Parse(
   }while( yymajor!=YYNOCODE && yypParser->yyidx>=0 );
   return;
 }
-#line 147 "src/grammar.lg"
+#line 156 "src/grammar.lg"
 
 
 	static token_t nulltoken = { };
@@ -1303,4 +1362,4 @@ void Parse(
 		
 		return result;
 	}
-#line 1307 "src/grammar.c"
+#line 1366 "src/grammar.c"

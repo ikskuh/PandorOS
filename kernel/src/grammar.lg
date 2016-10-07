@@ -54,6 +54,7 @@ static allocator_t * argalloc;
 %left DIVIDE TIMES.
 %left AND OR XOR.
 %left NOT.
+%left LESS LESSEQ GREATER GREATEREQ EQ NEQ.
    
 %syntax_error {  
   basic_error(ERR_SYNTAX_ERROR);
@@ -96,6 +97,14 @@ expr(A) ::= expr(B) DIVIDE expr(C). { A.val = val_div(B.val, C.val); }
 expr(A) ::= expr(B) AND expr(C). { A.val = val_and(B.val, C.val); }
 expr(A) ::= expr(B) OR expr(C).  { A.val = val_or(B.val, C.val); }
 expr(A) ::= expr(B) XOR expr(C). { A.val = val_xor(B.val, C.val); }
+
+expr(A) ::= expr(B) LESS expr(C).      { A.val = val_lt(B.val, C.val); }
+expr(A) ::= expr(B) LESSEQ expr(C).    { A.val = val_le(B.val, C.val); }
+expr(A) ::= expr(B) GREATER expr(C).   { A.val = val_lt(C.val, B.val); }
+expr(A) ::= expr(B) GREATEREQ expr(C). { A.val = val_le(C.val, B.val); }
+expr(A) ::= expr(B) EQ expr(C).        { A.val = val_eq(C.val, B.val); }
+expr(A) ::= expr(B) NEQ expr(C).       { A.val = val_neq(C.val, B.val); }
+
 
 expr(A) ::= BRO expr(B) BRC. { A = B; }
 

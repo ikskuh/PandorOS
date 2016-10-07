@@ -91,3 +91,23 @@ value_t val_not(value_t lhs)
 {
 	return basic_mknum(!basic_getnum(lhs));
 }
+
+
+value_t val_eq(value_t lhs, value_t rhs)
+{
+	return basic_mknum(basic_getnum(lhs) == basic_getnum(rhs));
+}
+value_t val_neq(value_t lhs, value_t rhs)
+{
+	return basic_mknum(!basic_getnum(val_eq(lhs, rhs)));
+}
+
+
+value_t val_lt(value_t lhs, value_t rhs)
+{
+	return basic_mknum(basic_getnum(lhs) < basic_getnum(rhs));
+}
+value_t val_le(value_t lhs, value_t rhs)
+{
+	return basic_mknum(basic_getnum(lhs) <= basic_getnum(rhs));
+}
