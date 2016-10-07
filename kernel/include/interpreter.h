@@ -84,6 +84,11 @@ value_t basic_mkstr(string_t num);
 value_t basic_mknull();
 
 /**
+ * Makes a control flow branch/merge.
+ */
+value_t basic_mkflow(int cflow, bool condition);
+
+/**
  * Throws an error.
  */
 void basic_error(error_t reason);

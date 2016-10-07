@@ -64,12 +64,6 @@ struct token lex(const char *input)
 		" Or "   { return (struct token){ TOK_OR, index }; }
 		"Not "   { return (struct token){ TOK_NOT, index }; }
 		
-		"While " { return (struct token){ TOKEN_WHILE, index }; }
-		"If "    { return (struct token){ TOKEN_IF, index }; }
-		"Then"   { return (struct token){ TOKEN_THEN, index }; }
-		"Else"   { return (struct token){ TOKEN_ELSE, index }; }
-		"End"    { return (struct token){ TOKEN_END, index }; }
-		
 		"<"      { return (struct token){ TOK_LESS, index }; }
 		"<="     { return (struct token){ TOK_LESSEQ, index }; }
 		">"      { return (struct token){ TOK_GREATER, index }; }

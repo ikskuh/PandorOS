@@ -20,11 +20,11 @@ void basic_error(error_t reason)
 		printf("Critical fault: ");
 		switch(reason)
 		{
-	#define ERR(i,n) case ERR_##n: \
+#define ERR(i,n) case ERR_##n: \
 		printf("%s\n", #n); \
 		break; 
-	#include "basic/errors.lst"
-	#undef ERR
+#include "basic/errors.lst"
+#undef ERR
 			default:
 				printf("ERR_UNKNOWN\n");
 				break;
@@ -67,11 +67,21 @@ value_t basic_mknum(number_t num)
 	val.number = num;
 	return val;
 }
+value_t basic_mkflow(int cflow, bool condition)
+{
+	debug("Mkflow!\n");
+	value_t val;
+	val.type = TYPE_CFLOW;
+	val.cflow = cflow;
+	val.number = condition;
+	return val;
+}
 
 value_t basic_mkstr(string_t str)
 {
 	value_t val;
 	val.type = TYPE_TEXT;
+	val.cflow = CFLOW_DEFAULT;
 	val.string = str;
 	return val;
 }
@@ -80,6 +90,7 @@ value_t basic_mknull()
 {
 	value_t val;
 	val.type = TYPE_NULL;
+	val.cflow = CFLOW_DEFAULT;
 	return val;
 }
 
@@ -131,7 +142,7 @@ dynmem_t basic_compile(char const * input, int insize)
 		
 		struct token token = lex(&input[rcursor]);
 		
-		if(token.type >= 0 || token.type == TOKEN_EOL)
+		if(token.type != TOKEN_WHITESPACE && token.type != TOKEN_INVALID)
 		{
 			char buffer[512];
 			mem_set(buffer, 0, sizeof(buffer));
