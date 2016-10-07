@@ -3,6 +3,7 @@
 #include "basic/types.h"
 #include "basic/var.h"
 #include "file.h"
+#include "dynmem.h"
 
 #include <stddef.h>
 #include <stdint.h>
@@ -50,7 +51,7 @@ void basic_register(char const *name, basfunc_f function, int type);
 /**
  *
  */
-void basic_compile(file_t * in, file_t * outfile);
+dynmem_t basic_compile(char const * input, int insize);
 
 /**
  * Returns true if a value is null.

@@ -43,6 +43,7 @@ struct token lex(const char *input)
 		*        { return (struct token){ TOKEN_INVALID, 0 }; }
 		"0x00"   { return (struct token){ TOKEN_EMPTY, 0 }; }
 		dec      { return (struct token){ TOK_INTEGER, index }; }
+		":"      { return (struct token){ TOKEN_EOL, index }; }
 		"+"      { return (struct token){ TOK_PLUS, index }; }
 		"-"      { return (struct token){ TOK_MINUS, index }; }
 		"*"      { return (struct token){ TOK_TIMES, index }; }

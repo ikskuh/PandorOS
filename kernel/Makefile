@@ -76,4 +76,4 @@ clean: rmbuild
 rmbuild: build.exe
 	rm build.exe
 	
-.PHONY: kernel cleanup harddisk
+.PHONY: kernel cleanup harddisk root.pfs

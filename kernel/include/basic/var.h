@@ -50,3 +50,8 @@ void var_set(variable_t * var, value_t source);
  * Sets the answer variable.
  */ 
 void var_setans(value_t value);
+
+/**
+ * Gets the value of the answer variable.
+ */
+void var_getans(value_t * target);

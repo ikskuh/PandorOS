@@ -94,7 +94,6 @@ void shell_main()
 				currshell.input[currshell.cursor] = 0;
 				currshell.cursor = 0;
 				
-				
 				mainmenu_shellenable(false);
 				
 				value_t result = basic_execute(currshell.input);

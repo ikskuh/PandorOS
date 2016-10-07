@@ -7,3 +7,5 @@ Sum(A, B) -> D
 Print "Sum(A,B)'1 = ", C
 Print "Sum(A,B)'2 = ", D
 Print "Sum(A,B)'3 = ", Sum(10, 20)
+
+Print "Hello" : Print "World"

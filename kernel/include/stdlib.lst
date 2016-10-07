@@ -36,14 +36,25 @@ ORDER(DEFAULT, Compile, "input, output", "Compiles the *TXT input* file into the
 		basic_error(ERR_INVALID_FILE);
 	
 	file_t *in = file_get(infile, FILE_DEFAULT);
-	file_t *out = file_get(outfile, FILE_NEW);
 	
 	if(in == NULL)
 		basic_error(ERR_INVALID_FILE);
-	if(out == NULL)
-		basic_error(ERR_INVALID_FILE);
 	
-	basic_compile(in, out);
+	dynmem_t bytecode = basic_compile(file_data(in), file_size(in));
+
+	file_t *out = file_get(outfile, FILE_NEW);
+	if(out == NULL) {
+		dynmem_free(&bytecode);
+		basic_error(ERR_INVALID_FILE);
+	}
+	
+	file_resize(out, bytecode.cursor);
+	mem_copy(
+		file_data(out),
+		bytecode.ptr,
+		bytecode.cursor);
+	
+	dynmem_free(&bytecode);
 })
 
 ORDER(DEFAULT, Run, "file", "Runs the compiled script file.",
@@ -61,23 +72,9 @@ ORDER(DEFAULT, DumpFile, "file", "Dumps a file in hexadecimal to the debug outpu
 	assert_argc(argc, 1);
 	file_t *in = file_get(STR(0), FILE_DEFAULT);
 	if(in == NULL) {
-		debug("File %s not found.\n", STR(0));
-	} else {
-		debug("Dump of '%s':\n", STR(0));
-		uint8_t *data = file_data(in);
-		int len = file_size(in);
-		for(int i = 0; i < len; i++)
-		{
-			if(i > 0 && (i % 16) == 0) {
-				debug("\n");
-			}
-			char const * hex = "0123456789ABCDEF";
-			debug("%c%c ",
-				hex[(data[i]&0xF0) >> 4],
-				hex[(data[i]&0x0F) >> 0]);
-		}
-		debug("\n");
+		basic_error(ERR_INVALID_FILE);
 	}
+	hexdump(STR(0), file_data(in), file_size(in));
 })
 
 ORDER(DEFAULT, Prompt, "str", "Sets the shell prompt for the current shell.",

@@ -129,3 +129,8 @@ void var_setans(value_t value)
 	var_set(&variable_ans, value);
 	variable_ans.ro = true;
 }
+
+void var_getans(value_t * target)
+{
+	var_get(&variable_ans, target);
+}

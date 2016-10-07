@@ -88,6 +88,7 @@ static char *basicmemory;
 void basic_memreset()
 {
 	basicmemory = pmm_getptr(stringpage);
+	mem_set(basicmemory, '?', PMM_PAGESIZE);
 }
 
 void *basic_alloc(size_t size)
@@ -110,49 +111,11 @@ char const * basic_err_to_string(error_t err)
 
 basfunc_f basic_getfunc(int type, char const *name);
 
-typedef struct dynmem
-{
-	char *ptr;
-	int cursor;
-	int size;
-} dynmem_t;
-
-static dynmem_t dm_new()
-{
-	return (dynmem_t) {
-		NULL, 0, 0
-	};
-}
-
-static void dm_write(dynmem_t * dm, void *ptr, int size)
-{
-	if(dm->cursor + size > dm->size)
-	{
-		debug("Resize %d to %d\n", dm->size, dm->size + 0x100);
-		dm->size += 0x100;
-		void *nx = realloc(dm->ptr, dm->size);
-		if(nx == NULL)
-			; // TODO: Handle error
-		dm->ptr = nx;
-	}
-	
-	mem_copy(&dm->ptr[dm->cursor], ptr, size);
-	
-	dm->cursor += size;
-}
-
-static void dm_kill(dynmem_t * dm)
-{
-	free(dm->ptr);
-}
-
-void basic_compile(file_t * infile, file_t * outfile)
+dynmem_t basic_compile(char const * input, int insize)
 {
 	char zero = 0;
-	char * input = file_data(infile);
-	int insize = file_size(infile);
 
-	dynmem_t bytecode = dm_new();
+	dynmem_t bytecode = dynmem_new();
 	
 	for(int rcursor = 0; rcursor < insize; )
 	{
@@ -167,7 +130,8 @@ void basic_compile(file_t * infile, file_t * outfile)
 			break; // Double break!
 		
 		struct token token = lex(&input[rcursor]);
-		if(token.type >= 0)
+		
+		if(token.type >= 0 || token.type == TOKEN_EOL)
 		{
 			char buffer[512];
 			mem_set(buffer, 0, sizeof(buffer));
@@ -175,7 +139,7 @@ void basic_compile(file_t * infile, file_t * outfile)
 			
 			{
 				char tok = token.type;
-				dm_write(&bytecode, &tok, 1); 
+				dynmem_write(&bytecode, &tok, 1); 
 			}
 			
 			switch(token.type)
@@ -183,22 +147,22 @@ void basic_compile(file_t * infile, file_t * outfile)
 				case TOK_INTEGER:
 				{
 					int ival = str_to_int(buffer, 10);
-					dm_write(&bytecode, &ival, sizeof(ival));
+					dynmem_write(&bytecode, &ival, sizeof(ival));
 					break;
 				}
 				case TOK_BOOL:
 				{
 					bool bval = str_eq(buffer, "True") || str_eq(buffer, "On");
-					dm_write(&bytecode, &bval, sizeof(bval));
+					dynmem_write(&bytecode, &bval, sizeof(bval));
 					break;
 				}
 				// Both strings are stored with each length+ptr and zero termination.
 				case TOK_STRING:
 				{
 					int len = token.length - 2;
-					dm_write(&bytecode, &len, sizeof(len));
-					dm_write(&bytecode, buffer + 1, len);
-					dm_write(&bytecode, &zero, sizeof(zero));
+					dynmem_write(&bytecode, &len, sizeof(len));
+					dynmem_write(&bytecode, buffer + 1, len);
+					dynmem_write(&bytecode, &zero, sizeof(zero));
 					break;
 				}
 				// Both strings are stored with each length+ptr and zero termination.
@@ -207,9 +171,9 @@ void basic_compile(file_t * infile, file_t * outfile)
 				case TOK_ORDER:
 				{
 					int len = token.length;
-					dm_write(&bytecode, &len, sizeof(len));
-					dm_write(&bytecode, buffer, len);
-					dm_write(&bytecode, &zero, sizeof(zero));
+					dynmem_write(&bytecode, &len, sizeof(len));
+					dynmem_write(&bytecode, buffer, len);
+					dynmem_write(&bytecode, &zero, sizeof(zero));
 					break;
 				}
 			}
@@ -218,6 +182,7 @@ void basic_compile(file_t * infile, file_t * outfile)
 		}
 		else if(token.type == TOKEN_INVALID)
 		{
+			dynmem_free(&bytecode);
 			basic_error(ERR_INVALID_TOKEN);
 		}
 		rcursor += token.length;
@@ -233,7 +198,7 @@ void basic_compile(file_t * infile, file_t * outfile)
 			} else {
 				end = TOKEN_EOL;
 			}
-			dm_write(&bytecode, &end, 1);
+			dynmem_write(&bytecode, &end, 1);
 			
 			rcursor++;
 			
@@ -242,12 +207,55 @@ void basic_compile(file_t * infile, file_t * outfile)
 		}
 	}
 	
-	// Finally, put the stuff in our target file.
-	file_resize(outfile, bytecode.cursor);
-	mem_copy(
-		file_data(outfile),
-		bytecode.ptr,
-		bytecode.cursor);
+	// hexdump("Tokenized Code", bytecode.ptr, bytecode.cursor);
 	
-	dm_kill(&bytecode);
+	return bytecode;
+}
+
+
+value_t basic_execute(char const *input)
+{
+	int len = str_len(input);
+	
+	dynmem_t bytecode = basic_compile(input, len);
+	
+	value_t result = basic_execute2(bytecode.ptr, bytecode.cursor);
+	
+	dynmem_free(&bytecode);
+	
+	return result;
+}
+
+
+	
+struct basreg {
+	char name[64];
+	int type;
+	basfunc_f func;
+};
+
+static struct basreg functions[1024];
+static int basfunc_cnt = 0;
+
+void basic_register(char const *name, basfunc_f function, int type)
+{
+	functions[basfunc_cnt] = (struct basreg){ "", type, function };
+	
+	str_copy(functions[basfunc_cnt].name, name);
+	if(type == BASIC_FUNCTION)
+		str_cat(functions[basfunc_cnt].name, "("); // Fancy hack to find the tokens instead of the names.
+	
+	++basfunc_cnt;
+}
+
+basfunc_f basic_getfunc(int type, char const *name)
+{
+	for(int i = 0; i < basfunc_cnt; i++)
+	{
+		if(functions[i].type != type)
+			continue;
+		if(str_eq(name, functions[i].name))
+			return functions[i].func;
+	}
+	return NULL;
 }
