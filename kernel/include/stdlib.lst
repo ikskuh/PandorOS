@@ -24,14 +24,25 @@ ORDER(DEFAULT, PrintSep, "separator", "Sets the separator that will be printed i
 	str_copy(printsep, STR(0));
 })
 
-ORDER(DEFAULT, Compile, "input, output", "Compiles the *TXT input* file into the *PRG output* file.",
+ORDER(DEFAULT, Compile, "input, [output]", "Compiles the *TXT input* file into the *PRG output* file. If *output* is not given, the file name of the input file is taken and the extension will be changed to '.PRG'.",
 {
-	assert_argc(argc, 2);
+	if(argc < 1 || argc > 2)
+		basic_error(ERR_ARG_COUNT);
 	string_t infile = STR(0);
-	string_t outfile = STR(1);
-	
 	if(file_type_by_extension(infile) != FILE_TEXT)
 		basic_error(ERR_INVALID_FILE);
+	
+	char outfile[128];
+	if(argc > 1) {
+		str_copy(outfile, STR(1));
+	} else {
+		str_copy(outfile, STR(0));
+		int len = str_len(outfile);
+		outfile[len - 3] = 'P';
+		outfile[len - 2] = 'R';
+		outfile[len - 1] = 'G';
+	}
+		
 	if(file_type_by_extension(outfile) != FILE_PROGRAM)
 		basic_error(ERR_INVALID_FILE);
 	
