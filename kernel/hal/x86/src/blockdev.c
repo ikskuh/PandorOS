@@ -4,6 +4,13 @@
 #include "interrupts.h"
 #include <stdint.h>
 
+#define ERR (1<<0)
+#define DRQ (1<<3)
+#define SRV (1<<4)
+#define DF (1<<5)
+#define RDY (1<<6)
+#define BSY (1<<7)
+
 static inline void wait400NS(uint16_t p) 
 {
 	inb(p);
@@ -14,7 +21,7 @@ static inline void wait400NS(uint16_t p)
 
 struct cpu *ata_isr(struct cpu *cpu)
 {
-	hal_debug("ATA isr!\n");
+	// hal_debug("ATA isr!\n");
 	return cpu;
 }
 
@@ -266,12 +273,14 @@ bool hal_write_block(int devid, int lba, void const * buffer)
 	outb(ports.lbaHigh, lba >> 16);
 	outb(ports.cmd, 0x30);
 	
+	hal_debug("HAL|Write %d\n", lba);
+	
 	uint32_t off = 0;
 	while(num-- > 0) {
 		uint8_t stat;
-		while(((stat = status(dev)) & 0x9) == 0);
+		while(((stat = status(dev)) & (ERR | DRQ)) == 0);
 		if(stat & 0x01) {
-			hal_debug("Failed to read from %s.\n", dev->name);
+			hal_debug("Failed to write to %s.\n", dev->name);
 			return false;
 		}
 		
@@ -284,6 +293,11 @@ bool hal_write_block(int devid, int lba, void const * buffer)
 		}
 		
 		outb(ports.cmd, 0xE7); // Flush
+		while(((stat = status(dev)) & (ERR | RDY)) == 0);
+		if(stat & 0x01) {
+			hal_debug("Failed to read from %s.\n", dev->name);
+			return false;
+		}
 	}
 
 #undef ports

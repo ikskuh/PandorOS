@@ -1,0 +1,8 @@
+
+10 -> A
+While A > 0
+
+Print A
+A - 1 -> A
+
+End

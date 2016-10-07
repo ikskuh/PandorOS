@@ -88,6 +88,16 @@ ORDER(DEFAULT, DumpFile, "file", "Dumps a file in hexadecimal to the debug outpu
 	hexdump(STR(0), file_data(in), file_size(in));
 })
 
+ORDER(DEFAULT, HexEdit, "file", "Opens the hex editor for *file*.",
+{
+	assert_argc(argc, 1);
+	file_t *in = file_get(STR(0), FILE_DEFAULT);
+	if(in == NULL) {
+		basic_error(ERR_INVALID_FILE);
+	}
+	hexedit_open(file_data(in), file_size(in), HEXEDIT_DEFAULT);
+})
+
 ORDER(DEFAULT, Prompt, "str", "Sets the shell prompt for the current shell.",
 {
 	assert_argc(argc, 1);

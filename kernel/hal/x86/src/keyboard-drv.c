@@ -120,5 +120,14 @@ struct cpu *keyboard_isr(struct cpu *cpu)
 		}
 	}
 	
+	// "Print" will display the CPU state:
+	if(scancode.set == 1 && scancode.code == 55 && !break_code)
+	{
+		hal_debug("CPU State:\n");
+#define REGISTER(reg) hal_debug("    " #reg " = 0x%x / %d\n", cpu->reg, cpu->reg);
+#include "registers.h"
+#undef REGISTER
+	}
+	
 	return cpu;
 }

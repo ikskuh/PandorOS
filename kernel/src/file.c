@@ -207,14 +207,16 @@ static storeio_t sio_init(storage_t const * storage, void * buffer)
 static void sio_read(storeio_t * sr, void * buffer, int len)
 {
 	uint8_t * buf = buffer;
+	int blocksize = hal_blocksize(sr->storage->device);
 	while(len > 0)
 	{
-		if(sr->cursor >= hal_blocksize(sr->storage->device))
+		if(sr->cursor >= blocksize)
 		{
-			hal_read_block(sr->storage->device, sr->lba, sr->buffer);
-			
 			sr->cursor = 0;
 			sr->lba++;
+			
+			hal_read_block(sr->storage->device, sr->lba, sr->buffer);
+			
 			if(sr->lba > (sr->storage->partition.lba + sr->storage->partition.size)) {
 				// TODO: Do some error handling here!
 				return;
@@ -233,14 +235,17 @@ static void sio_write(storeio_t * sr, void * buffer, int len)
 	}
 	
 	uint8_t * buf = buffer;
+	int blocksize = hal_blocksize(sr->storage->device);
 	while(len > 0)
 	{
 		sr->buffer[sr->cursor++] = *buf++;
 		len--;
 		
-		if(sr->cursor >= hal_blocksize(sr->storage->device))
+		if(sr->cursor >= blocksize)
 		{
 			hal_write_block(sr->storage->device, sr->lba, sr->buffer);
+			
+			mem_set(sr->buffer, 0xFF, blocksize);
 			
 			sr->cursor = 0;
 			sr->lba++;
@@ -281,7 +286,8 @@ void file_loadfs(storage_t const * storage)
 	do
 	{
 		sio_read(&read, &size, sizeof(size));
-		if(size > 0)
+		debug("size=%d\n", size);
+		if((size > 0) && (size != 0xFFFFFFFF))
 		{
 			char name[16];
 			sio_read(&read, name, 0x10);
@@ -290,7 +296,7 @@ void file_loadfs(storage_t const * storage)
 			file_resize(f, size);
 			sio_read(&read, file_data(f), size);
 		}
-	} while(size != 0);
+	} while((size != 0) && (size != 0xFFFFFFFF));
 }
 
 /**
@@ -321,22 +327,19 @@ void file_savefs(storage_t const * storage)
 		char name[16];
 		str_copy(name, it->name);
 		size = it->size;
-		
 		sio_write(&write, &size, sizeof(size));
 		sio_write(&write, name, 0x10);
 		sio_write(&write, file_data(it), size);
-			
 	} 
 	
 	// Write end marker
-	size = 0;
+	size = 0xFFFFFFFF;
 	sio_write(&write, &size, sizeof(size));
 	sio_flush(&write);
 }
 
 void file_initfs(storage_t const * storage)
 {
-
 	if(storage == NULL)
 		return;
 	int blocksize = hal_blocksize(storage->device);

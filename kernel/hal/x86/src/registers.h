@@ -1,0 +1,16 @@
+REGISTER(eax)
+REGISTER(ebx)
+REGISTER(ecx)
+REGISTER(edx)
+REGISTER(esi)
+REGISTER(edi)
+REGISTER(ebp)
+
+REGISTER(interrupt)
+REGISTER(error)
+
+REGISTER(eip)
+REGISTER(cs)
+REGISTER(eflags)
+REGISTER(esp)
+REGISTER(ss)

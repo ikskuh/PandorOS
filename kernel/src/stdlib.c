@@ -3,6 +3,7 @@
 #include "standard.h"
 #include "shell.h"
 #include "editor.h"
+#include "hexedit.h"
 #include "file.h"
 #include "debug.h"
 #include <stddef.h>
