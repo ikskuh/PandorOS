@@ -353,12 +353,12 @@ FUNCTION(Resize, "file, size", "",
 
 // Control flow
 
-ORDER(DEFAULT, While, "condition", "",
+CFLOW(While, "condition", "",
 {
 	assert_argc(argc, 1);
 	return basic_mkflow(CFLOW_WHILE, NUM(0));
 })
-ORDER(DEFAULT, End, "", "",
+CFLOW(End, "", "",
 {
 	assert_argc(argc, 0);
 	return basic_mkflow(CFLOW_END, true);

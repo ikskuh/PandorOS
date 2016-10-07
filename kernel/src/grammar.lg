@@ -87,6 +87,26 @@ program ::= ORDER(O) arglist(A). {
 	result = O.fun(cnt, args);
 }
 
+program ::= CFLOW(O) arglist(A). {
+	arg_t *a;
+
+	int cnt = 0;
+	for(a = A.arg; a != NULL; a = a->next)
+	{
+		cnt++;
+	}
+
+	value_t args[cnt];
+	
+	int i;
+	for(a = A.arg, i = 0; a != NULL; a = a->next, i++)
+	{
+		args[i] = a->value;
+	}
+
+	result = O.fun(cnt, args);
+}
+
 variable(V) ::= VAR(A).                { V = A; }
 
 expr(A) ::= expr(B) MINUS  expr(C). { A.val = val_sub(B.val, C.val); }
@@ -238,6 +258,20 @@ arglist(A) ::= expr(B) COMMA arglist(C). {
 							currtok.fun = basic_getfunc(BASIC_FUNCTION, (char const *)&tokens[i]);
 							if(currtok.fun == NULL) {
 								basic_error(ERR_FUNC_NOT_FOUND);
+							}
+							i += len;
+							
+							break;
+						}
+						case TOK_CFLOW:
+						{
+							debug("Cflow\n");
+							int len = *((int*)&tokens[i]);
+							i += sizeof(int);
+							
+							currtok.fun = basic_getfunc(BASIC_CFLOW, (char const *)&tokens[i]);
+							if(currtok.fun == NULL) {
+								basic_error(ERR_UNEXPECTED_CFLOW);
 							}
 							i += len;
 							

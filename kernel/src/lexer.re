@@ -57,12 +57,19 @@ struct token lex(const char *input)
 		ws+      { return (struct token){ TOKEN_WHITESPACE, index }; }
 		"\"" ([^"] \ "\x00")* "\""      { return (struct token){ TOK_STRING, index }; }
 		bool     { return (struct token){ TOK_BOOL, index }; }
-		ord      { return (struct token){ TOK_ORDER, index }; }
 		
 		" And "  { return (struct token){ TOK_AND, index }; }
 		" Xor "  { return (struct token){ TOK_XOR, index }; }
 		" Or "   { return (struct token){ TOK_OR, index }; }
 		"Not "   { return (struct token){ TOK_NOT, index }; }
+		
+		"While"  { return (struct token){ TOK_CFLOW, index }; }
+		"If"     { return (struct token){ TOK_CFLOW, index }; }
+		"Then"   { return (struct token){ TOK_CFLOW, index }; }
+		"Else"   { return (struct token){ TOK_CFLOW, index }; }
+		"End"    { return (struct token){ TOK_CFLOW, index }; }
+		
+		ord      { return (struct token){ TOK_ORDER, index }; }
 		
 		"<"      { return (struct token){ TOK_LESS, index }; }
 		"<="     { return (struct token){ TOK_LESSEQ, index }; }

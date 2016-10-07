@@ -11,6 +11,7 @@
 
 #define BASIC_FUNCTION 1
 #define BASIC_ORDER    2
+#define BASIC_CFLOW    3
 
 /**
  * Initializes the basic interpreter.

@@ -180,6 +180,7 @@ dynmem_t basic_compile(char const * input, int insize)
 				case TOK_FUN:
 				case TOK_VAR:
 				case TOK_ORDER:
+				case TOK_CFLOW:
 				{
 					int len = token.length;
 					dynmem_write(&bytecode, &len, sizeof(len));
