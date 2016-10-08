@@ -18,3 +18,18 @@ static inline void mem_set(void *dst, int value, size_t len)
 		d[i] = value;
 	}
 }
+
+static inline int mem_comp(const void *lhs, const void *rhs, size_t len)
+{
+	if(len == 0) return 0;
+	char const * l = lhs;
+	char const * r = rhs;
+	while(len-- > 0)
+	{
+		if (*l != *r) {
+			return (*l - *r);
+		}
+		l++, r++;
+	}
+	return 0;
+}

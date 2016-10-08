@@ -7,9 +7,23 @@
 #include "mainmenu.h"
 #include "debug.h"
 
+#include "ctype.h"
+
 shell_t *currentShell = NULL;
 
 #define currshell (*currentShell)
+
+#define COMPLETIONS_COUNT ((int)(sizeof(completions) / sizeof(completions[0])))
+static char const * completions[] = 
+{
+#define FUNCTION(name, synpsis, desc, code) #name "(", 
+#define CFLOW(name, synpsis, desc, code) #name " ",
+#define ORDER(mode, name, synpsis, desc, code) #name " ",
+#include "stdlib.lst"
+#undef ORDER
+#undef CFLOW
+#undef FUNCTION
+};
 
 void select_shell(shell_t * shell)
 {
@@ -45,6 +59,43 @@ void shell_init(int shellCount)
 	mainmenu_render();
 }
 
+static void shell_autocomplete()
+{
+	char word[64];
+	int length = 0;
+	for(int i = currshell.cursor - 1; i >= 0; i--)
+	{
+		char c = currshell.input[i];
+		if(!isalpha(c))
+			break;
+		word[length++] = c;
+	}
+	word[length] = 0;
+	for(int i = 0; i < length/2; i++)
+	{
+		char c = word[i];
+		word[i] = word[length - i - 1];
+		word[length - i - 1] = c;
+	}
+	
+	char const * selection = NULL;
+	for(int i = 0; i < COMPLETIONS_COUNT; i++)
+	{
+		if(mem_comp(word, completions[i], length) == 0) {
+			selection = completions[i];
+			break;
+		}
+	}
+	if(selection != NULL) {
+		char const * comp = &selection[length];
+		while(*comp) {
+			currshell.input[currshell.cursor++] = *comp;
+			putc(*comp);
+			comp++;
+		}
+	}
+}
+
 static void shell_readprompt()
 {
 	while(true)
@@ -55,7 +106,7 @@ static void shell_readprompt()
 		{
 			switch(hit.key)
 			{
-				case VK_META:
+				case VK_TAB:
 				{
 					mainmenu_open(true);
 					char const * insertion = catalog_get();
@@ -74,9 +125,11 @@ static void shell_readprompt()
 					mainmenu_shellenable(true);
 					continue;
 				}
-				case VK_TAB:
+				case VK_SPACE:
 				{
-					// Do autocompletion here!
+					if(!kbd_is_pressed(VK_CONTROL))
+						break;
+					shell_autocomplete();
 					continue;
 				}
 			}

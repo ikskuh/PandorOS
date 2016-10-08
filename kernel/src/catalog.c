@@ -19,7 +19,7 @@ static cataloginfo_t entries[] = {
 // { "Print(", "Print(value)", "Prints the given value and appends a newline." },
 	
 #define FUNCTION(name, synpsis, desc, code) { #name "(", #name "(" synpsis ")", desc },
-#define CFLOW(name, synpsis, desc, code) { #name "(", #name "(" synpsis ")", desc },
+#define CFLOW(name, synpsis, desc, code) { #name " ", #name "(" synpsis ")", desc },
 #define ORDER(mode, name, synpsis, desc, code) { #name " ", #name " " synpsis, desc },
 #include "stdlib.lst"
 #undef ORDER
