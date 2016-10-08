@@ -24,10 +24,10 @@ void editor_open(char const * fileName)
 	{
 		case FILE_INVALID:
 		case FILE_TEXT:
-		case FILE_PROGRAM:
+		case FILE_BASIC:
 			break;
 		default:
-			basic_error(ERR_INVALID_FILE);
+			basic_error(ERR_NOT_SUPPORTED);
 			return;
 	}
 	
@@ -301,8 +301,11 @@ void editor_open(char const * fileName)
 					{
 						mem_copy(ptr, lines[i].text, lines[i].length);
 						ptr += lines[i].length;
-						*ptr = '\n';
-						ptr += 1;
+						if(i != (lineCount - 1)) {
+							// Do not append newline at the end of the file.
+							*ptr = '\n';
+							ptr += 1;
+						}
 					}
 				
 					continue;

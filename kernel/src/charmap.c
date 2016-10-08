@@ -4,6 +4,9 @@
 
 static int last = -1;
 
+static int cx = 0;
+static int cy = 0;
+
 void charmap_open()
 {
 	console_t *prevcon = stdcon;
@@ -11,9 +14,6 @@ void charmap_open()
 	chcon->flags &= ~CON_AUTOREFRESH;
 	chcon->flags |= CON_NOCURSOR;
 	console_set(chcon);
-	
-	int cx = 0;
-	int cy = 0;
 	
 	last = -1;
 	

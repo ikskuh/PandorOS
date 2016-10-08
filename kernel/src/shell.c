@@ -194,5 +194,8 @@ void shell_main()
 		shell_readprompt();
 		
 		shell_execute();
+		
+		// Rerender the console window after each command.
+		console_refresh();
 	}
 }

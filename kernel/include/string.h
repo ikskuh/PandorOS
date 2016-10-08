@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdbool.h>
+#include "ctype.h"
 
 int str_printf(char *str, char const *fmt, ...);
 
@@ -9,6 +10,16 @@ static inline bool str_eq(char const * lhs, char const * rhs)
 	while(*lhs) {
 		if(*rhs == 0) break;
 		if((*lhs++) != (*rhs++))
+			return false;
+	}
+	return (*lhs == 0) && (*rhs == 0);
+}
+
+static inline bool str_eqi(char const * lhs, char const * rhs)
+{
+	while(*lhs) {
+		if(*rhs == 0) break;
+		if(tolower(*lhs++) != tolower(*rhs++))
 			return false;
 	}
 	return (*lhs == 0) && (*rhs == 0);

@@ -7,7 +7,8 @@
 optiongroup_t *firstGroup = NULL;
 
 console_t *console = NULL;
-
+;
+/*
 static optiongroup_t optionsDemo = { "Example Options", NULL, NULL };
 
 int _ival;
@@ -27,6 +28,7 @@ static option_t optionStr  = {
 	(optioncfg_txt_t[]) { { 15 } },
 	NULL
 };
+*/
 
 void options_init()
 {
@@ -34,7 +36,7 @@ void options_init()
 	console->flags &= ~CON_AUTOREFRESH;
 	console->flags |=  CON_NOCURSOR;
 	
-	
+	/*
 	optiongroup_register(&optionsDemo);
 	
 	option_add(&optionsDemo, &optionInt);
@@ -42,6 +44,7 @@ void options_init()
 	option_add(&optionsDemo, &optionStr);
 	
 	str_copy(_tval, "Edit this text!");
+	*/
 }
 
 void optiongroup_register(optiongroup_t *group)

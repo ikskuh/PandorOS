@@ -45,7 +45,7 @@ ORDER(DEFAULT, Compile, "input, [output]", "Compiles the *TXT input* file into t
 	if(argc < 1 || argc > 2)
 		basic_error(ERR_ARG_COUNT);
 	string_t infile = STR(0);
-	if(file_type_by_extension(infile) != FILE_TEXT)
+	if(file_type_by_extension(infile) != FILE_BASIC)
 		basic_error(ERR_INVALID_FILE);
 	
 	char outfile[128];
@@ -92,7 +92,7 @@ ORDER(DEFAULT, Run, "file", "Runs the compiled script file.",
 	{
 		case FILE_PROGRAM:
 			return basic_execute2(file_data(in), file_size(in));
-		case FILE_TEXT:
+		case FILE_BASIC:
 		{
 			dynmem_t bytecode = basic_compile(file_data(in), file_size(in));
 			// TODO: Fix memory leak on error

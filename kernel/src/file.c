@@ -90,12 +90,14 @@ int file_type_by_extension(char const * name)
 {
 	while(*name)
 	{
-		if(str_eq(name, ".PRG"))
+		if(str_eqi(name, ".PRG"))
 			return FILE_PROGRAM;
-		if(str_eq(name, ".DAT"))
+		if(str_eqi(name, ".DAT"))
 			return FILE_DATA;
-		if(str_eq(name, ".TXT"))
+		if(str_eqi(name, ".TXT"))
 			return FILE_TEXT;
+		if(str_eqi(name, ".BAS"))
+			return FILE_BASIC;
 		name++;
 	}
 	return FILE_INVALID;
@@ -120,6 +122,7 @@ file_t * file_get(char const * fileName, int flags)
 			case FILE_PROGRAM:
 			case FILE_DATA:
 			case FILE_TEXT:
+			case FILE_BASIC:
 				return file_new(fileName, type);
 			default:
 				return NULL;
