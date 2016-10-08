@@ -38,8 +38,6 @@ void shell_init(int shellCount)
 		if(i == 0) {
 			select_shell(shell);
 		}
-		
-		console_printf(shell->console, "%s", shell->prompt);
 	}
 	
 	mainmenu_initshell(shells, shellCount);
@@ -47,12 +45,11 @@ void shell_init(int shellCount)
 	mainmenu_render();
 }
 
-void shell_main()
+static void shell_readprompt()
 {
 	while(true)
 	{
 		int c = getchar();
-		
 		switch(c)
 		{
 			case '\t':
@@ -94,28 +91,38 @@ void shell_main()
 				currshell.input[currshell.cursor] = 0;
 				currshell.cursor = 0;
 				
-				mainmenu_shellenable(false);
-				
-				value_t result = basic_execute(currshell.input);
-				
-				mainmenu_shellenable(true);
-				
-				if(basic_lasterror() != ERR_SUCCESS)
-				{
-					printf("ERROR: %s\n", basic_err_to_string(basic_lasterror()));
-				}
-				else
-				{
-					if(basic_isnull(result) == false && (currshell.flags & SHELL_ECHO)) {
-						printf("= %v\n", result);
-					}
-				}
-				printf("%s", currshell.prompt);
-				break;
+				return;
 			default:
 				currshell.input[currshell.cursor++] = c;
 				putc(c);
 				break;
 		}
+	}
+}
+
+static void shell_execute()
+{
+	mainmenu_shellenable(false);
+				
+	value_t result = basic_execute(currshell.input);
+	
+	mainmenu_shellenable(true);
+	
+	if(basic_isnull(result) == false && (currshell.flags & SHELL_ECHO)) {
+		printf("= %v\n", result);
+	}
+}
+
+void shell_main()
+{
+	mainmenu_shellenable(true);
+	while(true)
+	{
+		// Start by printing the prompt.
+		printf("%s", currshell.prompt);
+	
+		shell_readprompt();
+		
+		shell_execute();
 	}
 }

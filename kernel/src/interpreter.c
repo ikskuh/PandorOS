@@ -16,24 +16,8 @@ extern jmp_buf errorhandler;
 void basic_error(error_t reason)
 {
 	if(reason == ERR_SUCCESS) return;
-	if(errorhandler_valid == false) {
-		printf("Critical fault: ");
-		switch(reason)
-		{
-#define ERR(i,n) case ERR_##n: \
-		printf("%s\n", #n); \
-		break; 
-#include "basic/errors.lst"
-#undef ERR
-			default:
-				printf("ERR_UNKNOWN\n");
-				break;
-		}
-		while(1);
-	} else {
-		longjmp(errorhandler, reason);
-		printf("?longjmp?");
-	}
+	longjmp(errorhandler, reason);
+	printf("?longjmp?");
 }
 
 static page_t stringpage;

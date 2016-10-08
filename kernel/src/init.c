@@ -13,6 +13,8 @@
 #include "shell.h"
 #include "file.h"
 #include "storage.h"
+#include "longjmp.h"
+#include "hal.h"
 
 int ticks = 0;
 
@@ -23,8 +25,25 @@ void os_tick()
 	// console_refresh();
 }
 
+jmp_buf errorhandler;
+
+static error_t lastError = ERR_SUCCESS;
+
+error_t basic_lasterror()
+{
+	return lastError;
+}
+
 void os_init()
 {
+	// This allows us to catch all basic_errors that will happen during initiliazation.
+	lastError = (error_t)setjmp(errorhandler);
+	if(lastError != ERR_SUCCESS)
+	{
+		hal_debug("Error while initialization: %s\n", basic_err_to_string(basic_lasterror()));
+		while(1);
+	}
+	
 	{ // Initialize pmm-dependent
 		console_init();
 		options_init();
@@ -48,7 +67,16 @@ void os_init()
 	
 	while(true)
 	{
-		shell_main();
+		// This will override the initialization error handler and will loop the OS forever :)
+		lastError = (error_t)setjmp(errorhandler);
+		if(lastError == ERR_SUCCESS)
+		{
+			shell_main();
+		}
+		else
+		{
+			printf("ERROR: %s\n", basic_err_to_string(lastError));
+		}
 	}
 	
 	while(true);

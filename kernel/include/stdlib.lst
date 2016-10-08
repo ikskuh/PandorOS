@@ -6,6 +6,11 @@
 IMPORT(extern bool shell_has_echo;)
 IMPORT(char printsep[64] = "";)
 
+ORDER(DEFAULT, Error, "", "Throws ERR_USER.\nCan be used to terminate a program and signal the user that something failed.",
+{
+	basic_error(ERR_USER);
+})
+
 ORDER(DEFAULT, Print, "...", "Prints its arguments and adds a newline.",
 {
 	for(int i = 0; i < argc; i++)
