@@ -27,8 +27,8 @@ bool kbd_is_pressed(int vk)
 				return kbd_is_pressed(VK_CONTROL_LEFT) || kbd_is_pressed(VK_CONTROL_RIGHT);
 			case VK_SHIFT:
 				return kbd_is_pressed(VK_SHIFT_LEFT) || kbd_is_pressed(VK_SHIFT_RIGHT);
-			case VK_ALT:
-				return kbd_is_pressed(VK_ALT_LEFT) || kbd_is_pressed(VK_ALT_RIGHT);
+			case VK_META:
+				return kbd_is_pressed(VK_META_LEFT) || kbd_is_pressed(VK_META_RIGHT);
 		}
 		return false;
 	}
