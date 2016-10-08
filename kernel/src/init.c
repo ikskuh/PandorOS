@@ -16,6 +16,8 @@
 #include "longjmp.h"
 #include "hal.h"
 
+#define AUTORUN_FILE "AUTORUN.BAS"
+
 int ticks = 0;
 
 void os_tick()
@@ -63,6 +65,28 @@ void os_init()
 		file_init();
 	
 		shell_init(4);
+	}
+	
+	// Make some error wrapper for init script:
+	lastError = (error_t)setjmp(errorhandler);
+	if(lastError == ERR_SUCCESS)
+	{
+		file_t *autorun = file_get(AUTORUN_FILE, FILE_DEFAULT);
+		if(autorun != NULL)
+		{
+			dynmem_t bytecode = basic_compile(
+				file_data(autorun), 
+				file_size(autorun));
+			// TODO: Fix memory leak on error
+			basic_execute2(bytecode.ptr, bytecode.cursor);
+			dynmem_free(&bytecode);
+		}
+		
+		console_refresh();
+	}
+	else
+	{
+		printf("Failed to run " AUTORUN_FILE ": %s\n", basic_err_to_string(lastError));
 	}
 	
 	while(true)

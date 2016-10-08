@@ -4,8 +4,9 @@
 
 #include <stdbool.h>
 
-#define SHELL_DEFAULT 0
-#define SHELL_ECHO    (1<<0)
+#define SHELL_DEFAULT     0
+#define SHELL_ECHO        (1<<0)
+#define SHELL_INITIALIZED (1<<1)
 
 typedef struct shell
 {

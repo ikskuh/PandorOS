@@ -5,3 +5,5 @@ SetOpt "x86 Options/Highlight Color", 10
 SetOpt "x86 Options/Bold Text Color", 4
 
 LoadFS "ATA0.0"
+
+Run "INIT.BAS"

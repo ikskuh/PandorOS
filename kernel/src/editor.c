@@ -284,7 +284,8 @@ void editor_open(char const * fileName)
 					for(int i = 0; i < lineCount; i++)
 					{
 						total += lines[i].length;
-						total += 1; // '\n'
+						if(i != (lineCount - 1))
+							total += 1; // '\n'
 					}
 					
 					file = file_get(fileName, FILE_NEW);

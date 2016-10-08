@@ -123,6 +123,14 @@ static void shell_readprompt()
 						putc(cmap);
 					}
 					mainmenu_shellenable(true);
+					
+	
+					if((currshell.flags & SHELL_INITIALIZED) == 0)
+					{
+						// Start by printing the prompt.
+						printf("%s", currshell.prompt);
+						currshell.flags |= SHELL_INITIALIZED;
+					}
 					continue;
 				}
 				case VK_SPACE:
@@ -185,12 +193,13 @@ static void shell_execute()
 
 void shell_main()
 {
+	currshell.flags |= SHELL_INITIALIZED;
 	mainmenu_shellenable(true);
 	while(true)
 	{
-		// Start by printing the prompt.
+		// re-print the prompt.
 		printf("%s", currshell.prompt);
-	
+		
 		shell_readprompt();
 		
 		shell_execute();
