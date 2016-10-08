@@ -9,12 +9,38 @@ bool kbdState[VK__LIMIT];
 
 void kbd_enqueue_event(keyhit_t event)
 {
-	// TODO: Implement key press/release counter for more precision?
 	if(event.flags & khfKeyPress) {
 		kbdState[(int)event.key] = true;
 	} else {
 		kbdState[(int)event.key] = false;
 	}
+	kbdEventQueue[(kbdEventQueueWritePtr++) % KBD_EVENT_QUEUE_SIZE] = event;
+	
+	if((event.flags & (khfKeyPress | khfKeyRelease)) == 0)
+		return;
+	// This code will emit key pressed for the "real" virtual keys
+	// that have two possible variants to be pressed.
+	bool override = true;
+	switch(event.key)
+	{
+		case VK_META_LEFT:
+		case VK_META_RIGHT:
+			event.key = VK_META;
+			break;
+		case VK_CONTROL_LEFT:
+		case VK_CONTROL_RIGHT:
+			event.key = VK_CONTROL;
+			break;
+		case VK_SHIFT_LEFT:
+		case VK_SHIFT_RIGHT:
+			event.key = VK_SHIFT;
+			break;
+		default:
+			override = false;
+			break;
+	}
+	if(!override)
+		return;
 	kbdEventQueue[(kbdEventQueueWritePtr++) % KBD_EVENT_QUEUE_SIZE] = event;
 }
 

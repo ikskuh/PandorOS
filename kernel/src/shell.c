@@ -49,28 +49,45 @@ static void shell_readprompt()
 {
 	while(true)
 	{
-		int c = getchar();
+		keyhit_t hit = getkey(true);
+		
+		if(hit.flags & khfKeyPress)
+		{
+			switch(hit.key)
+			{
+				case VK_META:
+				{
+					mainmenu_open(true);
+					char const * insertion = catalog_get();
+					if(insertion != NULL)
+					{
+						while(*insertion) {
+							putc(*insertion);
+							currshell.input[currshell.cursor++] = *insertion++;
+						}
+					}
+					int cmap = charmap_last();
+					if(cmap >= 0) {
+						currshell.input[currshell.cursor++] = cmap;
+						putc(cmap);
+					}
+					mainmenu_shellenable(true);
+					continue;
+				}
+				case VK_TAB:
+				{
+					// Do autocompletion here!
+					continue;
+				}
+			}
+		}
+		
+		if((hit.flags & khfCharInput) == 0)
+			continue;
+		
+		int c = hit.codepoint;
 		switch(c)
 		{
-			case '\t':
-			{
-				mainmenu_open(true);
-				char const * insertion = catalog_get();
-				if(insertion != NULL)
-				{
-					while(*insertion) {
-						putc(*insertion);
-						currshell.input[currshell.cursor++] = *insertion++;
-					}
-				}
-				int cmap = charmap_last();
-				if(cmap >= 0) {
-					currshell.input[currshell.cursor++] = cmap;
-					putc(cmap);
-				}
-				mainmenu_shellenable(true);
-				break;
-			}
 			case 0x1B: // Escape
 				while(--currshell.cursor >= 0)
 				{
