@@ -215,6 +215,7 @@ value_t basic_execute(char const *input)
 	
 	dynmem_t bytecode = basic_compile(input, len);
 	
+	// TODO: Fix memory leak on error
 	value_t result = basic_execute2(bytecode.ptr, bytecode.cursor);
 	
 	dynmem_free(&bytecode);

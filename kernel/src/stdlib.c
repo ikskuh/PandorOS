@@ -5,6 +5,7 @@
 #include "editor.h"
 #include "hexedit.h"
 #include "file.h"
+#include "options.h"
 #include "debug.h"
 #include <stddef.h>
 

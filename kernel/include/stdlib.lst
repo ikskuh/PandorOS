@@ -3,7 +3,6 @@
 #define _IMPORT_GENERATED_
 #endif
 
-IMPORT(extern bool shell_has_echo;)
 IMPORT(char printsep[64] = "";)
 
 ORDER(DEFAULT, Error, "", "Throws ERR_USER.\nCan be used to terminate a program and signal the user that something failed.",
@@ -27,6 +26,18 @@ ORDER(DEFAULT, PrintSep, "separator", "Sets the separator that will be printed i
 {
 	assert_argc(argc, 1);
 	str_copy(printsep, STR(0));
+})
+
+ORDER(DEFAULT, SetOpt, "option, value", "Sets a system configuration value.\n*option* is the name of the option,\n*value* is the value it should be set to.",
+{
+	assert_argc(argc, 2);
+	options_set(STR(0), argv[1]);
+})
+
+ORDER(DEFAULT, GetOpt, "option", "Gets a system configuration value.\n*option* is the name of the option.",
+{
+	assert_argc(argc, 1);
+	return options_get(STR(0));
 })
 
 ORDER(DEFAULT, Compile, "input, [output]", "Compiles the *TXT input* file into the *PRG output* file. If *output* is not given, the file name of the input file is taken and the extension will be changed to '.PRG'.",
@@ -77,10 +88,21 @@ ORDER(DEFAULT, Run, "file", "Runs the compiled script file.",
 {
 	assert_argc(argc, 1);
 	file_t *in = file_get(STR(0), FILE_DEFAULT);
-	if(file_type(in) != FILE_PROGRAM) {
-		basic_error(ERR_INVALID_FILE);
+	switch(file_type(in))
+	{
+		case FILE_PROGRAM:
+			return basic_execute2(file_data(in), file_size(in));
+		case FILE_TEXT:
+		{
+			dynmem_t bytecode = basic_compile(file_data(in), file_size(in));
+			// TODO: Fix memory leak on error
+			value_t result = basic_execute2(bytecode.ptr, bytecode.cursor);
+			dynmem_free(&bytecode);
+			return result;
+		}
+		default:
+			basic_error(ERR_INVALID_FILE);
 	}
-	return basic_execute2(file_data(in), file_size(in));
 })
 
 ORDER(DEFAULT, DumpFile, "file", "Dumps a file in hexadecimal to the debug output.",

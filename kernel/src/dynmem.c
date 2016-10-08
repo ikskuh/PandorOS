@@ -1,5 +1,6 @@
 #include "dynmem.h"
 #include "standard.h"
+#include "interpreter.h"
 #include <stddef.h>
 
 dynmem_t dynmem_new()
@@ -16,7 +17,7 @@ void dynmem_write(dynmem_t * dm, void *ptr, int size)
 		dm->size += 0x100;
 		void *nx = realloc(dm->ptr, dm->size);
 		if(nx == NULL)
-			; // TODO: Handle error
+			basic_error(ERR_OUT_OF_MEMORY);
 		dm->ptr = nx;
 	}
 	

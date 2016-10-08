@@ -304,3 +304,114 @@ void options_showmenu()
 		}
 	}
 }
+
+#include "interpreter.h"
+#include "debug.h"
+
+static option_t *find(char const * option)
+{
+	int len = str_len(option);
+	char buffer[128];
+	str_copy(buffer, option);
+	
+	int i;
+	for(i = 0; i < len; i++)
+	{
+		if(buffer[i] == '/')
+			break;
+	}
+	if(i >= len)
+		return NULL;
+	buffer[i] = 0;
+
+	optiongroup_t *group;
+	for(group = firstGroup; group != NULL; group = group->next)
+	{
+		if(str_eq(group->name, buffer))
+			break;
+	}
+	if(group == NULL)
+		return NULL;
+	for(option_t *opt = group->first; opt != NULL; opt = opt->next)
+	{
+		if(str_eq(opt->name, &buffer[i+1]))
+			return opt;
+	}
+	return NULL;
+}
+
+void options_set(char const * optname, value_t value)
+{
+	option_t * option = find(optname);
+	if(option == NULL)
+		basic_error(ERR_INVALID_OPTION);
+	
+	switch(option->type)
+	{
+		case OPT_BOOL:
+		{
+			bool state = basic_getnum(value);
+			*((bool*)option->value) = state;
+			break;
+		}
+		case OPT_INT:
+		{
+			int num = basic_getnum(value);
+			
+			optioncfg_int_t const *cfg = option->config;
+			int *i = option->value;
+			*i = num;
+			if(cfg != NULL) {
+				*i = clamp(*i,  cfg->min, cfg->max);
+			}
+			
+			break;
+		}
+		case OPT_TXT:
+		{
+			string_t text = basic_getstr(value);
+			optioncfg_txt_t const *cfg = option->config;
+			
+			int limit = 4096; // TODO: Replace with meaningful value.
+			if(cfg != NULL)
+				limit = cfg->length;
+			
+			int len = str_len(text);
+			if(len > limit)
+				basic_error(ERR_INVALID_VALUE);
+			
+			str_copy(option->value, text);
+			
+			break;
+		}
+		default:
+			return;
+	}
+}
+
+value_t options_get(char const * optname)
+{
+	option_t * option = find(optname);
+	if(option == NULL)
+		basic_error(ERR_INVALID_OPTION);
+	
+	switch(option->type)
+	{
+		case OPT_BOOL:
+		{
+			bool *b = option->value;
+			return basic_mknum(*b);
+		}
+		case OPT_INT:
+		{
+			int *i = option->value;
+			return basic_mknum(*i);
+		}
+		case OPT_TXT:
+		{
+			return basic_mkstr(option->value);
+		}
+		default:
+			return basic_mknull();
+	}
+}

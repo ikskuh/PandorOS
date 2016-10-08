@@ -1,5 +1,7 @@
 #pragma once
 
+#include "basic/types.h"
+
 #define OPT_NULL 0
 #define OPT_BOOL 1
 #define OPT_INT  2
@@ -60,3 +62,18 @@ void option_add(optiongroup_t *group, option_t *option);
  * Opens the options menu and does the input loop.
  */
 void options_showmenu();
+
+/**
+ * Sets an option to a value.
+ * @param option The name of the option in the format "group/option".
+ * @param value  The value the option should get.
+ * @remarks      Throws ERR_INVALID_OPTION if the option does not exist.
+ */
+void options_set(char const * option, value_t value);
+
+/**
+ * Gets an option to a value.
+ * @param option The name of the option in the format "group/option".
+ * @remarks      Throws ERR_INVALID_OPTION if the option does not exist.
+ */
+value_t options_get(char const * option);
