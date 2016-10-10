@@ -39,7 +39,7 @@ kernel: initfiles basicfiles makefile
 	mv build/kernel kernel
 
 basicfiles: src/grammar.lg src/lexer.re
-	re2c --input custom -o src/lexer.c src/lexer.re
+	re2c --no-generation-date --input custom -o src/lexer.c src/lexer.re
 	lemon src/grammar.lg
 	mv src/grammar.h include/basic/grammar.h
 

@@ -1,5 +1,7 @@
 #include "basic/lexer.h"
 #include "string.h"
+#include "memory.h"
+#include "debug.h"
 #include <stdbool.h>
 
 struct token lex(const char *input)
@@ -14,6 +16,17 @@ struct token lex(const char *input)
 	(void)marker;
 	(void)ctxmarker;
 	(void)index;
+	
+	if(*input == '\"')
+	{
+		int i;
+		for(i = 1; input[i] != 0 && input[i] != '\"'; i++);
+		if(input[i] == 0) {
+			return (struct token){ TOKEN_INVALID, i };
+		} else {
+			return (struct token){ TOK_STRING, i + 1 };
+		}
+	}
 	
 #define YYCTYPE        char
 #define YYPEEK()       input[index]
@@ -55,7 +68,7 @@ struct token lex(const char *input)
 		fun      { return (struct token){ TOK_FUN, index }; }
 		com      { return (struct token){ TOK_COMMA, index }; }
 		ws+      { return (struct token){ TOKEN_WHITESPACE, index }; }
-		"\"" ([^"] \ "\x00")* "\""      { return (struct token){ TOK_STRING, index }; }
+		"\"" ([\x01-\x21\x23-\xFF])* "\""      { return (struct token){ TOK_STRING, index }; }
 		bool     { return (struct token){ TOK_BOOL, index }; }
 		
 		" And "  { return (struct token){ TOK_AND, index }; }

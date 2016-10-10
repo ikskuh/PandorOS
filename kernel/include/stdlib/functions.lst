@@ -17,6 +17,21 @@ FUNCTION(ToNum, "val", "Converts *val* to a numeric value.",
 	return basic_mknum(str_to_int(result, 10));
 })
 
+FUNCTION(Asc, "str", "Returns the codepoint value for the first character of the given string.",
+{
+	assert_argc(argc, 1);
+	return basic_mknum((unsigned char)STR(0)[0]);
+})
+
+FUNCTION(Chr, "codepoint", "Returns a string with only a single character that is the character with the given *codepoint*.",
+{
+	assert_argc(argc, 1);
+	char * str = basic_alloc(2);
+	str[0] = NUM(0);
+	str[1] = 0;
+	return basic_mkstr(str);
+})
+
 FUNCTION(Type, "val", "Returns the name of the type of *val*.",
 {
 	assert_argc(argc, 1);
