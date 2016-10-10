@@ -5,8 +5,8 @@ CC=clang -target i386-pc-none-elf -march=i686
 
 all: vga
 
-vga: init.o setup.o
-	$(LD) -Ttext=0x100000 -o $@ $^ -nostdlib
+vga: init.o setup.o vga-drv.o
+	$(LD) -Tlinker.ld -o $@ $^ -nostdlib
 
 %.o: %.c
 	$(CC) -c -o $@ $< -g -O3 -ffreestanding -Wall -Wextra -Wno-unused-parameter

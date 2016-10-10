@@ -1,7 +1,6 @@
 #include <stdint.h>
 #include "multiboot.h"
 
-//*
 struct multiboot_header __attribute__((section ("multiboot"))) multibootHeader __attribute__ ((aligned (4))) = {
 	MULTIBOOT_HEADER_MAGIC, 
 	0x00,
@@ -20,7 +19,13 @@ struct multiboot_header __attribute__((section ("multiboot"))) multibootHeader _
 	0, // height;
 	0, // depth;
 };
-//*/
+
+void write_regs(unsigned char *regs);
+void read_regs(unsigned char *regs);
+void set_text_mode(int hi_res);
+
+extern unsigned char g_80x25_text[];
+extern unsigned char g_80x50_text[];
 
 void init()
 {
@@ -37,5 +42,9 @@ void init()
 		// 0x07 = Hellgrau auf Schwarz
 		video[i * 2 + 1] = 0x07;
 	}
+	
+	// write_regs(g_80x50_text);
+	set_text_mode(1);
+	
 	while(1);
 }
