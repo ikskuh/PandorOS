@@ -1,0 +1,250 @@
+
+ORDER(DEFAULT, Error, "", "Throws ERR_USER.\nCan be used to terminate a program and signal the user that something failed.",
+{
+	basic_error(ERR_USER);
+})
+
+ORDER(DEFAULT, Print, "...", "Prints its arguments and adds a newline.",
+{
+	for(int i = 0; i < argc; i++)
+	{
+		if(i > 0)
+			printf("%s", printsep);
+		printf("%v", argv[i]);
+	}
+	printf("\n");
+	return basic_mknull();
+})
+
+ORDER(DEFAULT, PrintSep, "separator", "Sets the separator that will be printed inbetween the arguments to *Print*.",
+{
+	assert_argc(argc, 1);
+	str_copy(printsep, STR(0));
+})
+
+ORDER(DEFAULT, SetOpt, "option, value", "Sets a system configuration value.\n*option* is the name of the option,\n*value* is the value it should be set to.",
+{
+	assert_argc(argc, 2);
+	options_set(STR(0), argv[1]);
+})
+
+ORDER(DEFAULT, GetOpt, "option", "Gets a system configuration value.\n*option* is the name of the option.",
+{
+	assert_argc(argc, 1);
+	return options_get(STR(0));
+})
+
+ORDER(DEFAULT, Compile, "input, [output]", "Compiles the *TXT input* file into the *PRG output* file. If *output* is not given, the file name of the input file is taken and the extension will be changed to '.PRG'.",
+{
+	if(argc < 1 || argc > 2)
+		basic_error(ERR_ARG_COUNT);
+	string_t infile = STR(0);
+	if(file_type_by_extension(infile) != FILE_BASIC)
+		basic_error(ERR_INVALID_FILE);
+	
+	char outfile[128];
+	if(argc > 1) {
+		str_copy(outfile, STR(1));
+	} else {
+		str_copy(outfile, STR(0));
+		int len = str_len(outfile);
+		outfile[len - 3] = 'P';
+		outfile[len - 2] = 'R';
+		outfile[len - 1] = 'G';
+	}
+		
+	if(file_type_by_extension(outfile) != FILE_PROGRAM)
+		basic_error(ERR_INVALID_FILE);
+	
+	file_t *in = file_get(infile, FILE_DEFAULT);
+	
+	if(in == NULL)
+		basic_error(ERR_INVALID_FILE);
+	
+	dynmem_t bytecode = basic_compile(file_data(in), file_size(in));
+
+	file_t *out = file_get(outfile, FILE_NEW);
+	if(out == NULL) {
+		dynmem_free(&bytecode);
+		basic_error(ERR_INVALID_FILE);
+	}
+	
+	file_resize(out, bytecode.cursor);
+	mem_copy(
+		file_data(out),
+		bytecode.ptr,
+		bytecode.cursor);
+	
+	dynmem_free(&bytecode);
+})
+
+ORDER(DEFAULT, Run, "file", "Runs the compiled script file.",
+{
+	assert_argc(argc, 1);
+	file_t *in = file_get(STR(0), FILE_DEFAULT);
+	switch(file_type(in))
+	{
+		case FILE_PROGRAM:
+			return basic_execute2(file_data(in), file_size(in));
+		case FILE_BASIC:
+		{
+			dynmem_t bytecode = basic_compile(file_data(in), file_size(in));
+			// TODO: Fix memory leak on error
+			value_t result = basic_execute2(bytecode.ptr, bytecode.cursor);
+			dynmem_free(&bytecode);
+			return result;
+		}
+		default:
+			basic_error(ERR_INVALID_FILE);
+	}
+})
+
+ORDER(DEFAULT, DumpFile, "file", "Dumps a file in hexadecimal to the debug output.",
+{
+	assert_argc(argc, 1);
+	file_t *in = file_get(STR(0), FILE_DEFAULT);
+	if(in == NULL) {
+		basic_error(ERR_INVALID_FILE);
+	}
+	hexdump(STR(0), file_data(in), file_size(in));
+})
+
+ORDER(DEFAULT, HexEdit, "file", "Opens the hex editor for *file*.",
+{
+	assert_argc(argc, 1);
+	file_t *in = file_get(STR(0), FILE_DEFAULT);
+	if(in == NULL) {
+		basic_error(ERR_INVALID_FILE);
+	}
+	hexedit_open(file_data(in), file_size(in), HEXEDIT_DEFAULT);
+})
+
+ORDER(DEFAULT, Prompt, "str", "Sets the shell prompt for the current shell.",
+{
+	assert_argc(argc, 1);
+	str_copy(currentShell->prompt, STR(0));
+})
+
+ORDER(NOPRG, Edit, "file",
+	"Opens the editor for the given file name.\n"
+	"\n"
+	"Editor Controls:\n"
+	"Up/Down/Left/Right  Move Cursor\n"
+	"Delete              Delete current char\n"
+	"Backspace           Delete previous char\n"
+	"Return              Splits the current line\n"
+	"Ctrl+K              Deletes the current line\n"
+	"Home                Moves the cursor to the start\n"
+	"End                 Moves the cursor to the end of the line\n",
+{
+	assert_argc(argc, 1);
+	
+	editor_open(STR(0));
+})
+
+ORDER(NOPRG, Echo, "state", "Sets the echo state of the console. When the state is *On*, the console will echo the results of expressions, when state is *Off* nothing will be printed.",
+{
+	assert_argc(argc, 1);
+	if(NUM(0)) {
+		currentShell->flags |= SHELL_ECHO;
+	} else {
+		currentShell->flags &= ~SHELL_ECHO;
+	}
+})
+
+ORDER(DEFAULT, Refresh, "[state]", "If *state* is not given, this order refreshes the screen and renders the text.\nIf *state* is *On*, the console auto-refresh is enabled. Disabling the auto-refresh is done by passing *Off* to *Refresh*",
+{
+	if(argc > 1) {
+		basic_error(ERR_ARG_COUNT);
+	}
+	if(argc == 0) {
+		console_refresh(stdcon);
+	} else {
+		if(NUM(0)) {
+			stdcon->flags |= CON_AUTOREFRESH;
+			console_refresh(stdcon);
+		} else {
+			stdcon->flags &= ~CON_AUTOREFRESH;
+		}
+	}
+})
+
+ORDER(DEFAULT, ListFS, "", "Lists all files of the inram file system.",
+{
+	assert_argc(argc, 0);
+	
+	int columnWidth = 8;
+	for(file_t *f = file_first(); f != NULL; f = file_next(f))
+	{
+		char const *name = file_getname(f);
+		int len = str_len(name);
+		if(stdcon->cursor.x + len + 1 >= stdcon->width) {
+			printf("\n");
+		}
+		printf("%s ", name);
+		stdcon->cursor.x = (stdcon->cursor.x + (columnWidth - 1)) & ~(columnWidth - 1);
+	}
+	printf("\n");
+})
+
+ORDER(DEFAULT, ClearFS, "", "Deletes all files from the inram file system.",
+{
+	assert_argc(argc, 0);
+	file_clearfs();
+})
+
+ORDER(DEFAULT, InitFS, "storage", "Initializes a new file system on the *storage* media.",
+{
+	assert_argc(argc, 1);
+	string_t storname = STR(0);
+	
+	storage_t const * storage = storage_get(storname);
+	if(storage == NULL) {
+		basic_error(ERR_INVALID_STORAGE);
+	}
+	
+	file_initfs(storage);
+})
+
+ORDER(DEFAULT, LoadFS, "storage", "Loads all files from the *storage* media into the inram file system.",
+{
+	assert_argc(argc, 1);
+	string_t storname = STR(0);
+	
+	storage_t const * storage = storage_get(storname);
+	if(storage == NULL) {
+		basic_error(ERR_INVALID_STORAGE);
+	}
+	
+	file_loadfs(storage);
+})
+
+ORDER(DEFAULT, SaveFS, "storage", "Saves all files from the inram file system to the *storage* media.",
+{
+	assert_argc(argc, 1);
+	string_t storname = STR(0);
+	
+	storage_t const * storage = storage_get(storname);
+	if(storage == NULL) {
+		basic_error(ERR_INVALID_STORAGE);
+	}
+	
+	file_savefs(storage);
+})
+
+ORDER(DEFAULT, ListStor, "", "Lists all possible storage medias.",
+{
+	assert_argc(argc, 0);
+	
+	int columnWidth = 8;
+	for(storage_t const * it = storage_first(); it != NULL; it = it->next)
+	{
+		int len = str_len(it->name);
+		if(stdcon->cursor.x + len + 1 >= stdcon->width) {
+			printf("\n");
+		}
+		printf("%s ", it->name);
+		stdcon->cursor.x = (stdcon->cursor.x + (columnWidth - 1)) & ~(columnWidth - 1);
+	}
+	printf("\n");
+})

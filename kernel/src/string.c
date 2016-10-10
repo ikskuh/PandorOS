@@ -16,12 +16,16 @@ void str_printf_putc(char c)
 
 int str_printf(char *str, char const *fmt, ...)
 {
+	int result;
 	str_printf_str = str;
 	str_printf_cur = 0;
 	
 	va_list list;
 	va_start(list, fmt);
-	int result = gprintf(str_printf_putc, fmt, list);
+	if(str != NULL)
+		result = gprintf(str_printf_putc, fmt, list);
+	else
+		result = gprintf(NULL, fmt, list);
 	va_end(list);
 	
 	str_printf_str = NULL;

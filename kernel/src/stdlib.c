@@ -9,7 +9,6 @@
 #include "debug.h"
 #include <stddef.h>
 
-
 void assert_argc(int argc, int i)
 {
 	if(argc != i)

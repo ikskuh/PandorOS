@@ -100,7 +100,7 @@ void console_puts(console_t *con, char const * str);
 /**
  * Puts a formatted string to the console.
  */
-void console_printf(console_t *con, char const * fmt, ...);
+int console_printf(console_t *con, char const * fmt, ...);
 
 /**
  * Writes a given text with a given length to the console.
@@ -135,7 +135,7 @@ void setcursor(int x, int y);
 /**
  * Prints a formatted string.
  */
-void printf(char const * fmt, ...);
+int printf(char const * fmt, ...);
 
 /**
  * Writes text to the console.

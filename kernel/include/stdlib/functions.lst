@@ -1,0 +1,209 @@
+
+FUNCTION(ToText, "val", "Converts *val* to a text value.",
+{
+	assert_argc(argc, 1);
+	int len = str_printf(NULL, "%v", argv[0]);
+	char * result = basic_alloc(len + 1);
+	str_printf(result, "%v", argv[0]);
+	return basic_mkstr(result);
+})
+
+FUNCTION(ToNum, "val", "Converts *val* to a numeric value.",
+{
+	assert_argc(argc, 1);
+	int len = str_printf(NULL, "%v", argv[0]);
+	char result[len + 1];
+	str_printf(result, "%v", argv[0]);
+	return basic_mknum(str_to_int(result, 10));
+})
+
+FUNCTION(Type, "val", "Returns the name of the type of *val*.",
+{
+	assert_argc(argc, 1);
+	switch(argv[0].type)
+	{
+		case TYPE_NUM:  return basic_mkstr("NUM");
+		case TYPE_TEXT: return basic_mkstr("TEXT");
+		default:        return basic_mkstr("NULL");
+	}
+})
+
+FUNCTION(Eval, "cmd", "Executes *cmd* and returns its result.",
+{
+	assert_argc(argc, 1);
+	char const * line = STR(0);
+
+	return basic_execute(line);
+})
+
+
+FUNCTION(Output, "x, y, ...", "Prints the values passed with *...* at the coordinates (*x*, *y*) to the screen.\nReturns the number of symbols written.",
+{
+	if(argc < 2)
+		basic_error(ERR_ARG_COUNT);
+	int x = stdcon->cursor.x;
+	int y = stdcon->cursor.y;
+	stdcon->cursor.x = NUM(0);
+	stdcon->cursor.y = NUM(1);
+	int len = 0;
+	for(int i = 2; i < argc; i++)
+	{
+		len += printf("%v", argv[i]);
+	}
+	stdcon->cursor.x = x;
+	stdcon->cursor.y = y;
+	return basic_mknum(len);
+})
+
+FUNCTION(GetKey, "", "Returns the key code of the last key press.",
+{
+	keyhit_t hit = getkey(false);
+	if(hit.flags & khfKeyPress)
+		return basic_mknum(hit.key);
+	else
+		return basic_mknum(0);
+})
+
+FUNCTION(WaitKey, "", "Waits for a key press and returns the key code of the pressed key.",
+{
+	do
+	{
+		keyhit_t hit = getkey(true);
+		if(hit.flags & khfKeyPress)
+			return basic_mknum(hit.key);
+		if(basic_break)
+			basic_error(ERR_BREAK);
+	} while(true);
+})
+
+FUNCTION(Abs, "x", "Returns *x* as a positive value.",
+{
+	assert_argc(argc, 1);
+	number_t num = NUM(0);
+	if(num < 0)
+		return basic_mknum(-num);
+	else
+		return basic_mknum(num);
+})
+
+FUNCTION(Sum, "...", "Sums up all arguments.",
+{
+	number_t sum = 0;
+	for(int i = 0; i < argc; i++)
+	{
+		sum += NUM(i);
+	}
+	return basic_mknum(sum);
+})
+
+FUNCTION(Product, "...", "Multiplies all arguments.",
+{
+	number_t sum = 1;
+	for(int i = 0; i < argc; i++)
+	{
+		sum *= NUM(i);
+	}
+	return basic_mknum(sum);
+})
+
+FUNCTION(Sub, "str, index, [len]", "Returns a substring of *str* starting at 1-based *index*.\nIf *len* is given, the length of the substring is limited to *len*.",
+{
+	if(argc < 2 || argc > 3)
+		basic_error(ERR_ARG_COUNT);
+	string_t src = STR(0);
+	int index = NUM(1) - 1;
+	if(index < 0) index = 0;
+	int length = TYPE_STR_LEN;
+	if(argc == 3)
+		length = NUM(2);
+	
+	int len = str_len(src);
+	if(index >= len || length <= 0) {
+		return basic_mkstr("");
+	}
+	len -= index;
+	if(length >= len) {
+		return basic_mkstr(src + index);
+	}
+	
+	char * dst = basic_alloc(len + 1);
+	mem_copy(dst, src + index, length);
+	dst[length] = 0;
+	return basic_mkstr(dst);
+})
+
+FUNCTION(Length, "str", "Returns the length of the string.",
+{
+	if(argc != 1) basic_error(ERR_ARG_COUNT);
+	string_t src = STR(0);
+	return basic_mknum(str_len(src));
+})
+
+FUNCTION(Malloc, "len", "Allocates *len* bytes of memory and returns a pointer to it.",
+{
+	if(argc != 1) basic_error(ERR_ARG_COUNT);
+	int len = NUM(0);
+	return basic_mknum((int)malloc(len));
+})
+
+FUNCTION(Free, "pointer", "Frees the *pointer* previously allocated by *Malloc()*.",
+{
+	if(argc != 1) basic_error(ERR_ARG_COUNT);
+	void *ptr = (void*)(int)NUM(0);
+	free(ptr);
+})
+
+FUNCTION(Peek, "pointer", "Reads the byte from memory address given with *pointer*.",
+{
+	if(argc != 1) basic_error(ERR_ARG_COUNT);
+	uint8_t * ptr = (uint8_t*)(int)NUM(0);
+	return basic_mknum(*ptr);
+})
+
+FUNCTION(Poke, "pointer, byte", "Writes *byte* to the memory address given with *pointer*.",
+{
+	if(argc != 2) basic_error(ERR_ARG_COUNT);
+	uint8_t * ptr = (uint8_t*)(int)NUM(0);
+	int val = NUM(1);
+	*ptr = val;
+	return basic_mknum(val);
+})
+
+FUNCTION(Open, "name, [flags]", "",
+{
+	if(argc < 1 || argc > 3)
+		basic_error(ERR_ARG_COUNT);
+	string_t name = STR(0);
+	int flags = (argc > 1) ? NUM(1) : FILE_DEFAULT;
+	
+	return basic_mknum((int)file_get(name, flags));
+})
+
+FUNCTION(GetSize, "file", "",
+{
+	assert_argc(argc, 1);
+	file_t * file = (void*)(int)NUM(0);
+	return basic_mknum(file_size(file));
+})
+
+FUNCTION(GetType, "file", "",
+{
+	assert_argc(argc, 1);
+	file_t * file = (void*)(int)NUM(0);
+	return basic_mknum(file_type(file));
+})
+
+FUNCTION(GetData, "file", "",
+{
+	assert_argc(argc, 1);
+	file_t * file = (void*)(int)NUM(0);
+	return basic_mknum((int)file_data(file));
+})
+
+FUNCTION(Resize, "file, size", "",
+{
+	assert_argc(argc, 2);
+	file_t * file = (void*)(int)NUM(0);
+	int size = NUM(1);
+	file_resize(file, size);
+})

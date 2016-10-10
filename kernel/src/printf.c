@@ -1,5 +1,6 @@
 #include <stdarg.h>
 #include "standard.h"
+#include "debug.h"
 #include "interpreter.h"
 
 static char buffer[128];
@@ -7,6 +8,14 @@ static char buffer[128];
 int gprintf(void (*_putc)(char c), char const *fmt, va_list list)
 {
 	int chars = 0;
+#define PUTC(C) do { \
+		char __c = (C); \
+		if(_putc != NULL) { \
+			_putc(__c); \
+		} \
+		chars++; \
+		} while(false)
+	
 	while(*fmt)
 	{
 		char c = *fmt++;
@@ -18,8 +27,7 @@ int gprintf(void (*_putc)(char c), char const *fmt, va_list list)
 				case 'c':
 				{
 					char c = va_arg(list, int);
-					_putc(c);
-					chars++;
+					PUTC(c);
 					break;
 				}
 				case 'd':
@@ -27,9 +35,8 @@ int gprintf(void (*_putc)(char c), char const *fmt, va_list list)
 					int val = va_arg(list, int);
 					int len = int_to_string(buffer, val, 10);
 					for(int i = 0; i < len; i++) {
-						_putc(buffer[i]);
+						PUTC(buffer[i]);
 					}
-					chars += len;
 					break;
 				}
 				case 'b':
@@ -37,9 +44,8 @@ int gprintf(void (*_putc)(char c), char const *fmt, va_list list)
 					int val = va_arg(list, int);
 					int len = int_to_string(buffer, val, 2);
 					for(int i = 0; i < len; i++) {
-						_putc(buffer[i]);
+						PUTC(buffer[i]);
 					}
-					chars += len;
 					break;
 				}
 				case 'x':
@@ -48,17 +54,15 @@ int gprintf(void (*_putc)(char c), char const *fmt, va_list list)
 					int val = va_arg(list, int);
 					int len = int_to_string(buffer, val, 16);
 					for(int i = 0; i < len; i++) {
-						_putc(buffer[i]);
+						PUTC(buffer[i]);
 					}
-					chars += len;
 					break;
 				}
 				case 's':
 				{
 					char const *str = va_arg(list, char const *);
 					while(*str) {
-						_putc(*str++);
-						chars++;
+						PUTC(*str++);
 					}
 					break;
 				}
@@ -68,26 +72,24 @@ int gprintf(void (*_putc)(char c), char const *fmt, va_list list)
 					switch(val.type)
 					{
 						case TYPE_NULL:
-							_putc('N');
-							_putc('U');
-							_putc('L');
-							_putc('L');
+							PUTC('N');
+							PUTC('U');
+							PUTC('L');
+							PUTC('L');
 							break;
 						case TYPE_NUM:
 						{
 							int len = int_to_string(buffer, val.number, 10);
 							for(int i = 0; i < len; i++) {
-								_putc(buffer[i]);
+								PUTC(buffer[i]);
 							}
-							chars += len;
 							break;
 						}
 						case TYPE_TEXT:
 						{
 							char const *str = val.string;
 							while(*str) {
-								_putc(*str++);
-								chars++;
+								PUTC(*str++);
 							}
 							break;
 						}
@@ -95,16 +97,15 @@ int gprintf(void (*_putc)(char c), char const *fmt, va_list list)
 					break;
 				}
 				default:
-					_putc(c);
-					chars++;
+					PUTC(c);
 					break;
 			}
 		}
 		else
 		{
-			_putc(c);
-			chars++;
+			PUTC(c);
 		}
 	}
+#undef PUTC
 	return chars;
 }

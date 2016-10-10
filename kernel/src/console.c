@@ -172,16 +172,18 @@ static void printf_putc(char c)
 	console_putc(printf_target, c);
 }
 
-void console_printf(console_t *con, char const * fmt, ...)
+int console_printf(console_t *con, char const * fmt, ...)
 {
+	int len;
 	printf_target = con;
-	
-	va_list list;
-	va_start(list, fmt);
-	gprintf(printf_putc, fmt, list);
-	va_end(list);
-	
+	{
+		va_list list;
+		va_start(list, fmt);
+		len = gprintf(printf_putc, fmt, list);
+		va_end(list);
+	}
 	printf_target = NULL;
+	return len;
 }
 
 void console_write(console_t *con, char const * text, int length)
@@ -217,11 +219,11 @@ void setcursor(int x, int y)
 	console_setcursor(stdcon, x, y);
 }
 
-void printf(char const * fmt, ...)
+int printf(char const * fmt, ...)
 {
 	va_list list;
 	va_start(list, fmt);
-	gprintf(putc, fmt, list);
+	return gprintf(putc, fmt, list);
 	va_end(list);
 }
 
