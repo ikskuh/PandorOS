@@ -1150,10 +1150,11 @@ void set_text_mode(int hi_res)
 
 	if(hi_res)
 	{
-		write_regs(g_90x60_text);
+		//write_regs(g_90x60_text);
+		write_regs(g_90x30_text);
 		cols = 90;
-		rows = 60;
-		ht = 8;
+		rows = 30;
+		ht = 16;
 	}
 	else
 	{
