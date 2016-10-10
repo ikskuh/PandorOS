@@ -2,6 +2,7 @@
 #include "string.h"
 #include "pmm.h"
 #include "hal.h"
+#include "debug.h"
 
 #include <stddef.h>
 #include <stdbool.h>
@@ -46,6 +47,7 @@ void var_init()
 
 variable_t * var_byname(char const * name)
 {
+	debug("var-by-name: '%s'\n", name);
 	if(str_eq(name, "Ans")) {
 		return &variable_ans;
 	}
@@ -63,6 +65,7 @@ variable_t * var_byname(char const * name)
 	// } else if(n >= 'a' && n <= 'z') {
 	// 	return &variables_int[n - 'a'];
 	} else {
+		debug("\tnot found!\n");
 		return &variable_null;
 	}
 }

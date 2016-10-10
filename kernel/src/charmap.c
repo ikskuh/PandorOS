@@ -1,6 +1,8 @@
 #include "charmap.h"
 #include "io.h"
 #include "standard.h"
+#include "debug.h"
+#include "console/utils.h"
 
 static int last = -1;
 
@@ -21,28 +23,33 @@ void charmap_open()
 	{
 		cls();
 		
+		int left = (chcon->width - 34) / 2;
+		int top = (chcon->height - 17) / 2 - 1;
+		
 		for(int i = 0; i < 16; i++) {
 			setc(
-				26 + 2 * i, 
-				3, 
+				left + 2 * i + 2,
+				top, 
 				("0123456789ABCDEF")[i]);
 			setc(
-				24, 
-				4 + i, 
+				left, 
+				top + i + 1,
 				("0123456789ABCDEF")[i]);
 		}
 		
 		for(int y = 0; y < 16; y++) {
 			for(int x = 0; x < 16; x++) {
 				setc(
-					26 + 2*x, 
-					4 + y, 
+					left + 2 * x + 2, 
+					top + y + 1, 
 					(y << 4) | x);
 				if(cx == x && cy == y) {
-					console_seta(chcon, 26 + 2 * x, 4 + y, CHA_HIGHLIGHT);
+					console_seta(chcon, left + 2 * x + 2, top + y + 1, CHA_HIGHLIGHT);
 				}
 			}
 		}
+		
+		console_box(chcon, left - 1, top - 1, 35, 18);
 		
 		console_refresh();
 	

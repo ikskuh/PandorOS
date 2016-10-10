@@ -1379,7 +1379,7 @@ void Parse(
 					conditionalMode = 0;
 				}
 			}
-			else if(token_type == TOKEN_WHITESPACE) 
+			else if(token_type == TOKEN_WHITESPACE || token_type == TOKEN_EMPTY) 
 			{
 				// Silently ignore
 			}

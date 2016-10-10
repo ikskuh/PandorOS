@@ -323,7 +323,6 @@ void file_loadfs(storage_t const * storage)
 	do
 	{
 		sio_read(&read, &size, sizeof(size));
-		debug("size=%d\n", size);
 		if((size > 0) && (size != 0xFFFFFFFF))
 		{
 			char name[16];
