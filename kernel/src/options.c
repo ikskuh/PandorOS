@@ -6,7 +6,6 @@
 // This must be initialized in .data, so HAL can register option groups as well.
 optiongroup_t *firstGroup = NULL;
 
-console_t *console = NULL;
 ;
 /*
 static optiongroup_t optionsDemo = { "Example Options", NULL, NULL };
@@ -32,9 +31,6 @@ static option_t optionStr  = {
 
 void options_init()
 {
-	console = console_new();
-	console->flags &= ~CON_AUTOREFRESH;
-	console->flags |=  CON_NOCURSOR;
 	
 	/*
 	optiongroup_register(&optionsDemo);
@@ -191,7 +187,10 @@ void options_showmenu()
 {
 	console_t *prev = stdcon;
 	
-	console_set(console);
+	console_t *optcon = console_new();
+	optcon->flags &= ~CON_AUTOREFRESH;
+	optcon->flags |=  CON_NOCURSOR;
+	console_set(optcon);
 	
 	int optionswidth;
 	int optionscount;
@@ -213,7 +212,7 @@ void options_showmenu()
 			putc(0xC4);
 			printf("[%s]", group->name);
 			
-			int len = console->width - str_len(group->name) - 6;
+			int len = optcon->width - str_len(group->name) - 6;
 			for(int i = 0; i < len; i++) {
 				putc(0xC4);
 			}
@@ -226,14 +225,14 @@ void options_showmenu()
 				printf("%s", opt->name);
 				
 				if(index == cursor) {
-					cursor_y = console->cursor.y;
+					cursor_y = optcon->cursor.y;
 					for(int i = 0; i < optionswidth; i++) {
-						int idx = console->cursor.y * console->width + 2 + i;
-						console->data[idx].attribs = CHA_HIGHLIGHT;
+						int idx = optcon->cursor.y * optcon->width + 2 + i;
+						optcon->data[idx].attribs = CHA_HIGHLIGHT;
 					}
 				}
 				
-				console->cursor.x = optionswidth + 3;
+				optcon->cursor.x = optionswidth + 3;
 				putc('=');
 				putc(' ');
 				
@@ -256,7 +255,7 @@ void options_showmenu()
 						break;
 				}
 				
-				console->cursor.x = console->width - 1;
+				optcon->cursor.x = optcon->width - 1;
 				putc(0xB3);
 				
 				index++;
@@ -264,7 +263,7 @@ void options_showmenu()
 			
 			putc(0xC0);
 			
-			for(int i = 0; i < console->width - 2; i++) {
+			for(int i = 0; i < optcon->width - 2; i++) {
 				putc(0xC4);
 			}
 			putc(0xD9);
@@ -298,10 +297,11 @@ void options_showmenu()
 					opt,
 					optionswidth + 5, 
 					cursor_y,
-					console->width - optionswidth - 7,
+					optcon->width - optionswidth - 7,
 					hit.key);
 				break;
 			case VK_ESCAPE:
+				console_delete(optcon);
 				console_set(prev);
 				return;
 		}

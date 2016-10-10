@@ -3,9 +3,9 @@
 #include "pmm.h"
 #include "debug.h"
 #include "memory.h"
+#include "interpreter.h"
 
-tlsf_t tlsf;
-
+tlsf_t tlsf = NULL;
 
 void malloc_init()
 {
@@ -43,6 +43,8 @@ void malloc_init()
 
 void * malloc(size_t bytes)
 {
+	if(tlsf == NULL)
+		basic_error(ERR_UNINITIALIZED);
 	return tlsf_malloc(tlsf, bytes);
 }
 
@@ -56,11 +58,15 @@ void * zalloc(size_t bytes)
 
 void free(void *ptr)
 {
+	if(tlsf == NULL)
+		basic_error(ERR_UNINITIALIZED);
 	tlsf_free(tlsf, ptr);
 }
 
 
 void * realloc(void* ptr, size_t size)
 {
+	if(tlsf == NULL)
+		basic_error(ERR_UNINITIALIZED);
 	return tlsf_realloc(tlsf, ptr, size);
 }

@@ -47,9 +47,6 @@ void os_init()
 	}
 	
 	{ // Initialize pmm-dependent
-		console_init();
-		options_init();
-		catalog_init();
 		
 		basic_init();
 		stdlib_init();
@@ -60,8 +57,12 @@ void os_init()
 	malloc_init();
 	
 	{ // Initialize malloc-dependent
-		storage_init();
+		console_init();
 		
+		options_init();
+		catalog_init();
+		
+		storage_init();
 		file_init();
 	
 		shell_init(4);

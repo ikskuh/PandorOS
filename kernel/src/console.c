@@ -3,6 +3,7 @@
 #include "hal.h"
 #include "pmm.h"
 #include "menu.h"
+#include "malloc.h"
 #include <stdarg.h>
 #include <stddef.h>
 
@@ -43,12 +44,15 @@ void console_refresh()
 
 console_t *console_new()
 {
-	console_t *con = pmm_getptr(pmm_alloc());
+	int w = screenwidth;
+	int h = screenheight - 2;
+	
+	console_t *con = malloc(sizeof(console_t) + w*h*2);
 	
 	*con = (console_t) {
 		// Consoles are 2 rows less tall than the screen.
-		screenwidth, 
-		screenheight - 2,
+		w, 
+		h,
 		CON_DEFAULT | CON_AUTOREFRESH,
 		{ 0, 0 },
 		(attrchar_t*)((uint8_t*)con + sizeof(*con)),
@@ -61,7 +65,7 @@ console_t *console_new()
 
 void console_delete(console_t *con)
 {
-	pmm_free(pmm_getpage(con));
+	free(con);
 }
 
 void console_clear(console_t *con)
