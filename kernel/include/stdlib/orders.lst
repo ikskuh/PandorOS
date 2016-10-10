@@ -22,6 +22,31 @@ ORDER(DEFAULT, PrintSep, "separator", "Sets the separator that will be printed i
 	str_copy(printsep, STR(0));
 })
 
+ORDER(DEFAULT, Put, "file", "Writes the given file to the console.",
+{
+	assert_argc(argc, 1);
+	string_t infile = STR(0);
+	int type = file_type_by_extension(infile);
+	
+	switch(type)
+	{
+		case FILE_BASIC: break;
+		case FILE_TEXT: break;
+		default: basic_error(ERR_INVALID_FILE);
+	}
+	
+	file_t *in = file_get(infile, FILE_DEFAULT);
+	
+	if(in == NULL)
+		basic_error(ERR_INVALID_FILE);
+	
+	console_write(
+		stdcon,
+		file_data(in),
+		file_size(in));
+	printf("\n");
+})
+
 ORDER(DEFAULT, SetOpt, "option, value", "Sets a system configuration value.\n*option* is the name of the option,\n*value* is the value it should be set to.",
 {
 	assert_argc(argc, 2);

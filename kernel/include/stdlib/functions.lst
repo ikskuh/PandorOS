@@ -36,7 +36,6 @@ FUNCTION(Eval, "cmd", "Executes *cmd* and returns its result.",
 	return basic_execute(line);
 })
 
-
 FUNCTION(Output, "x, y, ...", "Prints the values passed with *...* at the coordinates (*x*, *y*) to the screen.\nReturns the number of symbols written.",
 {
 	if(argc < 2)
