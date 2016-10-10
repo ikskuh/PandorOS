@@ -8,6 +8,8 @@
 
 #include <stdint.h>
 
+#define filename_eq(a,b) str_eqi((a), (b))
+
 struct file
 {
 	char name[128];
@@ -90,13 +92,13 @@ int file_type_by_extension(char const * name)
 {
 	while(*name)
 	{
-		if(str_eqi(name, ".PRG"))
+		if(filename_eq(name, ".PRG"))
 			return FILE_PROGRAM;
-		if(str_eqi(name, ".DAT"))
+		if(filename_eq(name, ".DAT"))
 			return FILE_DATA;
-		if(str_eqi(name, ".TXT"))
+		if(filename_eq(name, ".TXT"))
 			return FILE_TEXT;
-		if(str_eqi(name, ".BAS"))
+		if(filename_eq(name, ".BAS"))
 			return FILE_BASIC;
 		name++;
 	}
@@ -111,7 +113,7 @@ file_t * file_get(char const * fileName, int flags)
 
 	for(file_t *it = first; it != NULL; it = it->next)
 	{
-		if(str_eq(it->name, fileName) == false || it->type != type) {
+		if(filename_eq(it->name, fileName) == false || it->type != type) {
 			continue;
 		}
 		return it;
@@ -170,6 +172,38 @@ void file_resize(file_t * file, int size)
 	file->size = size;
 }
 
+void file_rename(file_t * file, char const * newName)
+{
+	if(file == NULL)
+		return;
+	str_copy(file->name, newName);
+}
+
+/**
+ * Deletes the given file.
+ */
+void file_delete(file_t * file)
+{
+	if(file == NULL)
+		return;
+	
+	if(file == first) {
+		first = file->next;
+	} else {
+		for(file_t *it = first; it != NULL; it = it->next)
+		{
+			if(it->next != file)
+				continue;
+			// surgically remove the file from the file list.
+			it->next = it->next->next;
+			// after surgery, leave the operating room
+			break;
+		}
+	}
+	
+	free(file->data);
+	free(file);
+}
 
 
 

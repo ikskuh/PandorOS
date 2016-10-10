@@ -51,6 +51,16 @@ void file_savefs(storage_t const * storage);
 file_t * file_get(char const * fileName, int flags);
 
 /**
+ * Renames the given file.
+ */
+void file_rename(file_t * file, char const * newName);
+
+/**
+ * Deletes the given file.
+ */
+void file_delete(file_t * file);
+
+/**
  * Returns the file type determined by the given file name.
  */
 int file_type_by_extension(char const * fileName);
