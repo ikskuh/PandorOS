@@ -1216,12 +1216,16 @@ void Parse(
 
 
 	volatile bool basic_break;
+	volatile bool basic_stop_silent = false;
 
 	static token_t nulltoken = { };
+	
 	
 	value_t basic_execute2(uint8_t const * tokens, int length)
 	{
 		basic_break = false;
+		basic_stop_silent = false;
+		
 		basic_memreset();
 		
 		// ParseTrace(&nulltoken, "PARSER: ");
@@ -1237,6 +1241,9 @@ void Parse(
 		result = basic_mknull();
 		for(int i = 0; i < length; )
 		{
+			if(basic_stop_silent) {
+				break;
+			}
 			if(basic_break) {
 				basic_error(ERR_BREAK);
 			}
@@ -1379,6 +1386,14 @@ void Parse(
 					conditionalMode = 0;
 				}
 			}
+			else if(token_type == TOKEN_EXIT)
+			{
+				break;
+			}
+			else if(token_type == TOKEN_STOP)
+			{
+				basic_stop_silent = true;
+			}
 			else if(token_type == TOKEN_WHITESPACE || token_type == TOKEN_EMPTY) 
 			{
 				// Silently ignore
@@ -1396,4 +1411,4 @@ void Parse(
 		
 		return result;
 	}
-#line 1400 "src/grammar.c"
+#line 1415 "src/grammar.c"
