@@ -17,7 +17,6 @@ typedef struct file FILE;
 
 #define fprintf(a, ...) hal_debug(__VA_ARGS__)
 
-// epic assertion fake:
 static void assert(int x, char const * xstr)
 {
 	if(x) return;
@@ -67,26 +66,6 @@ program ::= expr(A) ASS variable(V).  {
 }
 program ::= ORDER(O) arglist(A). {
 	
-	arg_t *a;
-
-	int cnt = 0;
-	for(a = A.arg; a != NULL; a = a->next)
-	{
-		cnt++;
-	}
-
-	value_t args[cnt];
-	
-	int i;
-	for(a = A.arg, i = 0; a != NULL; a = a->next, i++)
-	{
-		args[i] = a->value;
-	}
-
-	result = O.fun(cnt, args);
-}
-
-program ::= CFLOW(O) arglist(A). {
 	arg_t *a;
 
 	int cnt = 0;
@@ -174,10 +153,13 @@ arglist(A) ::= expr(B) COMMA arglist(C). {
 
 % code {
 
+	volatile bool basic_break;
+
 	static token_t nulltoken = { };
 	
 	value_t basic_execute2(uint8_t const * tokens, int length)
 	{
+		basic_break = false;
 		basic_memreset();
 		
 		// ParseTrace(&nulltoken, "PARSER: ");
@@ -188,9 +170,14 @@ arglist(A) ::= expr(B) COMMA arglist(C). {
 		
 		argalloc = allocator_new(sizeof(arg_t));
 		
+		int conditionalMode = 0;
+		
 		result = basic_mknull();
 		for(int i = 0; i < length; )
 		{
+			if(basic_break) {
+				basic_error(ERR_BREAK);
+			}
 			int token_type = (char)tokens[i++];
 			if(token_type > 0)
 			{
@@ -199,14 +186,18 @@ arglist(A) ::= expr(B) COMMA arglist(C). {
 				{
 					case TOK_INTEGER:
 					{
-						int ival = *((int*)&tokens[i]);
-						currtok.val = basic_mknum(ival);
+						if(conditionalMode != 3) {
+							int ival = *((int*)&tokens[i]);
+							currtok.val = basic_mknum(ival);
+						}
 						i += sizeof(int);
 						break;
 					}
 					case TOK_BOOL:
 					{
-						currtok.val = basic_mknum(*((bool*)&tokens[i]));
+						if(conditionalMode != 3) {
+							currtok.val = basic_mknum(*((bool*)&tokens[i]));
+						}
 						i += sizeof(bool);
 						break;
 					}
@@ -215,9 +206,10 @@ arglist(A) ::= expr(B) COMMA arglist(C). {
 						int len = *((int*)&tokens[i]);
 						i += sizeof(int);
 						
-						currtok.val = basic_mkstr((char const *)&tokens[i]);
+						if(conditionalMode != 3) {
+							currtok.val = basic_mkstr((char const *)&tokens[i]);
+						}
 						i += len;
-						
 						break;
 					}
 					case TOK_VAR:
@@ -225,12 +217,13 @@ arglist(A) ::= expr(B) COMMA arglist(C). {
 						int len = *((int*)&tokens[i]);
 						i += sizeof(int);
 						
-						currtok.var = var_byname((char const *)&tokens[i]);
-						if(currtok.var == NULL) {
-							basic_error(ERR_INVALID_VAR);
+						if(conditionalMode != 3) {
+							currtok.var = var_byname((char const *)&tokens[i]);
+							if(currtok.var == NULL) {
+								basic_error(ERR_INVALID_VAR);
+							}
 						}
 						i += len;
-						
 						break;
 					}
 					case TOK_FUN:
@@ -238,23 +231,11 @@ arglist(A) ::= expr(B) COMMA arglist(C). {
 						int len = *((int*)&tokens[i]);
 						i += sizeof(int);
 						
-						currtok.fun = basic_getfunc(BASIC_FUNCTION, (char const *)&tokens[i]);
-						if(currtok.fun == NULL) {
-							basic_error(ERR_FUNC_NOT_FOUND);
-						}
-						i += len;
-						
-						break;
-					}
-					case TOK_CFLOW:
-					{
-						debug("Cflow\n");
-						int len = *((int*)&tokens[i]);
-						i += sizeof(int);
-						
-						currtok.fun = basic_getfunc(BASIC_CFLOW, (char const *)&tokens[i]);
-						if(currtok.fun == NULL) {
-							basic_error(ERR_UNEXPECTED_CFLOW);
+						if(conditionalMode != 3) {
+							currtok.fun = basic_getfunc(BASIC_FUNCTION, (char const *)&tokens[i]);
+							if(currtok.fun == NULL) {
+								basic_error(ERR_FUNC_NOT_FOUND);
+							}
 						}
 						i += len;
 						
@@ -264,36 +245,85 @@ arglist(A) ::= expr(B) COMMA arglist(C). {
 					{
 						int len = *((int*)&tokens[i]);
 						i += sizeof(int);
-						
-						currtok.fun = basic_getfunc(BASIC_ORDER, (char const *)&tokens[i]);
-						if(currtok.fun == NULL) {
-							basic_error(ERR_FUNC_NOT_FOUND);
+						if(conditionalMode != 3) {
+							currtok.fun = basic_getfunc(BASIC_ORDER, (char const *)&tokens[i]);
+							if(currtok.fun == NULL) {
+								basic_error(ERR_FUNC_NOT_FOUND);
+							}
 						}
 						i += len;
 						
 						break;
 					}
 				}
-				
-				Parse(pParser, token_type, currtok);
-				
+				if(conditionalMode != 3) {
+					Parse(pParser, token_type, currtok);
+				}
 			}
 			else if(token_type == TOKEN_INVALID)
 			{
 				basic_error(ERR_INVALID_TOKEN);
 			}
+			else if(token_type == TOKEN_GOTO)
+			{
+				if(conditionalMode != 3)
+				{
+					// Simple goto.
+					i = *((int*)&tokens[i]);
+					conditionalMode = 0;
+				}
+			}
+			else if(token_type == TOKEN_IF)
+			{
+				conditionalMode = 1;
+			}
 			else if(token_type == TOKEN_EOF || token_type == TOKEN_EOL)
 			{
-				Parse(pParser, 0, nulltoken);
-				
-				if(basic_isnull(result) == false) {
-					var_setans(result);
+				if(conditionalMode != 3)
+				{ // Only evaluate when we have taken the condition
+					Parse(pParser, 0, nulltoken);
 					
-					// This seems odd, but our temporary work buffer will be
-					// released after this function returns, so we
-					// copy the persistent 'Ans' variable content to it.
-					var_getans(&result);
+					if(conditionalMode == 0 || conditionalMode == 2)
+					{
+						if(basic_isnull(result) == false) {
+							var_setans(result);
+							
+							// This seems odd, but our temporary work buffer will be
+							// released after this function returns, so we
+							// copy the persistent 'Ans' variable content to it.
+							var_getans(&result);
+						}
+						
+						// Normal execution, resets conditional mode.
+						conditionalMode = 0;
+					}
+					else if(conditionalMode == 1)
+					{
+						// Execute when non-zero numeric value.
+						if(basic_getnum(result) != 0) {
+							conditionalMode = 2;
+						} else {
+							conditionalMode = 3;
+						}
+					}
+					else
+					{
+						debug("Huh? conditionalMode=%d\n", conditionalMode);
+					}
 				}
+				else
+				{
+					// Reset conditional mode
+					conditionalMode = 0;
+				}
+			}
+			else if(token_type == TOKEN_WHITESPACE) 
+			{
+				// Silently ignore
+			}
+			else
+			{
+				debug("Unhandled token: %d\n", token_type);
 			}
 			if(token_type == TOKEN_EOF)
 				break;

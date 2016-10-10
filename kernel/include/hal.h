@@ -3,6 +3,12 @@
 #include <stddef.h>
 #include <stdbool.h>
 
+/**
+ * This will signal a break code to the OS.
+ * It should STOP what it is currently doing.
+ */
+void os_break();
+
 typedef struct console console_t;
 
 typedef struct rootfs

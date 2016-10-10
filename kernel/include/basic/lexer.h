@@ -1,5 +1,8 @@
 #pragma once
 
+#define TOKEN_LABEL      -7
+#define TOKEN_GOTO       -6
+#define TOKEN_IF         -5
 #define TOKEN_EOF        -4
 #define TOKEN_EOL        -3
 #define TOKEN_INVALID    -2

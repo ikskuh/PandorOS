@@ -51,21 +51,11 @@ value_t basic_mknum(number_t num)
 	val.number = num;
 	return val;
 }
-value_t basic_mkflow(int cflow, bool condition)
-{
-	debug("Mkflow!\n");
-	value_t val;
-	val.type = TYPE_CFLOW;
-	val.cflow = cflow;
-	val.number = condition;
-	return val;
-}
 
 value_t basic_mkstr(string_t str)
 {
 	value_t val;
 	val.type = TYPE_TEXT;
-	val.cflow = CFLOW_DEFAULT;
 	val.string = str;
 	return val;
 }
@@ -74,7 +64,6 @@ value_t basic_mknull()
 {
 	value_t val;
 	val.type = TYPE_NULL;
-	val.cflow = CFLOW_DEFAULT;
 	return val;
 }
 
@@ -106,11 +95,21 @@ char const * basic_err_to_string(error_t err)
 
 basfunc_f basic_getfunc(int type, char const *name);
 
+typedef struct label
+{
+	char label[64];
+	int location;
+	struct label * next;
+} label_t;
+
 dynmem_t basic_compile(char const * input, int insize)
 {
 	char zero = 0;
 
 	dynmem_t bytecode = dynmem_new();
+	
+	label_t *labels = NULL;
+	label_t *patches = NULL;
 	
 	for(int rcursor = 0; rcursor < insize; )
 	{
@@ -125,56 +124,98 @@ dynmem_t basic_compile(char const * input, int insize)
 			break; // Double break!
 		
 		struct token token = lex(&input[rcursor]);
-		
-		if(token.type != TOKEN_WHITESPACE && token.type != TOKEN_INVALID)
+		if(
+			token.type != TOKEN_WHITESPACE && 
+			token.type != TOKEN_INVALID)
 		{
-			char buffer[512];
-			mem_set(buffer, 0, sizeof(buffer));
+			char buffer[token.length + 1];
+			mem_set(buffer, 0, token.length + 1);
 			mem_copy(buffer, input + rcursor, token.length);
 			
+			if(token.type == TOKEN_LABEL)
+			{
+				int start ;
+				for(
+					start = token.length - 1; 
+					start >= 0 && buffer[start] != ' '; 
+					start--);
+				start++;
+				
+				label_t * label = zalloc(sizeof(label_t));
+				label->location = bytecode.cursor;
+				str_copy(label->label, (&buffer[start]));
+				label->next = labels;
+				labels = label;
+			}
+			else
 			{
 				char tok = token.type;
 				dynmem_write(&bytecode, &tok, 1); 
-			}
 			
-			switch(token.type)
-			{
-				case TOK_INTEGER:
+				switch(token.type)
 				{
-					int ival = str_to_int(buffer, 10);
-					dynmem_write(&bytecode, &ival, sizeof(ival));
-					break;
+					case TOKEN_IF:
+					{
+						// An if just says that the following expression
+						// will be executed dependently or not.
+						break;
+					}
+					case TOKEN_GOTO:
+					{
+						int start ;
+						for(
+							start = token.length - 1; 
+							start >= 0 && buffer[start] != ' '; 
+							start--);
+						start++;
+						
+						label_t * patch = zalloc(sizeof(label_t));
+						patch->location = bytecode.cursor;
+						str_copy(patch->label, &buffer[start]);
+						patch->next = patches;
+						patches = patch;
+						
+						int dest = 0xFFFFFFFF;
+						dynmem_write(&bytecode, &dest, sizeof(dest));
+					
+						break;
+					}
+					case TOK_INTEGER:
+					{
+						int ival = str_to_int(buffer, 10);
+						dynmem_write(&bytecode, &ival, sizeof(ival));
+						break;
+					}
+					case TOK_BOOL:
+					{
+						bool bval = str_eq(buffer, "True") || str_eq(buffer, "On");
+						dynmem_write(&bytecode, &bval, sizeof(bval));
+						break;
+					}
+					// Both strings are stored with each length+ptr and zero termination.
+					case TOK_STRING:
+					{
+						int len = token.length - 2;
+						dynmem_write(&bytecode, &len, sizeof(len));
+						dynmem_write(&bytecode, buffer + 1, len);
+						dynmem_write(&bytecode, &zero, sizeof(zero));
+						break;
+					}
+					// Both strings are stored with each length+ptr and zero termination.
+					case TOK_FUN:
+					case TOK_VAR:
+					case TOK_ORDER:
+					{
+						int len = token.length;
+						dynmem_write(&bytecode, &len, sizeof(len));
+						dynmem_write(&bytecode, buffer, len);
+						dynmem_write(&bytecode, &zero, sizeof(zero));
+						break;
+					}
 				}
-				case TOK_BOOL:
-				{
-					bool bval = str_eq(buffer, "True") || str_eq(buffer, "On");
-					dynmem_write(&bytecode, &bval, sizeof(bval));
+				if(token.type == TOKEN_EMPTY)
 					break;
-				}
-				// Both strings are stored with each length+ptr and zero termination.
-				case TOK_STRING:
-				{
-					int len = token.length - 2;
-					dynmem_write(&bytecode, &len, sizeof(len));
-					dynmem_write(&bytecode, buffer + 1, len);
-					dynmem_write(&bytecode, &zero, sizeof(zero));
-					break;
-				}
-				// Both strings are stored with each length+ptr and zero termination.
-				case TOK_FUN:
-				case TOK_VAR:
-				case TOK_ORDER:
-				case TOK_CFLOW:
-				{
-					int len = token.length;
-					dynmem_write(&bytecode, &len, sizeof(len));
-					dynmem_write(&bytecode, buffer, len);
-					dynmem_write(&bytecode, &zero, sizeof(zero));
-					break;
-				}
 			}
-			if(token.type == TOKEN_EMPTY)
-				break;
 		}
 		else if(token.type == TOKEN_INVALID)
 		{
@@ -201,6 +242,38 @@ dynmem_t basic_compile(char const * input, int insize)
 			if(rcursor >= insize)
 				break;
 		}
+	}
+	
+	// Patch all goto references
+	for(label_t *patch = patches; patch != NULL; patch = patch->next)
+	{
+		label_t *label = NULL;
+		for(label_t *l = labels; l != NULL; l = l->next)
+		{
+			if(str_eq(l->label, patch->label)) {
+				label = l;
+				break;
+			}
+		}
+		if(label == NULL)
+			basic_error(ERR_INVALID_LABEL);
+		
+		int *dest = (void*)&bytecode.ptr[patch->location];
+		*dest = label->location;
+	}
+	
+	// Free all labels and jumps:
+	for(label_t *l = labels; l != NULL;)
+	{
+		label_t *k = l;
+		l = l->next;
+		free(k);
+	}
+	for(label_t *l = patches; l != NULL;)
+	{
+		label_t *k = l;
+		l = l->next;
+		free(k);
 	}
 	
 	// hexdump("Tokenized Code", bytecode.ptr, bytecode.cursor);

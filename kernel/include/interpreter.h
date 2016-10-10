@@ -14,6 +14,11 @@
 #define BASIC_CFLOW    3
 
 /**
+ * If this variable is set to true, the basic execution will halt.
+ */
+extern volatile bool basic_break;
+
+/**
  * Initializes the basic interpreter.
  */
 void basic_init();

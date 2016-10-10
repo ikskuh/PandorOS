@@ -91,27 +91,6 @@ int gprintf(void (*_putc)(char c), char const *fmt, va_list list)
 							}
 							break;
 						}
-						case TYPE_CFLOW:
-						{
-							char const * msg;
-							switch(val.cflow)
-							{
-								case CFLOW_WHILE: msg = "CFLOW(While,"; break;
-								case CFLOW_IF: msg = "CFLOW(If,"; break;
-								case CFLOW_THEN: msg = "CFLOW(Then,"; break;
-								case CFLOW_END: msg = "CFLOW(End,"; break;
-								case CFLOW_ELSE: msg = "CFLOW(Else,"; break;
-								default: msg = "CFLOW(???,"; break;
-							}
-							while(*msg) _putc(*msg++);
-							
-							if(val.number != 0)
-								_putc('1');
-							else
-								_putc('0');
-							_putc(')');
-							break;
-						}
 					}
 					break;
 				}

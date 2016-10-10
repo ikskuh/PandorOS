@@ -106,3 +106,9 @@ void os_init()
 	
 	while(true);
 }
+
+
+void os_break()
+{
+	basic_break = 1;
+}

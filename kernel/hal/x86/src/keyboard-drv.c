@@ -73,6 +73,15 @@ struct cpu *keyboard_isr(struct cpu *cpu)
 		// Normaler Scancode
 		scancode = (struct scancode){ kbpInput, 0 };
 	}
+	
+	
+	if(scancode.set == 0 && scancode.code == 46 && !break_code && kbd_is_pressed(VK_CONTROL))
+	{
+		// os_break will not yield a key press.
+		os_break();
+		return cpu;
+	}
+	
 	if(scancode.set >= 0) {
 	
 		if(kbddrvLogKeys) {

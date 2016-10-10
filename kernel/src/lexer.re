@@ -63,11 +63,9 @@ struct token lex(const char *input)
 		" Or "   { return (struct token){ TOK_OR, index }; }
 		"Not "   { return (struct token){ TOK_NOT, index }; }
 		
-		"While"  { return (struct token){ TOK_CFLOW, index }; }
-		"If"     { return (struct token){ TOK_CFLOW, index }; }
-		"Then"   { return (struct token){ TOK_CFLOW, index }; }
-		"Else"   { return (struct token){ TOK_CFLOW, index }; }
-		"End"    { return (struct token){ TOK_CFLOW, index }; }
+		"Label" ws+ [A-Za-z0-9_]+  { return (struct token){ TOKEN_LABEL, index }; }
+		"Goto" ws+ [A-Za-z0-9_]+   { return (struct token){ TOKEN_GOTO, index }; }
+		"If"     { return (struct token){ TOKEN_IF, index }; }
 		
 		ord      { return (struct token){ TOK_ORDER, index }; }
 		
