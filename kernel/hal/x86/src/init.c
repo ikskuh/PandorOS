@@ -86,11 +86,7 @@ optiongroup_t halOptions = {
 	"x86 Options", NULL, NULL
 };
 
-extern option_t halOptConsoleForeground;
-extern option_t halOptConsoleBackground;
-extern option_t halOptConsoleHighlight;
-extern option_t halOptConsoleBoldtext;
-
+void x86video_init();
 
 extern bool kbddrvLogKeys;
 
@@ -134,10 +130,7 @@ void x86_init(uint32_t bootmagic, struct multiboot_info const * info)
 	
 	optiongroup_register(&halOptions);
 	
-	option_add(&halOptions, &halOptConsoleForeground);
-	option_add(&halOptions, &halOptConsoleBackground);
-	option_add(&halOptions, &halOptConsoleHighlight);
-	option_add(&halOptions, &halOptConsoleBoldtext);
+	x86video_init();
 	
 	option_add(&halOptions, &halOptKeyboardLog);
 	
