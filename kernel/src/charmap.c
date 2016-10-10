@@ -31,10 +31,12 @@ void charmap_open()
 				left + 2 * i + 2,
 				top, 
 				("0123456789ABCDEF")[i]);
+			console_seta(chcon, left + 2*i + 2, top, CHA_BOLD);
 			setc(
 				left, 
 				top + i + 1,
 				("0123456789ABCDEF")[i]);
+			console_seta(chcon, left, top + i + 1, CHA_BOLD);
 		}
 		
 		for(int y = 0; y < 16; y++) {

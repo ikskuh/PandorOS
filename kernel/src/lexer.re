@@ -66,6 +66,8 @@ struct token lex(const char *input)
 		"Label" ws+ [A-Za-z0-9_]+  { return (struct token){ TOKEN_LABEL, index }; }
 		"Goto" ws+ [A-Za-z0-9_]+   { return (struct token){ TOKEN_GOTO, index }; }
 		"If"     { return (struct token){ TOKEN_IF, index }; }
+		"Stop"   { return (struct token){ TOKEN_STOP, index }; }
+		"Exit"   { return (struct token){ TOKEN_EXIT, index }; }
 		
 		ord      { return (struct token){ TOK_ORDER, index }; }
 		
