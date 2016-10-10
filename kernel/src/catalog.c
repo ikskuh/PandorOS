@@ -96,10 +96,10 @@ void catalog_open()
 		// Synopsis box
 		console_box(
 			stdcon, 
-			leftside_width + 4, 
+			leftside_width + 3, 
 			0, 
-			stdcon->width - leftside_width - 4,
-		 3);
+			stdcon->width - leftside_width - 3,
+		  3);
 		
 		console_box(stdcon, 0, 0, stdcon->width, stdcon->height);
 		

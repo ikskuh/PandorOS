@@ -1,14 +1,24 @@
 
-FUNCTION(ToText, "val", "Converts *val* to a text value.",
-{
-	assert_argc(argc, 1);
-	int len = str_printf(NULL, "%v", argv[0]);
-	char * result = basic_alloc(len + 1);
-	str_printf(result, "%v", argv[0]);
-	return basic_mkstr(result);
-})
+FUNCTION(
+	ToText, "val", 
+	"Converts *val* to a text value.\n"
+	"\n"
+	"*val* can be any type that is printable to the console, even NULL values are allowed.\n"
+	"The function will return a string value that contains *val* converted into a text.",
+	{
+		assert_argc(argc, 1);
+		int len = str_printf(NULL, "%v", argv[0]);
+		char * result = basic_alloc(len + 1);
+		str_printf(result, "%v", argv[0]);
+		return basic_mkstr(result);
+	})
 
-FUNCTION(ToNum, "val", "Converts *val* to a numeric value.",
+FUNCTION(
+	ToNum, "val", 
+	"Converts *val* to a numeric value.\n"
+	"\n"
+	"*val* should be a string value with numeric content, but can contain any type that will be represented as a numeric value when it's printed.\n"
+	"The function will return the value into a number and returns it.",
 {
 	assert_argc(argc, 1);
 	int len = str_printf(NULL, "%v", argv[0]);
@@ -17,13 +27,17 @@ FUNCTION(ToNum, "val", "Converts *val* to a numeric value.",
 	return basic_mknum(str_to_int(result, 10));
 })
 
-FUNCTION(Asc, "str", "Returns the codepoint value for the first character of the given string.",
+FUNCTION(
+	Asc, "str", 
+	"Returns the codepoint value for the first character of the given string.",
 {
 	assert_argc(argc, 1);
 	return basic_mknum((unsigned char)STR(0)[0]);
 })
 
-FUNCTION(Chr, "codepoint", "Returns a string with only a single character that is the character with the given *codepoint*.",
+FUNCTION(
+	Chr, "codepoint", 
+	"Returns a string with only a single character that is the character with the given *codepoint*.",
 {
 	assert_argc(argc, 1);
 	char * str = basic_alloc(2);
@@ -32,7 +46,11 @@ FUNCTION(Chr, "codepoint", "Returns a string with only a single character that i
 	return basic_mkstr(str);
 })
 
-FUNCTION(Type, "val", "Returns the name of the type of *val*.",
+FUNCTION(
+	Type, "val", 
+	"Returns the name of the type of *val*.\n"
+	"\n"
+	"Possible types are: *NUM*, *TEXT* and *NULL*.",
 {
 	assert_argc(argc, 1);
 	switch(argv[0].type)
@@ -43,7 +61,11 @@ FUNCTION(Type, "val", "Returns the name of the type of *val*.",
 	}
 })
 
-FUNCTION(Eval, "cmd", "Executes *cmd* and returns its result.",
+FUNCTION(
+	Eval, "cmd", 
+	"Executes *cmd* and returns its result.\n"
+	"\n"
+	"This function will invoke the basic interpreter and can execute arbitrary code.",
 {
 	assert_argc(argc, 1);
 	char const * line = STR(0);
@@ -51,7 +73,9 @@ FUNCTION(Eval, "cmd", "Executes *cmd* and returns its result.",
 	return basic_execute(line);
 })
 
-FUNCTION(Output, "x, y, ...", "Prints the values passed with *...* at the coordinates (*x*, *y*) to the screen.\nReturns the number of symbols written.",
+FUNCTION(
+	Output, "x, y, ...", 
+	"Prints the values passed with *...* at the coordinates (*x*, *y*) to the screen.\nReturns the number of symbols written.",
 {
 	if(argc < 2)
 		basic_error(ERR_ARG_COUNT);
@@ -69,7 +93,9 @@ FUNCTION(Output, "x, y, ...", "Prints the values passed with *...* at the coordi
 	return basic_mknum(len);
 })
 
-FUNCTION(GetKey, "", "Returns the key code of the last key press.",
+FUNCTION(
+	GetKey, "", 
+	"Returns the key code of the last key press.",
 {
 	keyhit_t hit = getkey(false);
 	if(hit.flags & khfKeyPress)
@@ -78,7 +104,9 @@ FUNCTION(GetKey, "", "Returns the key code of the last key press.",
 		return basic_mknum(0);
 })
 
-FUNCTION(WaitKey, "", "Waits for a key press and returns the key code of the pressed key.",
+FUNCTION(
+	WaitKey, "", 
+	"Waits for a key press and returns the key code of the pressed key.",
 {
 	do
 	{
@@ -183,7 +211,7 @@ FUNCTION(Poke, "pointer, byte", "Writes *byte* to the memory address given with 
 	return basic_mknum(val);
 })
 
-FUNCTION(Open, "name, [flags]", "",
+FUNCTION(Open, "name, [flags]", "Opens the given file. If *flags* is 1, the file will be created if it doesn't exist.",
 {
 	if(argc < 1 || argc > 3)
 		basic_error(ERR_ARG_COUNT);
@@ -199,31 +227,44 @@ FUNCTION(Exists, "name", "Returns *True* if a file with the given *name* exists.
 	return basic_mknum(file_get(STR(0), FILE_DEFAULT) != NULL);
 })
 
-FUNCTION(GetSize, "file", "",
+FUNCTION(GetSize, "file", "Gets the size of *file* in bytes.",
 {
 	assert_argc(argc, 1);
 	file_t * file = (void*)(int)NUM(0);
 	return basic_mknum(file_size(file));
 })
 
-FUNCTION(GetType, "file", "",
+FUNCTION(GetType, "file", "Gets the type of *file*.",
 {
 	assert_argc(argc, 1);
 	file_t * file = (void*)(int)NUM(0);
 	return basic_mknum(file_type(file));
 })
 
-FUNCTION(GetData, "file", "",
+FUNCTION(GetData, "file", "Gets a pointer to the *file* data.\nMay be invalidated by Resize.",
 {
 	assert_argc(argc, 1);
 	file_t * file = (void*)(int)NUM(0);
 	return basic_mknum((int)file_data(file));
 })
 
-FUNCTION(Resize, "file, size", "",
+FUNCTION(Resize, "file, size", "Resizes *file* to the given size.",
 {
 	assert_argc(argc, 2);
 	file_t * file = (void*)(int)NUM(0);
 	int size = NUM(1);
 	file_resize(file, size);
+})
+
+FUNCTION(
+	MemToStr, "ptr, size",
+	"Returns a string containing the *size* bytes of data located at address *ptr*.",
+{
+	assert_argc(argc, 2);
+	int len = NUM(1);
+	char const * src = (void*)(int)NUM(0);
+	char * dst = basic_alloc(len + 1);
+	mem_copy(dst, src, len);
+	dst[len] = 0;
+	return basic_mkstr(dst);
 })
