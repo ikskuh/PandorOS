@@ -88,7 +88,7 @@ static file_t * file_new(char const * fileName, int type)
 	return file;
 }
 
-int file_type_by_extension(char const * name)
+int _file_type_by_extension(char const * name)
 {
 	while(*name)
 	{
@@ -100,9 +100,19 @@ int file_type_by_extension(char const * name)
 			return FILE_TEXT;
 		if(filename_eq(name, ".BAS"))
 			return FILE_BASIC;
+		if(*name == '.') {
+			return FILE_UNKNOWN;
+		}
 		name++;
 	}
 	return FILE_INVALID;
+}
+
+int file_type_by_extension(char const * name)
+{
+	int type = _file_type_by_extension(name);
+	debug("'%s' has type %d.\n", name, type);
+	return type;
 }
 
 file_t * file_get(char const * fileName, int flags)
@@ -176,7 +186,10 @@ void file_rename(file_t * file, char const * newName)
 {
 	if(file == NULL)
 		return;
+	if(file_type_by_extension(newName) == FILE_INVALID)
+		basic_error(ERR_INVALID_ARG);
 	str_copy(file->name, newName);
+	file->type = file_type_by_extension(file->name);
 }
 
 /**

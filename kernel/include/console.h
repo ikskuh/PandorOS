@@ -57,6 +57,14 @@ void console_set(console_t *con);
 console_t *console_new();
 
 /**
+ * Creates a new, sized console.
+ * @param w The width of the console
+ * @param h The height of the console
+ * @remarks The size of the console is clamped to the screen size.
+ */
+console_t *console_create(int w, int h);
+
+/**
  * Destroys a console.
  */
 void console_delete(console_t *con);

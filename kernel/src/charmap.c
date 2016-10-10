@@ -12,7 +12,7 @@ static int cy = 0;
 void charmap_open()
 {
 	console_t *prevcon = stdcon;
-	console_t *chcon = console_new();
+	console_t *chcon = console_create(35,19);
 	chcon->flags &= ~CON_AUTOREFRESH;
 	chcon->flags |= CON_NOCURSOR;
 	console_set(chcon);
@@ -23,8 +23,8 @@ void charmap_open()
 	{
 		cls();
 		
-		int left = (chcon->width - 34) / 2;
-		int top = (chcon->height - 17) / 2 - 1;
+		int left = 1; //(chcon->width - 34) / 2;
+		int top = 1; //(chcon->height - 17) / 2;
 		
 		for(int i = 0; i < 16; i++) {
 			setc(
@@ -49,7 +49,7 @@ void charmap_open()
 			}
 		}
 		
-		console_box(chcon, left - 1, top - 1, 35, 18);
+		console_box(chcon, left - 1, top - 1, 35, 19);
 		
 		console_refresh();
 	

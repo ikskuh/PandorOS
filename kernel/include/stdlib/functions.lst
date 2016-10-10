@@ -178,6 +178,12 @@ FUNCTION(Open, "name, [flags]", "",
 	return basic_mknum((int)file_get(name, flags));
 })
 
+FUNCTION(Exists, "name", "Returns *True* if a file with the given *name* exists.",
+{
+	assert_argc(argc, 1);
+	return basic_mknum(file_get(STR(0), FILE_DEFAULT) != NULL);
+})
+
 FUNCTION(GetSize, "file", "",
 {
 	assert_argc(argc, 1);

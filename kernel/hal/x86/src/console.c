@@ -102,9 +102,12 @@ void hal_render_console(console_t const * con, int sx, int sy, int w, int h)
 {
 	w += sx;
 	h += sy;
+	int dx = (WIDTH - con->width) / 2;
+	int dy = ((HEIGHT - 2) - con->height) / 2;
+	
 	for(int y = sy; y < h; y++) {
 		for(int x = sx; x < w; x++) {
-			VIDEO[(y+2) * WIDTH + x] = (struct _vchar) {
+			VIDEO[(dy+y+2) * WIDTH + x + dx] = (struct _vchar) {
 				con->data[con->width * y + x].c,
 				getcolor(con->data[con->width * y + x].attribs),
 			};

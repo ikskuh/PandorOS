@@ -7,6 +7,7 @@
 #define FILE_DATA    2
 #define FILE_TEXT    3
 #define FILE_BASIC   4
+#define FILE_UNKNOWN 5
 
 
 #define FILE_DEFAULT    0

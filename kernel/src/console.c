@@ -11,7 +11,7 @@ int screenwidth, screenheight;
 
 console_t *stdcon = NULL;
 
-#define CON_WANTS_REFRESH(con) ((con) == stdcon && (con)->flags && CON_AUTOREFRESH)
+#define CON_WANTS_REFRESH(con) ((con) == stdcon && (con)->flags & CON_AUTOREFRESH)
 
 void console_init()
 {
@@ -30,10 +30,13 @@ void console_set(console_t *con)
 
 static void _setcursor(console_t *con)
 {
-	if(stdcon->flags & CON_NOCURSOR)
+	if(stdcon->flags & CON_NOCURSOR) {
 		hal_set_cursor(screenwidth, screenheight);
-	else
-		hal_set_cursor(con->cursor.x, con->cursor.y + 2);
+	} else {
+		hal_set_cursor(
+			(screenwidth - con->width) / 2 + con->cursor.x, 
+			(screenheight - con->height) / 2 + con->cursor.y + 1);
+	}
 }
 
 void console_refresh()
@@ -44,9 +47,11 @@ void console_refresh()
 
 console_t *console_new()
 {
-	int w = screenwidth;
-	int h = screenheight - 2;
-	
+	return console_create(screenwidth, screenheight - 2);
+}
+
+console_t *console_create(int w, int h)
+{
 	console_t *con = malloc(sizeof(console_t) + w*h*2);
 	
 	*con = (console_t) {
@@ -112,12 +117,16 @@ void console_scroll(console_t *con, int lines)
 
 void console_setc(console_t *con, int x, int y, char c)
 {
+	if(x < 0 || x >= con->width) return;
+	if(y < 0 || y >= con->height) return;
 	con->data[con->width * y + x] = (attrchar_t) { c, 0x00 };
 	if(CON_WANTS_REFRESH(con))  hal_render_console(con, x, y, 1, 1);
 }
 
 void console_seta(console_t *con, int x, int y, int attribs)
 {
+	if(x < 0 || x >= con->width) return;
+	if(y < 0 || y >= con->height) return;
 	con->data[con->width * y + x].attribs = attribs;
 	if(CON_WANTS_REFRESH(con))  hal_render_console(con, x, y, 1, 1);
 }
