@@ -34,7 +34,7 @@ void hal_debug(char const *fmt, ...)
 
 struct multiboot_header __attribute__((section ("multiboot"))) multibootHeader __attribute__ ((aligned (4))) = {
 	MULTIBOOT_HEADER_MAGIC, 
-	0x00,
+	0x00, // MULTIBOOT_VIDEO_MODE,
 	-(MULTIBOOT_HEADER_MAGIC + 0x00),
 	
 	/* These are only valid if MULTIBOOT_AOUT_KLUDGE is set. */
@@ -48,7 +48,7 @@ struct multiboot_header __attribute__((section ("multiboot"))) multibootHeader _
 	0, // mode_type;
 	0, // width;
 	0, // height;
-	0, // depth;
+	32, // depth;
 };
 
 struct idt
@@ -86,7 +86,7 @@ optiongroup_t halOptions = {
 	"x86 Options", NULL, NULL
 };
 
-void x86video_init();
+void x86video_init(struct multiboot_info const * info);
 
 extern bool kbddrvLogKeys;
 
@@ -130,7 +130,7 @@ void x86_init(uint32_t bootmagic, struct multiboot_info const * info)
 	
 	optiongroup_register(&halOptions);
 	
-	x86video_init();
+	x86video_init(info);
 	
 	option_add(&halOptions, &halOptKeyboardLog);
 	

@@ -41,8 +41,6 @@ typedef union {
 
 static value_t result;
 
-static allocator_t * argalloc;
-
 }
 
 %token_type {token_t}  
@@ -140,13 +138,13 @@ expr(A) ::= FUN(F) arglist(B) BRC. {
 arglist(A) ::= . { A.arg = NULL; }
 
 arglist(A) ::= expr(B). { 
-	A.arg = allocator_alloc(argalloc);
+	A.arg = basic_alloc(sizeof(arg_t));
 	A.arg->value = B.val;
 	A.arg->next = NULL;
 }
 
 arglist(A) ::= expr(B) COMMA arglist(C). {
-	A.arg = allocator_alloc(argalloc);
+	A.arg = basic_alloc(sizeof(arg_t));
 	A.arg->value = B.val;
 	A.arg->next = C.arg;
 }
@@ -171,8 +169,6 @@ arglist(A) ::= expr(B) COMMA arglist(C). {
 		// hexdump("Executed Code", tokens, length);
 		
 		void* pParser = ParseAlloc (malloc);
-		
-		argalloc = allocator_new(sizeof(arg_t));
 		
 		int conditionalMode = 0;
 		
@@ -317,6 +313,8 @@ arglist(A) ::= expr(B) COMMA arglist(C). {
 					{
 						debug("Huh? conditionalMode=%d\n", conditionalMode);
 					}
+					// TODO: Evaluate if this actually solves memory leaking
+					basic_memreset();
 				}
 				else
 				{
@@ -326,11 +324,15 @@ arglist(A) ::= expr(B) COMMA arglist(C). {
 			}
 			else if(token_type == TOKEN_EXIT)
 			{
-				break;
+				if(conditionalMode != 3)
+					break;
+				conditionalMode = 0;
 			}
 			else if(token_type == TOKEN_STOP)
 			{
-				basic_stop_silent = true;
+				if(conditionalMode != 3)
+					basic_stop_silent = true;
+				conditionalMode = 0;
 			}
 			else if(token_type == TOKEN_WHITESPACE || token_type == TOKEN_EMPTY) 
 			{
@@ -344,8 +346,6 @@ arglist(A) ::= expr(B) COMMA arglist(C). {
 				break;
 		}
 		ParseFree(pParser, free );
-		
-		allocator_delete(argalloc);
 		
 		return result;
 	}

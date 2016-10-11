@@ -16,11 +16,17 @@ extern jmp_buf errorhandler;
 /**
  * Throws an error.
  */
-void basic_error(error_t reason)
+void _basic_error(error_t reason)
 {
 	if(reason == ERR_SUCCESS) return;
 	longjmp(errorhandler, reason);
 	printf("?longjmp?");
+}
+
+void _basic_error_dbg(error_t reason, char const * file, int line)
+{
+	debug("ERR %d: %s:%d\n", reason, file, line);
+	_basic_error(reason);
 }
 
 static page_t stringpage;
@@ -76,11 +82,16 @@ void basic_memreset()
 {
 	basicmemory = pmm_getptr(stringpage);
 	mem_set(basicmemory, '?', PMM_PAGESIZE);
+	
+	debug("MEMRESET: %d\n", basicmemory);
 }
 
 void *basic_alloc(size_t size)
 {
 	void *ptr = basicmemory;
+	
+	debug("ALLOC(%d) = %x\n", size, ptr);
+	
 	basicmemory += size;
 	return ptr;
 }

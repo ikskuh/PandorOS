@@ -16,6 +16,22 @@ ORDER(DEFAULT, Print, "...", "Prints its arguments and adds a newline.",
 	return basic_mknull();
 })
 
+ORDER(DEFAULT, ClearScr, "", "Clears the screen.",
+{
+	assert_argc(argc, 0);
+	cls();
+})
+
+ORDER(DEFAULT, Cursor, "state", "Enables or disables the cursor.",
+{
+	assert_argc(argc, 1);
+	if(NUM(0) != 0) {
+		stdcon->flags &= ~CON_NOCURSOR;
+	} else {
+		stdcon->flags |=  CON_NOCURSOR;
+	}
+})
+
 ORDER(DEFAULT, PrintSep, "separator", "Sets the separator that will be printed inbetween the arguments to *Print*.",
 {
 	assert_argc(argc, 1);

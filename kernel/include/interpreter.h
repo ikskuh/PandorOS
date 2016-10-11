@@ -97,7 +97,11 @@ value_t basic_mkflow(int cflow, bool condition);
 /**
  * Throws an error.
  */
-void basic_error(error_t reason);
+void _basic_error(error_t reason);
+
+void _basic_error_dbg(error_t reason, char const * file, int line);
+
+#define basic_error(r) _basic_error_dbg((r), __FILE__, __LINE__)
 
 /**
  * Returns the last error that occured.

@@ -204,6 +204,9 @@ void shell_main()
 		
 		shell_execute();
 		
+		stdcon->flags &= ~CON_NOCURSOR;
+		stdcon->flags |=  CON_AUTOREFRESH;
+		
 		// Rerender the console window after each command.
 		console_refresh();
 	}
