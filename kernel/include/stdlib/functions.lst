@@ -133,14 +133,14 @@ FUNCTION(
 {
 	assert_argc(argc, 1);
 	return basic_mknum((int)NUM(0));
-});
+})
 
 FUNCTION(
 	Round, "x", "Returns x rounded to the next integer.",
 {
 	assert_argc(argc, 1);
 	return basic_mknum((int)(NUM(0) + 0.5));
-});
+})
 
 FUNCTION(Sum, "...", "Sums up all arguments.",
 {
