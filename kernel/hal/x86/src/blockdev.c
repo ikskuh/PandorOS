@@ -278,8 +278,11 @@ bool hal_write_block(int devid, int lba, void const * buffer)
 	uint32_t off = 0;
 	while(num-- > 0) {
 		uint8_t stat;
-		while(((stat = status(dev)) & (ERR | DRQ)) == 0);
-		if(stat & 0x01) {
+		while(((stat = status(dev)) & (ERR | RDY)) == 0)
+		{
+			hal_debug("Status(ATA, Write) = %b\n", stat);
+		}
+		if(stat & ERR) {
 			hal_debug("Failed to write to %s.\n", dev->name);
 			return false;
 		}
@@ -293,8 +296,11 @@ bool hal_write_block(int devid, int lba, void const * buffer)
 		}
 		
 		outb(ports.cmd, 0xE7); // Flush
-		while(((stat = status(dev)) & (ERR | RDY)) == 0);
-		if(stat & 0x01) {
+		while(((stat = status(dev)) & (ERR | RDY)) == 0)
+		{
+			hal_debug("Status(ATA, Flush) = %b\n", stat);
+		}
+		if(stat & ERR) {
 			hal_debug("Failed to read from %s.\n", dev->name);
 			return false;
 		}

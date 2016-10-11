@@ -221,6 +221,17 @@ FUNCTION(Open, "name, [flags]", "Opens the given file. If *flags* is 1, the file
 	return basic_mknum((int)file_get(name, flags));
 })
 
+FUNCTION(
+	GetStor, "file",
+	"Returns the name of the storage device this *file* is associated with.",
+{
+	assert_argc(argc, 1);
+	file_t * file = (void*)(int)NUM(0);
+	if(file == NULL)
+		basic_error(ERR_INVALID_FILE);
+	return basic_mkstr(file_storage(file)->name);
+})
+
 FUNCTION(Exists, "name", "Returns *True* if a file with the given *name* exists.",
 {
 	assert_argc(argc, 1);

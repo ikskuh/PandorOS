@@ -89,6 +89,10 @@ void * file_data(file_t * file);
  */
 void file_resize(file_t * file, int size);
 
+/**
+ * Returns the storage of the file.
+ */
+storage_t const * file_storage(file_t *file);
 
 file_t * file_first();
 

@@ -18,6 +18,8 @@ struct file
 	void * data;
 	int size;
 	
+	storage_t const * origin;
+	
 	struct file * next;
 };
 
@@ -56,6 +58,7 @@ void file_init()
 					ptr += 0x10;
 					
 					file_t *f = file_get(name, FILE_NEW);
+					f->origin = storage_bootrom;
 					file_resize(f, size);
 					mem_copy(file_data(f), ptr, size);
 					
@@ -75,7 +78,7 @@ static file_t * file_new(char const * fileName, int type)
 	mem_set(file->data, 0, 1);
 	file->size = 0;
 	file->next = NULL;
-	
+	file->origin = storage_inram;
 	
 	if(first == NULL) {
 		first = file;
@@ -218,7 +221,13 @@ void file_delete(file_t * file)
 	free(file);
 }
 
-
+storage_t const * file_storage(file_t *file)
+{
+	if(file == NULL)
+		return NULL;
+	else
+		return file->origin;
+}
 
 
 void file_clearfs()
@@ -342,6 +351,7 @@ void file_loadfs(storage_t const * storage)
 			sio_read(&read, name, 0x10);
 			
 			file_t *f = file_get(name, FILE_NEW);
+			f->origin = storage;
 			file_resize(f, size);
 			sio_read(&read, file_data(f), size);
 		}

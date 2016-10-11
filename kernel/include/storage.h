@@ -2,6 +2,9 @@
 
 #include <stdint.h>
 
+#define STORAGE_BOOTROM -2
+#define STORAGE_INRAM   -1
+
 typedef struct chs
 {
 	unsigned head      :  8;
@@ -34,6 +37,9 @@ typedef struct storage
 	partition_t partition;
 	struct storage * next;
 } storage_t;
+
+extern storage_t const * storage_inram;
+extern storage_t const * storage_bootrom;
 
 void storage_init();
 

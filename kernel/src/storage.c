@@ -5,8 +5,28 @@
 
 static storage_t *storages = NULL;
 
+storage_t const * storage_inram;
+storage_t const * storage_bootrom;
+
 void storage_init()
 {
+	{ // Setup inram storage
+		storage_t * store = malloc(sizeof(storage_t));
+		str_copy(store->name, "RAM");
+		store->device = STORAGE_INRAM;
+		store->next = storages;
+		storages = store;
+		storage_inram = store;
+	}
+	{ // Setup bootrom storage
+		storage_t *store = malloc(sizeof(storage_t));
+		str_copy(store->name, "ROM");
+		store->device = STORAGE_BOOTROM;
+		store->next = storages;
+		storages = store;
+		storage_bootrom = store;
+	}
+
 	int cnt = hal_devcount();
 	for(int i = 0; i < cnt; i++)
 	{
@@ -18,6 +38,31 @@ void storage_init()
 		
 		mbr_t mbr;
 		hal_read_block(i, 0, &mbr);
+		
+		uint32_t * blockMagic = (void*)&mbr;
+		if(*blockMagic == 0xD05E4ABC)
+		{
+			debug("Device is non-partitioned data.\n");
+			storage_t *store = malloc(sizeof(storage_t));
+				
+			// Setup
+			str_copy(store->name, hal_devname(i));
+			store->device = i;
+			store->partition = (partition_t) {
+				0x00,
+				{ 1, 1, 1 }, // CHS Start
+				0x7F,
+				{ 10, 10, 10 }, // CHS End?
+				1, // LBA
+				2880, // TODO: Set correct device size. Currently, its a 3.5" Floppy with 1.44 MB
+			};
+			
+			// Enlist
+			store->next = storages;
+			storages = store;
+			
+			continue;
+		}
 		
 		if(mbr.signature != 0xAA55) {
 			debug("Invalid MBR signature: %X\n", mbr.signature);

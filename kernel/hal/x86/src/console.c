@@ -66,7 +66,7 @@ void x86video_init()
 	option_add(&halOptions, &halOptConsoleHighlight);
 	option_add(&halOptions, &halOptConsoleBoldtext);
 	
-	set_text_mode(1);
+	// set_text_mode(1);
 }
 
 static void displaycursor(uint8_t col, uint8_t row)
