@@ -6,6 +6,9 @@
 #include "debug.h"
 #include "basic/lexer.h"
 
+
+#define cmd_eq(a, b) str_eqi((a), (b))
+
 // declared in grammar.lg
 extern bool errorhandler_valid;
 extern jmp_buf errorhandler;
@@ -324,7 +327,7 @@ basfunc_f basic_getfunc(int type, char const *name)
 	{
 		if(functions[i].type != type)
 			continue;
-		if(str_eq(name, functions[i].name))
+		if(cmd_eq(name, functions[i].name))
 			return functions[i].func;
 	}
 	return NULL;
