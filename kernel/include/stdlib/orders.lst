@@ -211,13 +211,19 @@ ORDER(DEFAULT, Refresh, "[state]", "If *state* is not given, this order refreshe
 	}
 })
 
-ORDER(DEFAULT, ListFS, "", "Lists all files of the inram file system.",
+IMPORT(static void render_filelist(storage_t const * sto)
 {
-	assert_argc(argc, 0);
-	
+	bool any = false;
 	int columnWidth = 8;
 	for(file_t *f = file_first(); f != NULL; f = file_next(f))
 	{
+		if(sto != NULL && file_storage(f) != sto)
+			continue;
+		if(!any) {
+			if(sto != NULL)
+				printf("==[ %s ]==\n", sto->name);
+			any = true;
+		}
 		char const *name = file_getname(f);
 		int len = str_len(name);
 		if(stdcon->cursor.x + len + 1 >= stdcon->width) {
@@ -226,7 +232,18 @@ ORDER(DEFAULT, ListFS, "", "Lists all files of the inram file system.",
 		printf("%s ", name);
 		stdcon->cursor.x = (stdcon->cursor.x + (columnWidth - 1)) & ~(columnWidth - 1);
 	}
-	printf("\n");
+	if(any)
+		printf("\n");
+})
+
+ORDER(DEFAULT, ListFS, "", "Lists all files of the inram file system.",
+{
+	assert_argc(argc, 0);
+	
+	for(storage_t const * sto = storage_first(); sto != NULL; sto = sto->next)
+	{
+		render_filelist(sto);
+	}
 })
 
 ORDER(DEFAULT, ClearFS, "", "Deletes all files from the inram file system.",
