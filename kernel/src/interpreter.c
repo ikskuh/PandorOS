@@ -300,7 +300,6 @@ value_t basic_execute(char const *input)
 }
 
 
-	
 struct basreg {
 	char name[64];
 	int type;

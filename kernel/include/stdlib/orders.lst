@@ -258,7 +258,7 @@ ORDER(DEFAULT, InitFS, "storage", "Initializes a new file system on the *storage
 	string_t storname = STR(0);
 	
 	storage_t const * storage = storage_get(storname);
-	if(storage == NULL) {
+	if(storage == NULL || storage->device < 0) {
 		basic_error(ERR_INVALID_STORAGE);
 	}
 	
@@ -271,24 +271,51 @@ ORDER(DEFAULT, LoadFS, "storage", "Loads all files from the *storage* media into
 	string_t storname = STR(0);
 	
 	storage_t const * storage = storage_get(storname);
-	if(storage == NULL) {
+	if(storage == NULL || storage->device < 0) {
 		basic_error(ERR_INVALID_STORAGE);
 	}
 	
 	file_loadfs(storage);
 })
 
-ORDER(DEFAULT, SaveFS, "storage", "Saves all files from the inram file system to the *storage* media.",
+ORDER(DEFAULT, Backup, "storage", "Saves all files from the inram file system to the *storage* media.",
 {
 	assert_argc(argc, 1);
 	string_t storname = STR(0);
 	
 	storage_t const * storage = storage_get(storname);
-	if(storage == NULL) {
+	if(storage == NULL || storage->device < 0) {
 		basic_error(ERR_INVALID_STORAGE);
 	}
 	
-	file_savefs(storage);
+	file_savefs(storage, false);
+})
+
+ORDER(DEFAULT, Sync, "",
+	"Writes all files to their associated storage devices. "
+	"This will create a save of the current inram system with the correct devices attached.",
+{
+	assert_argc(argc, 0);
+	for(storage_t const * it = storage_first(); it != NULL; it = it->next)
+	{
+		// Skip invalid devices
+		if(it->device < 0)
+			continue;
+		file_savefs(it, true);
+	}
+})
+
+ORDER(DEFAULT, Move, "file, storage",
+	"Moves a *file* to a given *storage*.",
+{
+	assert_argc(argc, 2);
+	file_t * file = file_get(STR(0), FILE_DEFAULT);
+	storage_t const * storage = storage_get(STR(1));
+	if(file == NULL)
+		basic_error(ERR_INVALID_FILE);
+	if(storage == NULL)
+		basic_error(ERR_INVALID_STORAGE);
+	file_move(file, storage);
 })
 
 ORDER(DEFAULT, ListStor, "", "Lists all possible storage medias.",

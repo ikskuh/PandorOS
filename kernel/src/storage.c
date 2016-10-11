@@ -8,6 +8,8 @@ static storage_t *storages = NULL;
 storage_t const * storage_inram;
 storage_t const * storage_bootrom;
 
+#define stor_eq(a,b) str_eqi((a), (b))
+
 void storage_init()
 {
 	{ // Setup inram storage
@@ -123,7 +125,7 @@ storage_t const * storage_get(char const * name)
 {
 	for(storage_t const * it = storage_first(); it != NULL; it = it->next)
 	{
-		if(str_eq(it->name, name)) {
+		if(stor_eq(it->name, name)) {
 			return it;
 		}
 	}

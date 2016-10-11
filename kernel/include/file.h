@@ -2,6 +2,8 @@
 
 #include "storage.h"
 
+#include <stdbool.h>
+
 #define FILE_INVALID 0
 #define FILE_PROGRAM 1
 #define FILE_DATA    2
@@ -40,8 +42,10 @@ void file_loadfs(storage_t const * storage);
 
 /**
  * Stores the current inram FS to a storage device.
+ * @param storage The storage device for which the save process should be done.
+ * @param filter  If true, only files associated with the device will be stored.
  */
-void file_savefs(storage_t const * storage);
+void file_savefs(storage_t const * storage, bool filter);
 
 /** 
  * Gets or creates a new file.
@@ -55,6 +59,13 @@ file_t * file_get(char const * fileName, int flags);
  * Renames the given file.
  */
 void file_rename(file_t * file, char const * newName);
+
+/**
+ * Changes the storage association of a file.
+ * @param file    The file that should be moved.
+ * @param storage The storage the file should be moved to.
+ */
+void file_move(file_t * file, storage_t const * storage);
 
 /**
  * Deletes the given file.

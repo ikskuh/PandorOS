@@ -229,6 +229,13 @@ storage_t const * file_storage(file_t *file)
 		return file->origin;
 }
 
+void file_move(file_t * file, storage_t const * storage)
+{
+	if(file == NULL)
+		return;
+	file->origin = storage;
+}
+
 
 void file_clearfs()
 {
@@ -361,7 +368,7 @@ void file_loadfs(storage_t const * storage)
 /**
  * Stores the current inram FS to a storage device.
  */
-void file_savefs(storage_t const * storage)
+void file_savefs(storage_t const * storage, bool filter)
 {
 	if(storage == NULL)
 		return;
@@ -382,6 +389,8 @@ void file_savefs(storage_t const * storage)
 	for(file_t *it = first; it != NULL; it = it->next)
 	{
 		if(it->size == 0) 
+			continue;
+		if(filter && it->origin != storage)
 			continue;
 		char name[16];
 		str_copy(name, it->name);
