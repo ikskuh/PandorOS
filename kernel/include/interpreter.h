@@ -75,6 +75,11 @@ number_t basic_getnum(value_t value);
 string_t basic_getstr(value_t value);
 
 /**
+ * Extracts the pointer from a value.
+ */
+void * basic_getptr(value_t value, int type);
+
+/**
  * Makes a numeric value.
  */
 value_t basic_mknum(number_t num);
@@ -83,6 +88,11 @@ value_t basic_mknum(number_t num);
  * Makes a string value.
  */
 value_t basic_mkstr(string_t num);
+
+/**
+ * Makes a typed pointer value.
+ */
+value_t basic_mkptr(void *value, int type);
 
 /**
  * Makes a null value.

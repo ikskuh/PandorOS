@@ -30,6 +30,7 @@ value_t getarg(int argc, value_t *argv, int i)
 
 #define STR(n) basic_getstr(getarg(argc, argv, n))
 #define NUM(n) basic_getnum(getarg(argc, argv, n))
+#define PTR(n,t) basic_getptr(getarg(argc, argv, n), t)
 
 #define IMPORT(x) x
 #define FUNCTION(name, synpsis, desc, code) static value_t fun_##name(int argc, value_t *argv) { code return basic_mknull(); }

@@ -5,13 +5,22 @@ FUNCTION(
 	"\n"
 	"*val* can be any type that is printable to the console, even NULL values are allowed.\n"
 	"The function will return a string value that contains *val* converted into a text.",
-	{
-		assert_argc(argc, 1);
-		int len = str_printf(NULL, "%v", argv[0]);
-		char * result = basic_alloc(len + 1);
-		str_printf(result, "%v", argv[0]);
-		return basic_mkstr(result);
-	})
+{
+	assert_argc(argc, 1);
+	int len = str_printf(NULL, "%v", argv[0]);
+	char * result = basic_alloc(len + 1);
+	str_printf(result, "%v", argv[0]);
+	return basic_mkstr(result);
+})
+	
+FUNCTION(
+	Ptr, "addr",
+	"Converts the number *addr* to a raw pointer.",
+{
+	assert_argc(argc, 1);
+	int ref = NUM(0);
+	return basic_mkptr((void*)ref, PTR_RAW);
+})
 
 FUNCTION(
 	ToNum, "val", 
@@ -21,6 +30,9 @@ FUNCTION(
 	"The function will return the value into a number and returns it.",
 {
 	assert_argc(argc, 1);
+	if(argv[0].type == TYPE_PTR) {
+		return basic_mknum((int)argv[0].pointer.ref);
+	}
 	int len = str_printf(NULL, "%v", argv[0]);
 	char result[len + 1];
 	str_printf(result, "%v", argv[0]);
@@ -55,9 +67,15 @@ FUNCTION(
 	assert_argc(argc, 1);
 	switch(argv[0].type)
 	{
+		case TYPE_NULL: return basic_mkstr("NULL");
 		case TYPE_NUM:  return basic_mkstr("NUM");
 		case TYPE_TEXT: return basic_mkstr("TEXT");
-		default:        return basic_mkstr("NULL");
+		case TYPE_PTR: {
+			char * name = basic_alloc(10);
+			str_printf(name, "PTR'%d", argv[0].pointer.type);
+			return basic_mkstr(name);
+		}
+		default:        return basic_mkstr("???");
 	}
 })
 
@@ -199,40 +217,48 @@ FUNCTION(Malloc, "len", "Allocates *len* bytes of memory and returns a pointer t
 {
 	if(argc != 1) basic_error(ERR_ARG_COUNT);
 	int len = NUM(0);
-	return basic_mknum((int)malloc(len));
+	return basic_mkptr(malloc(len), PTR_RAW);
 })
 
 FUNCTION(Free, "pointer", "Frees the *pointer* previously allocated by *Malloc()*.",
 {
 	if(argc != 1) basic_error(ERR_ARG_COUNT);
-	void *ptr = (void*)(int)NUM(0);
+	void *ptr = PTR(0, PTR_RAW);
 	free(ptr);
 })
 
 FUNCTION(Peek, "pointer", "Reads the byte from memory address given with *pointer*.",
 {
 	if(argc != 1) basic_error(ERR_ARG_COUNT);
-	uint8_t * ptr = (uint8_t*)(int)NUM(0);
+	uint8_t * ptr = PTR(0, PTR_RAW);
 	return basic_mknum(*ptr);
 })
 
 FUNCTION(Poke, "pointer, byte", "Writes *byte* to the memory address given with *pointer*.",
 {
 	if(argc != 2) basic_error(ERR_ARG_COUNT);
-	uint8_t * ptr = (uint8_t*)(int)NUM(0);
+	uint8_t * ptr = PTR(0, PTR_RAW);
 	int val = NUM(1);
 	*ptr = val;
 	return basic_mknum(val);
 })
 
-FUNCTION(Open, "name, [flags]", "Opens the given file. If *flags* is 1, the file will be created if it doesn't exist.",
+FUNCTION(
+	Open, "name, [flags]", 
+	"Opens the given file. If *flags* is 1, the file will be created if it doesn't exist.\n"
+	"\n"
+	"If the file does not exist and it won't be created, an error is thrown.",
 {
 	if(argc < 1 || argc > 3)
 		basic_error(ERR_ARG_COUNT);
 	string_t name = STR(0);
 	int flags = (argc > 1) ? NUM(1) : FILE_DEFAULT;
 	
-	return basic_mknum((int)file_get(name, flags));
+	file_t * file = file_get(name, flags);
+	if(file == NULL)
+		basic_error(ERR_INVALID_FILE);
+	
+	return basic_mkptr(file, PTR_FILE);
 })
 
 FUNCTION(
@@ -240,13 +266,15 @@ FUNCTION(
 	"Returns the name of the storage device this *file* is associated with.",
 {
 	assert_argc(argc, 1);
-	file_t * file = (void*)(int)NUM(0);
+	file_t * file = PTR(0, PTR_FILE);
 	if(file == NULL)
 		basic_error(ERR_INVALID_FILE);
 	return basic_mkstr(file_storage(file)->name);
 })
 
-FUNCTION(Exists, "name", "Returns *True* if a file with the given *name* exists.",
+FUNCTION(
+	Exists, "name", 
+	"Returns *True* if a file with the given *name* exists.",
 {
 	assert_argc(argc, 1);
 	return basic_mknum(file_get(STR(0), FILE_DEFAULT) != NULL);
@@ -255,28 +283,28 @@ FUNCTION(Exists, "name", "Returns *True* if a file with the given *name* exists.
 FUNCTION(GetSize, "file", "Gets the size of *file* in bytes.",
 {
 	assert_argc(argc, 1);
-	file_t * file = (void*)(int)NUM(0);
+	file_t * file = PTR(0, PTR_FILE);
 	return basic_mknum(file_size(file));
 })
 
 FUNCTION(GetType, "file", "Gets the type of *file*.",
 {
 	assert_argc(argc, 1);
-	file_t * file = (void*)(int)NUM(0);
+	file_t * file = PTR(0, PTR_FILE);
 	return basic_mknum(file_type(file));
 })
 
 FUNCTION(GetData, "file", "Gets a pointer to the *file* data.\nMay be invalidated by Resize.",
 {
 	assert_argc(argc, 1);
-	file_t * file = (void*)(int)NUM(0);
+	file_t * file = PTR(0, PTR_FILE);
 	return basic_mknum((int)file_data(file));
 })
 
 FUNCTION(Resize, "file, size", "Resizes *file* to the given size.",
 {
 	assert_argc(argc, 2);
-	file_t * file = (void*)(int)NUM(0);
+	file_t * file = PTR(0, PTR_FILE);
 	int size = NUM(1);
 	file_resize(file, size);
 })
@@ -287,7 +315,7 @@ FUNCTION(
 {
 	assert_argc(argc, 2);
 	int len = NUM(1);
-	char const * src = (void*)(int)NUM(0);
+	char const * src = PTR(0, PTR_RAW);
 	char * dst = basic_alloc(len + 1);
 	mem_copy(dst, src, len);
 	dst[len] = 0;

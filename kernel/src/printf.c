@@ -85,6 +85,21 @@ int gprintf(void (*_putc)(char c), char const *fmt, va_list list)
 							}
 							break;
 						}
+						case TYPE_PTR:
+						{
+							PUTC('0');
+							PUTC('x');
+							int len = int_to_string(buffer, (int)val.pointer.ref, 16);
+							for(int i = 0; i < len; i++) {
+								PUTC(buffer[i]);
+							}
+							PUTC('\'');
+							len = int_to_string(buffer, val.pointer.type, 10);
+							for(int i = 0; i < len; i++) {
+								PUTC(buffer[i]);
+							}
+							break;
+						}
 						case TYPE_TEXT:
 						{
 							char const *str = val.string;

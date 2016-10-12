@@ -53,6 +53,13 @@ string_t basic_getstr(value_t value)
 	return value.string;
 }
 
+void * basic_getptr(value_t value, int type)
+{
+	if(value.type != TYPE_PTR) basic_error(ERR_INVALID_ARG);
+	if(type != PTR_RAW && value.pointer.type != type) basic_error(ERR_INVALID_PTR);
+	return value.pointer.ref;
+}
+
 value_t basic_mknum(number_t num)
 {
 	value_t val;
@@ -66,6 +73,15 @@ value_t basic_mkstr(string_t str)
 	value_t val;
 	val.type = TYPE_TEXT;
 	val.string = str;
+	return val;
+}
+
+value_t basic_mkptr(void *value, int type)
+{
+	value_t val;
+	val.type = TYPE_PTR;
+	val.pointer.type = type;
+	val.pointer.ref = value;
 	return val;
 }
 
