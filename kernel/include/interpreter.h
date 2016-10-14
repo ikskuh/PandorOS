@@ -9,10 +9,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#define BASIC_FUNCTION 1
-#define BASIC_ORDER    2
-#define BASIC_CFLOW    3
-
 /**
  * If this variable is set to true, the basic execution will halt.
  */
@@ -52,7 +48,7 @@ value_t basic_execute2(uint8_t const * tokens, int length);
  * @param function The function itself.
  * @param type     The type of the function (BASIC_ORDER or BASIC_FUNCTION)
  */
-void basic_register(char const *name, basfunc_f function, int type);
+void basic_register(char const *name, basfunc_f function);
 
 /**
  *

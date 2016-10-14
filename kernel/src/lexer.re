@@ -47,14 +47,13 @@ struct token lex(const char *input)
 		ws  = [ \t];
 		var = 'str'[0-9] | [A-Z] | "Ans";
 		ass = "->" | "\x1A";
-		fun = [A-Za-z][A-Za-z0-9]* "(";
+		fun = [A-Za-z][A-Za-z0-9]* [ \t]* "(";
 		com = ",";
 		str = "\"" [^"]* "\"";
-		ord = [A-Za-z][A-Za-z0-9]*;
-		bool = "On" | "Off" | "True" | "False";
+		bool = 'On' | 'Off' | 'True' | 'False';
 
 		*        { return (struct token){ TOKEN_INVALID, 0 }; }
-		"0x00"   { return (struct token){ TOKEN_EMPTY, 0 }; }
+		'0x00'   { return (struct token){ TOKEN_EMPTY, 0 }; }
 		dec      { return (struct token){ TOK_INTEGER, index }; }
 		":"      { return (struct token){ TOKEN_EOL, index }; }
 		"+"      { return (struct token){ TOK_PLUS, index }; }
@@ -71,18 +70,16 @@ struct token lex(const char *input)
 		"\"" ([\x01-\x21\x23-\xFF])* "\""      { return (struct token){ TOK_STRING, index }; }
 		bool     { return (struct token){ TOK_BOOL, index }; }
 		
-		" And "  { return (struct token){ TOK_AND, index }; }
-		" Xor "  { return (struct token){ TOK_XOR, index }; }
-		" Or "   { return (struct token){ TOK_OR, index }; }
-		"Not "   { return (struct token){ TOK_NOT, index }; }
+		' And '  { return (struct token){ TOK_AND, index }; }
+		' Xor '  { return (struct token){ TOK_XOR, index }; }
+		' Or '   { return (struct token){ TOK_OR, index }; }
+		'Not '   { return (struct token){ TOK_NOT, index }; }
 		
-		"Label" ws+ [A-Za-z0-9_]+  { return (struct token){ TOKEN_LABEL, index }; }
-		"Goto" ws+ [A-Za-z0-9_]+   { return (struct token){ TOKEN_GOTO, index }; }
-		"If"     { return (struct token){ TOKEN_IF, index }; }
-		"Stop"   { return (struct token){ TOKEN_STOP, index }; }
-		"Exit"   { return (struct token){ TOKEN_EXIT, index }; }
-		
-		ord      { return (struct token){ TOK_ORDER, index }; }
+		'Label' ws+ [A-Za-z0-9_]+  { return (struct token){ TOKEN_LABEL, index }; }
+		'Goto' ws+ [A-Za-z0-9_]+   { return (struct token){ TOKEN_GOTO, index }; }
+		'If'     { return (struct token){ TOKEN_IF, index }; }
+		'Stop'   { return (struct token){ TOKEN_STOP, index }; }
+		'Exit'   { return (struct token){ TOKEN_EXIT, index }; }
 		
 		"<"      { return (struct token){ TOK_LESS, index }; }
 		"<="     { return (struct token){ TOK_LESSEQ, index }; }

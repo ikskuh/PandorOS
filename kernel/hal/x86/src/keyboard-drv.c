@@ -111,9 +111,10 @@ struct cpu *keyboard_isr(struct cpu *cpu)
 				event.flags = (keyhitflags_t)(event.flags | khfKeyPress);
 			}
 			
-			// TODO: Add variant support with alt-graph here...
 			if(event.flags & khfKeyPress) {
-				if(kbd_is_pressed(VK_SHIFT_LEFT) || kbd_is_pressed(VK_SHIFT_RIGHT)) {
+				if(kbd_is_pressed(VK_ALT_GRAPH)) {
+					event.codepoint = key.variant;
+				} else if(kbd_is_pressed(VK_SHIFT)) {
 					event.codepoint = key.upper;
 				} else {
 					event.codepoint = key.lower;

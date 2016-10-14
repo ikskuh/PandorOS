@@ -25,7 +25,7 @@ static void assert(int x, char const * xstr)
 }
 #define assert(x) assert(x, #x);
 
-basfunc_f basic_getfunc(int type, char const *name);
+basfunc_f basic_getfunc(char const *name);
 
 typedef struct arg {
 	value_t value;
@@ -61,26 +61,6 @@ program ::= expr(A).                  { result = A.val; }
 program ::= expr(A) ASS variable(V).  {
 	var_set(V.var, A.val);
 	result = A.val;
-}
-program ::= ORDER(O) arglist(A). {
-	
-	arg_t *a;
-
-	int cnt = 0;
-	for(a = A.arg; a != NULL; a = a->next)
-	{
-		cnt++;
-	}
-
-	value_t args[cnt];
-	
-	int i;
-	for(a = A.arg, i = 0; a != NULL; a = a->next, i++)
-	{
-		args[i] = a->value;
-	}
-
-	result = O.fun(cnt, args);
 }
 
 variable(V) ::= VAR(A).                { V = A; }
@@ -235,21 +215,7 @@ arglist(A) ::= expr(B) COMMA arglist(C). {
 						i += sizeof(int);
 						
 						if(conditionalMode != 3) {
-							currtok.fun = basic_getfunc(BASIC_FUNCTION, (char const *)&tokens[i]);
-							if(currtok.fun == NULL) {
-								basic_error(ERR_FUNC_NOT_FOUND);
-							}
-						}
-						i += len;
-						
-						break;
-					}
-					case TOK_ORDER:
-					{
-						int len = *((int*)&tokens[i]);
-						i += sizeof(int);
-						if(conditionalMode != 3) {
-							currtok.fun = basic_getfunc(BASIC_ORDER, (char const *)&tokens[i]);
+							currtok.fun = basic_getfunc((char const *)&tokens[i]);
 							if(currtok.fun == NULL) {
 								basic_error(ERR_FUNC_NOT_FOUND);
 							}

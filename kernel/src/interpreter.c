@@ -123,7 +123,7 @@ char const * basic_err_to_string(error_t err)
 	}
 }
 
-basfunc_f basic_getfunc(int type, char const *name);
+basfunc_f basic_getfunc(char const *name);
 
 typedef struct label
 {
@@ -234,7 +234,6 @@ dynmem_t basic_compile(char const * input, int insize)
 					// Both strings are stored with each length+ptr and zero termination.
 					case TOK_FUN:
 					case TOK_VAR:
-					case TOK_ORDER:
 					{
 						int len = token.length;
 						dynmem_write(&bytecode, &len, sizeof(len));
@@ -329,30 +328,26 @@ value_t basic_execute(char const *input)
 
 struct basreg {
 	char name[64];
-	int type;
 	basfunc_f func;
 };
 
 static struct basreg functions[1024];
 static int basfunc_cnt = 0;
 
-void basic_register(char const *name, basfunc_f function, int type)
-{
-	functions[basfunc_cnt] = (struct basreg){ "", type, function };
+void basic_register(char const *name, basfunc_f function)
+{ 
+	functions[basfunc_cnt] = (struct basreg){ "", function };
 	
 	str_copy(functions[basfunc_cnt].name, name);
-	if(type == BASIC_FUNCTION)
-		str_cat(functions[basfunc_cnt].name, "("); // Fancy hack to find the tokens instead of the names.
+	str_cat(functions[basfunc_cnt].name, "("); // Fancy hack to find the tokens instead of the names.
 	
 	++basfunc_cnt;
 }
 
-basfunc_f basic_getfunc(int type, char const *name)
+basfunc_f basic_getfunc(char const *name)
 {
 	for(int i = 0; i < basfunc_cnt; i++)
 	{
-		if(functions[i].type != type)
-			continue;
 		if(cmd_eq(name, functions[i].name))
 			return functions[i].func;
 	}
