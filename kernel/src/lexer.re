@@ -47,7 +47,7 @@ struct token lex(const char *input)
 		ws  = [ \t];
 		var = 'str'[0-9] | [A-Z] | "Ans";
 		ass = "->" | "\x1A";
-		fun = [A-Za-z][A-Za-z0-9]* [ \t]* "(";
+		id  = [A-Za-z][A-Za-z0-9]*;
 		com = ",";
 		str = "\"" [^"]* "\"";
 		bool = 'On' | 'Off' | 'True' | 'False';
@@ -63,8 +63,6 @@ struct token lex(const char *input)
 		"("      { return (struct token){ TOK_BRO, index }; }
 		")"      { return (struct token){ TOK_BRC, index }; }
 		ass      { return (struct token){ TOK_ASS, index }; }
-		var      { return (struct token){ TOK_VAR, index }; }
-		fun      { return (struct token){ TOK_FUN, index }; }
 		com      { return (struct token){ TOK_COMMA, index }; }
 		ws+      { return (struct token){ TOKEN_WHITESPACE, index }; }
 		"\"" ([\x01-\x21\x23-\xFF])* "\""      { return (struct token){ TOK_STRING, index }; }
@@ -81,6 +79,8 @@ struct token lex(const char *input)
 		'Stop'   { return (struct token){ TOKEN_STOP, index }; }
 		'Exit'   { return (struct token){ TOKEN_EXIT, index }; }
 		
+		id       { return (struct token){ TOK_ID, index }; }
+
 		"<"      { return (struct token){ TOK_LESS, index }; }
 		"<="     { return (struct token){ TOK_LESSEQ, index }; }
 		">"      { return (struct token){ TOK_GREATER, index }; }

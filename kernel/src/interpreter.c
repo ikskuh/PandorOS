@@ -232,8 +232,9 @@ dynmem_t basic_compile(char const * input, int insize)
 						break;
 					}
 					// Both strings are stored with each length+ptr and zero termination.
-					case TOK_FUN:
-					case TOK_VAR:
+					// case TOK_FUN:
+					// case TOK_VAR:
+					case TOK_ID:
 					{
 						int len = token.length;
 						dynmem_write(&bytecode, &len, sizeof(len));
@@ -339,7 +340,7 @@ void basic_register(char const *name, basfunc_f function)
 	functions[basfunc_cnt] = (struct basreg){ "", function };
 	
 	str_copy(functions[basfunc_cnt].name, name);
-	str_cat(functions[basfunc_cnt].name, "("); // Fancy hack to find the tokens instead of the names.
+	// str_cat(functions[basfunc_cnt].name, "("); // Fancy hack to find the tokens instead of the names.
 	
 	++basfunc_cnt;
 }
@@ -351,5 +352,6 @@ basfunc_f basic_getfunc(char const *name)
 		if(cmd_eq(name, functions[i].name))
 			return functions[i].func;
 	}
+	debug("Function '%s' not found!\n", name);
 	return NULL;
 }

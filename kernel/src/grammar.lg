@@ -34,9 +34,8 @@ typedef struct arg {
 
 typedef union {
 	value_t val;
-	variable_t * var;
 	arg_t * arg;
-	basfunc_f fun;
+	char * id;
 } token_t;
 
 static value_t result;
@@ -58,12 +57,12 @@ static value_t result;
 	
 program ::= . { result = basic_mknull(); }
 program ::= expr(A).                  { result = A.val; }
-program ::= expr(A) ASS variable(V).  {
-	var_set(V.var, A.val);
+program ::= expr(A) ASS ID(V).  {
+	variable_t * var = var_byname(V.id);
+	if(var == NULL) basic_error(ERR_INVALID_VAR);
+	var_set(var, A.val);
 	result = A.val;
 }
-
-variable(V) ::= VAR(A).                { V = A; }
 
 expr(A) ::= expr(B) MINUS  expr(C). { A.val = val_sub(B.val, C.val); }
 expr(A) ::= expr(B) PLUS   expr(C). { A.val = val_add(B.val, C.val); }
@@ -91,11 +90,13 @@ expr(A) ::= INTEGER(B). { A = B; }
 expr(A) ::= BOOL(B). { A = B; }
 expr(A) ::= STRING(B). { A = B; }
 
-expr(A) ::= VAR(B). { 
-	var_get(B.var, &A.val);
+expr(A) ::= ID(B). { 
+	variable_t * var = var_byname(B.id);
+	if(var == NULL) basic_error(ERR_INVALID_VAR);
+	var_get(var, &A.val);
 }
 
-expr(A) ::= FUN(F) arglist(B) BRC. {
+expr(A) ::= ID(F) BRO arglist(B) BRC. {
 	arg_t *a;
 
 	int cnt = 0;
@@ -111,8 +112,13 @@ expr(A) ::= FUN(F) arglist(B) BRC. {
 	{
 		args[i] = a->value;
 	}
+	
+	basfunc_f fun = basic_getfunc(F.id);
+	if(fun == NULL) {
+		basic_error(ERR_FUNC_NOT_FOUND);
+	}
 
-	A.val = F.fun(cnt, args);
+	A.val = fun(cnt, args);
 }
 
 arglist(A) ::= . { A.arg = NULL; }
@@ -195,30 +201,14 @@ arglist(A) ::= expr(B) COMMA arglist(C). {
 						i += len;
 						break;
 					}
-					case TOK_VAR:
+					case TOK_ID:
 					{
 						int len = *((int*)&tokens[i]);
 						i += sizeof(int);
 						
 						if(conditionalMode != 3) {
-							currtok.var = var_byname((char const *)&tokens[i]);
-							if(currtok.var == NULL) {
-								basic_error(ERR_INVALID_VAR);
-							}
-						}
-						i += len;
-						break;
-					}
-					case TOK_FUN:
-					{
-						int len = *((int*)&tokens[i]);
-						i += sizeof(int);
-						
-						if(conditionalMode != 3) {
-							currtok.fun = basic_getfunc((char const *)&tokens[i]);
-							if(currtok.fun == NULL) {
-								basic_error(ERR_FUNC_NOT_FOUND);
-							}
+							currtok.id = basic_alloc(len + 1);
+							str_copy(currtok.id, (char const *)&tokens[i]);
 						}
 						i += len;
 						
