@@ -63,6 +63,30 @@ program ::= expr(A) ASS ID(V).  {
 	var_set(var, A.val);
 	result = A.val;
 }
+program ::= BANG ID(F) arglist(B). {
+	arg_t *a;
+
+	int cnt = 0;
+	for(a = B.arg; a != NULL; a = a->next)
+	{
+		cnt++;
+	}
+
+	value_t args[cnt];
+	
+	int i;
+	for(a = B.arg, i = 0; a != NULL; a = a->next, i++)
+	{
+		args[i] = a->value;
+	}
+	
+	basfunc_f fun = basic_getfunc(F.id);
+	if(fun == NULL) {
+		basic_error(ERR_FUNC_NOT_FOUND);
+	}
+
+	result = fun(cnt, args);
+}
 
 expr(A) ::= expr(B) MINUS  expr(C). { A.val = val_sub(B.val, C.val); }
 expr(A) ::= expr(B) PLUS   expr(C). { A.val = val_add(B.val, C.val); }
