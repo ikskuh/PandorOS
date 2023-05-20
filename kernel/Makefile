@@ -18,23 +18,24 @@ boot.img: kernel root.pfs
 		kernel \
 		root.pfs \
 		syslinux.cfg \
-		/lib/syslinux/bios/libcom32.c32 \
-		/lib/syslinux/bios/libutil.c32 \
-		/lib/syslinux/bios/menu.c32 \
-		/lib/syslinux/bios/mboot.c32 \
-		/lib/syslinux/bios/poweroff.c32 \
+		/usr/lib/syslinux/libcom32.c32 \
+		/usr/lib/syslinux/libutil.c32 \
+		/usr/lib/syslinux/menu.c32 \
+		/usr/lib/syslinux/mboot.c32 \
+		/usr/lib/syslinux/poweroff.c32 \
 		::
 	syslinux boot.img
 	mdir -i boot.img ::
 
 root.pfs:
 	$(MONO) ../fstools/fstools.exe ../root.pfs/*
-	
+
 harddisk:
 	fallocate -l 32M $@
 	sfdisk $@ < harddisk.sfdisk
 
-kernel: initfiles basicfiles makefile 
+
+kernel: initfiles basicfiles makefile
 	$(MAKE) -B -C build
 	mv build/kernel kernel
 

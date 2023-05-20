@@ -22,11 +22,11 @@ typedef struct
 
 typedef struct console
 {
-	const int width;
-	const int height;
+	int width;
+	int height;
 	int flags;
 	struct { int x, y; } cursor;
-	attrchar_t * const data;
+	attrchar_t * data;
 } console_t;
 
 /**

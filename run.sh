@@ -6,7 +6,6 @@ qemu-system-arm \
 	-m 256 \
 	-kernel kernel.bin \
 	-append "root=/dev/sda" \
-	-localtime \
 	-usb \
 	-usbdevice wacom-tablet \
 	-show-cursor

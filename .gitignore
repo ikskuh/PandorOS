@@ -40,3 +40,4 @@ kernel/root.pfs
 kernel/boot.img
 kernel/harddisk
 extvga/vga
+.vscode/

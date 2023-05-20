@@ -232,8 +232,9 @@ int printf(char const * fmt, ...)
 {
 	va_list list;
 	va_start(list, fmt);
-	return gprintf(putc, fmt, list);
+	int res = gprintf(putc, fmt, list);
 	va_end(list);
+	return res;
 }
 
 void conwrite(char const * text, int length)

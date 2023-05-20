@@ -22,9 +22,9 @@ int ticks = 0;
 
 void os_tick()
 {
-	ticks++;
-	// int_to_string(mainmenu[5].label, ticks, 10);
-	// console_refresh();
+    ticks++;
+    // int_to_string(mainmenu[5].label, ticks, 10);
+    // console_refresh();
 }
 
 jmp_buf errorhandler;
@@ -33,82 +33,89 @@ static error_t lastError = ERR_SUCCESS;
 
 error_t basic_lasterror()
 {
-	return lastError;
+    return lastError;
 }
 
 void os_init()
 {
-	// This allows us to catch all basic_errors that will happen during initiliazation.
-	lastError = (error_t)setjmp(errorhandler);
-	if(lastError != ERR_SUCCESS)
-	{
-		hal_debug("Error while initialization: %s\n", basic_err_to_string(basic_lasterror()));
-		while(1);
-	}
-	
-	{ // Initialize pmm-dependent
-		
-		basic_init();
-		stdlib_init();
-		
-		var_init();
-	}
-	
-	malloc_init();
-	
-	{ // Initialize malloc-dependent
-		console_init();
-		
-		options_init();
-		catalog_init();
-		
-		storage_init();
-		file_init();
-	
-		shell_init(4);
-	}
-	
-	// Make some error wrapper for init script:
-	lastError = (error_t)setjmp(errorhandler);
-	if(lastError == ERR_SUCCESS)
-	{
-		file_t *autorun = file_get(AUTORUN_FILE, FILE_DEFAULT);
-		if(autorun != NULL)
-		{
-			dynmem_t bytecode = basic_compile(
-				file_data(autorun), 
-				file_size(autorun));
-			// TODO: Fix memory leak on error
-			basic_execute2(bytecode.ptr, bytecode.cursor);
-			dynmem_free(&bytecode);
-		}
-		
-		console_refresh();
-	}
-	else
-	{
-		printf("Failed to run " AUTORUN_FILE ": %s\n", basic_err_to_string(lastError));
-	}
-	
-	while(true)
-	{
-		// This will override the initialization error handler and will loop the OS forever :)
-		lastError = (error_t)setjmp(errorhandler);
-		if(lastError == ERR_SUCCESS)
-		{
-			shell_main();
-		}
-		else
-		{
-			printf("ERROR: %s\n", basic_err_to_string(lastError));
-		}
-	}
-	
-	while(true);
-}
+    // This allows us to catch all basic_errors that will happen during initiliazation.
+    lastError = (error_t)setjmp(errorhandler);
+    if (lastError != ERR_SUCCESS)
+    {
+        hal_debug("Error while initialization: %s\n", basic_err_to_string(basic_lasterror()));
+        while (1)
+            ;
+    }
 
+    { // Initialize pmm-dependent
+
+        basic_init();
+        stdlib_init();
+
+        var_init();
+    }
+
+    malloc_init();
+
+    { // Initialize malloc-dependent
+        console_init();
+
+        options_init();
+        catalog_init();
+
+        storage_init();
+        file_init();
+
+        shell_init(4);
+    }
+
+    // Make some error wrapper for init script:
+    lastError = (error_t)setjmp(errorhandler);
+    if (lastError == ERR_SUCCESS)
+    {
+        file_t *autorun = file_get(AUTORUN_FILE, FILE_DEFAULT);
+        if (autorun != NULL)
+        {
+            dynmem_t bytecode = basic_compile(file_data(autorun), file_size(autorun));
+            // TODO: Fix memory leak on error
+            basic_execute2(bytecode.ptr, bytecode.cursor);
+            dynmem_free(&bytecode);
+        }
+
+        console_refresh();
+    }
+    else
+    {
+        printf("Failed to run " AUTORUN_FILE ": %s\n", basic_err_to_string(lastError));
+    }
+
+    while (true)
+    {
+        // This will override the initialization error handler and will loop the OS forever :)
+        lastError = (error_t)setjmp(errorhandler);
+        if (lastError == ERR_SUCCESS)
+        {
+            shell_main();
+        }
+        else
+        {
+            printf("ERROR: %s\n", basic_err_to_string(lastError));
+        }
+    }
+
+    while (true)
+        ;
+}
 
 void os_break()
 {
-	basic_break = 1;
+    basic_break = 1;
+}
+
+void __assert_fail()
+{
+    while (true)
+    {
+        asm volatile("" ::: "memory");
+    }
 }

@@ -7,6 +7,7 @@
 #include "file.h"
 #include "options.h"
 #include "debug.h"
+#include "gc.h"
 #include <stddef.h>
 
 void assert_argc(int argc, int i)

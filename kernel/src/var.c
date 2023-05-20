@@ -7,6 +7,8 @@
 #include <stddef.h>
 #include <stdbool.h>
 
+#define var_eq(a,b) str_eqi((a), (b))
+
 typedef struct variable
 {
 	int type;
@@ -48,8 +50,11 @@ void var_init()
 variable_t * var_byname(char const * name)
 {
 	debug("var-by-name: '%s'\n", name);
-	if(str_eq(name, "Ans")) {
+	if(var_eq(name, "Ans")) {
 		return &variable_ans;
+	}
+	if(var_eq(name, "NULL")) {
+		return &variable_null;
 	}
 	if(str_startswith(name, "Str"))
 	{
